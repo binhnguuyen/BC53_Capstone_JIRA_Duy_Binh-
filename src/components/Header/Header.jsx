@@ -13,8 +13,8 @@ import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import SettingsIcon from '@mui/icons-material/Settings';
-import { Button } from '@mui/material';
-
+import Paper from '@mui/material/Paper';
+import { Button, Container, Divider, Stack } from '@mui/material';
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -58,10 +58,26 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
 }));
 
+const Item = styled(Paper)(({ theme }) => ({
+    backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
+    ...theme.typography.body2,
+    padding: theme.spacing(1),
+    textAlign: 'center',
+    color: theme.palette.text.secondary,
+    flexGrow: 1,
+}));
+
 export default function Header() {
+    const stackSettings = {
+        spacing: 2,
+        direction: "row",
+        justifyContent: "space-between",
+    }
+
     return (
         <Box
             sx={{ flexGrow: 1 }}
+            style={{ width: '100vw', margin: 0 }}
         >
             <AppBar position="static">
                 <Toolbar
@@ -70,149 +86,157 @@ export default function Header() {
                         backgroundColor: "white",
                     }}
                 >
-                    <Typography
-                        variant="h6"
-                        noWrap
-                        component="div"
-                        sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                    <Stack
+                        {...stackSettings}
                     >
-                        <IconButton>
-                            <AppsIcon />
-                            Jira Software
-                        </IconButton>
-                    </Typography>
-                    <Typography
-                        variant="h6"
-                        noWrap
-                        component="div"
-                        sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
-                    >
-                        <IconButton>
-                            Your Work
-                            <KeyboardArrowDownIcon />
-                        </IconButton>
-                    </Typography>
-                    <Typography
-                        variant="h6"
-                        noWrap
-                        component="div"
-                        sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
-                    >
-                        <IconButton>
-                            Projects
-                            <KeyboardArrowDownIcon />
-                        </IconButton>
-                    </Typography>
-                    <Typography
-                        variant="h6"
-                        noWrap
-                        component="div"
-                        sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
-                    >
-                        <IconButton>
-                            Filters
-                            <KeyboardArrowDownIcon />
-                        </IconButton>
-                    </Typography>
-                    <Typography
-                        variant="h6"
-                        noWrap
-                        component="div"
-                        sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
-                    >
-                        <IconButton>
-                            Dashboards
-                            <KeyboardArrowDownIcon />
-                        </IconButton>
-                    </Typography>
-                    <Typography
-                        variant="h6"
-                        noWrap
-                        component="div"
-                        sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
-                    >
-                        <IconButton>
-                            Teams
-                            <KeyboardArrowDownIcon />
-                        </IconButton>
-                    </Typography>
-                    <Typography
-                        variant="h6"
-                        noWrap
-                        component="div"
-                        sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
-                    >
-                        <IconButton>
-                            Plans
-                            <KeyboardArrowDownIcon />
-                        </IconButton>
-                    </Typography>
-                    <Typography
-                        variant="h6"
-                        noWrap
-                        component="div"
-                        sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
-                    >
-                        <IconButton>
-                            Apps
-                            <KeyboardArrowDownIcon />
-                        </IconButton>
-                    </Typography>
-                    <Typography
-                        variant="h6"
-                        noWrap
-                        component="div"
-                        sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
-                    >
-                        <Button variant="contained" size="large">
-                            Create
-                        </Button>
-                    </Typography>
-                    <Search
-                        style={{
-                            border: "1px solid #6B778C"
-                        }}
-                    >
-                        <SearchIconWrapper>
-                            <SearchIcon />
-                        </SearchIconWrapper>
-                        <StyledInputBase
-                            placeholder="Search…"
-                            inputProps={{ 'aria-label': 'search' }}
-                        />
-                    </Search>
-                    <IconButton
-                        variant="h6"
-                        noWrap
-                        component="div"
-                        sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
-                    >
-                        <NotificationsActiveIcon/>
-                    </IconButton>
-                    <IconButton
-                        variant="h6"
-                        noWrap
-                        component="div"
-                        sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
-                    >
-                        <HelpOutlineIcon/>
-                    </IconButton>
-                    <IconButton
-                        variant="h6"
-                        noWrap
-                        component="div"
-                        sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
-                    >
-                        <SettingsIcon/>
-                    </IconButton>
-                    <Typography
-                        variant="h6"
-                        noWrap
-                        component="div"
-                        sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
-                    >
-                        {}
-                    </Typography>
+                        <Stack {...stackSettings}>
+                            <Typography
+                                variant="h6"
+                                noWrap
+                                component="div"
+                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                            >
+                                <IconButton>
+                                    <AppsIcon />
+                                    Jira Software
+                                </IconButton>
+                            </Typography>
+                            <Typography
+                                variant="h6"
+                                noWrap
+                                component="div"
+                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                            >
+                                <IconButton>
+                                    Your Work
+                                    <KeyboardArrowDownIcon />
+                                </IconButton>
+                            </Typography>
+                            <Typography
+                                variant="h6"
+                                noWrap
+                                component="div"
+                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                            >
+                                <IconButton>
+                                    Projects
+                                    <KeyboardArrowDownIcon />
+                                </IconButton>
+                            </Typography>
+                            <Typography
+                                variant="h6"
+                                noWrap
+                                component="div"
+                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                            >
+                                <IconButton>
+                                    Filters
+                                    <KeyboardArrowDownIcon />
+                                </IconButton>
+                            </Typography>
+                            <Typography
+                                variant="h6"
+                                noWrap
+                                component="div"
+                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                            >
+                                <IconButton>
+                                    Dashboards
+                                    <KeyboardArrowDownIcon />
+                                </IconButton>
+                            </Typography>
+                            <Typography
+                                variant="h6"
+                                noWrap
+                                component="div"
+                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                            >
+                                <IconButton>
+                                    Teams
+                                    <KeyboardArrowDownIcon />
+                                </IconButton>
+                            </Typography>
+                            <Typography
+                                variant="h6"
+                                noWrap
+                                component="div"
+                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                            >
+                                <IconButton>
+                                    Plans
+                                    <KeyboardArrowDownIcon />
+                                </IconButton>
+                            </Typography>
+                            <Typography
+                                variant="h6"
+                                noWrap
+                                component="div"
+                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                            >
+                                <IconButton>
+                                    Apps
+                                    <KeyboardArrowDownIcon />
+                                </IconButton>
+                            </Typography>
+                            <Typography
+                                variant="h6"
+                                noWrap
+                                component="div"
+                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                            >
+                                <Button variant="contained" size="large">
+                                    Create
+                                </Button>
+                            </Typography>
+                        </Stack>
+                        <Stack {...stackSettings}>
+                            <Search
+                                style={{
+                                    border: "1px solid #6B778C"
+                                }}
+                            >
+                                <SearchIconWrapper>
+                                    <SearchIcon />
+                                </SearchIconWrapper>
+                                <StyledInputBase
+                                    placeholder="Search…"
+                                    inputProps={{ 'aria-label': 'search' }}
+                                />
+                            </Search>
+                            <IconButton
+                                variant="h6"
+                                noWrap
+                                component="div"
+                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                            >
+                                <NotificationsActiveIcon />
+                            </IconButton>
+                            <IconButton
+                                variant="h6"
+                                noWrap
+                                component="div"
+                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                            >
+                                <HelpOutlineIcon />
+                            </IconButton>
+                            <IconButton
+                                variant="h6"
+                                noWrap
+                                component="div"
+                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                            >
+                                <SettingsIcon />
+                            </IconButton>
+                            <Typography
+                                variant="h6"
+                                noWrap
+                                component="div"
+                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                            >
+                                { }
+                            </Typography>
+                        </Stack>
+                    </Stack>
                 </Toolbar>
             </AppBar>
         </Box>
