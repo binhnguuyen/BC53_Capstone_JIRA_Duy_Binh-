@@ -3,9 +3,9 @@ import { getLocalStorage } from "../utils/helpers";
 import { CURRENT_USER } from "../utils/constants";
 
 const fetcher = axios.create({
-    baseURL: import.meta.env.API_BASE_URL,
+    baseURL: import.meta.env.baseUrl,
     headers: {
-        TokenCybersoft: import.meta.env.CYBERSOFT_TOKEN,
+        TokenCybersoft: import.meta.env.TokenCybersoft,
     }
 });
 
