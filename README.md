@@ -1,8 +1,49 @@
-# React + Vite
+# Cấu trúc dự án
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+- components
+    - Chứa những cái component được tái sử dụng, chủ yếu dùng render UI, không bao hồm những logic (call API)
+    - Ex: Button, Select, Input, Card...
+    - VD:
+        - Header
+        - Footer
+        - SideBar(Collapse Style)
 
-Currently, two official plugins are available:
+- modules/modules-name
+    - Chứa các components cấu thành 1 page, trong các components này sẽ chứa các logic như call API
+    - VD: 
+        - Home
+        - ProjectManagement
+        - UserManagement
+        - CreateProject
+        - Project
+            - ProjectTitle(ProjectName, SearchBar...)
+            - ProjectDetails(BackLog, Selected For Development, In Progress, Done)
+            - CreateTaskButton
+                - CreateTaskModal
+        - AuthenticateRouter
+        -...
+            
+- layouts
+    - Chứa các components layout
+    - VD: 
+        - MainLayout
+            - Header
+            - SideBar(Collapse Style)
+            - Outlet
+            - Footer
+        - AdminLayout
+            - Header
+            - Outlet
+            - Footer
+        - AuthenticationLayout
+            - Header
+            - Outlet
+            - Footer
+        - NotFound
+            - Header
+            - Outlet
+            - Footer
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- apis
+    - Chứa cấu hình mặc định của api
+    - Chứa các function định nghĩa api
