@@ -1,6 +1,6 @@
 import { Box, Button, Card, CardActions, CardContent, CardMedia, Container, Grid, IconButton, MenuItem, Select, Skeleton, Tab, Tabs, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { getAllProject } from '../../apis/project.api';
 import { useQuery } from '@tanstack/react-query';
 import Slider from 'react-slick'
@@ -12,16 +12,12 @@ import Paper from '@mui/material/Paper';
 import PC_Logo from "../../assets/img/PC_Logo.webp"
 import Mobile_Logo from "../../assets/img/Mobile_Logo.png"
 import Software_Logo from "../../assets/img/Software_Logo.jpg"
-import { useDispatch } from 'react-redux';
 
 const Home = () => {
     const navigate = useNavigate();
-    const dispatch = useDispatch();
-
     const [categoryId, setCategoryId] = useState("0");
     const [newDataList, setNewDataList] = useState("");
     const [projectImage, setProjectImage] = useState("");
-    const [searchParams, setSearchParams] = useSearchParams();
 
     const Item = styled(Paper)(({ theme }) => ({
         backgroundColor: theme.palette.mode === 'grey' ? '#1A2027' : '#fff',
@@ -68,16 +64,8 @@ const Home = () => {
 
     const { data = [], isLoading, isError, error } = useQuery({
         queryKey: ["allProject"],
-        queryFn: getAllProject({ page: searchParams.get("page") }),
+        queryFn: getAllProject,
     });
-    console.log('data: ', data);
-    console.log(searchParams.get("page"));
-
-
-    const pages = Array.from(
-        { length: Math.ceil(50 / 10) },
-        (_, index) => index + 1
-    );
 
 
     const handleFirstDataList = () => {
@@ -114,12 +102,7 @@ const Home = () => {
         }
         setNewDataList(newData);
     }
-
-
-    const handleOnChangePage = (page) => {
-        searchParams.set("page", page)
-        setSearchParams(searchParams);
-    };
+    console.log('projectImage: ', projectImage);
 
 
     // khi data thay đổi (>0) thì mặc định render ra thằng đầu tiên
@@ -136,14 +119,10 @@ const Home = () => {
         }
     }, [categoryId]);
 
-    useEffect(() => {
-        dispatch(getAllProject({ page: searchParams.get("page") }));
-    }, [searchParams]);
-    console.log("searchParams", searchParams.get("page"));
-
 
     return (
         <Container style={{ maxWidth: "1600px" }} sx={{ margin: "50px 10px", padding: "50px 10px" }} spacing={4}>
+
             <Select
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
@@ -156,23 +135,6 @@ const Home = () => {
                 <MenuItem value={2}>Dự án phần mềm</MenuItem>
                 <MenuItem value={3}>Dự án Mobile</MenuItem>
             </Select>
-            <Box>
-                {pages.map((page, index) => (
-                    <Button
-                        key = {index}
-                        style={{
-                            border: "solid 2px",
-                            marginRight: 10,
-                            width: 40,
-                            textAlign: "center",
-                            alignItems: "center",
-                        }}
-                        onClick={() => { handleOnChangePage(page) }}
-                    >
-                        {page}
-                    </Button>
-                ))}
-            </Box>
             <Typography variant="h6" style={{ color: `${red[500]}` }}>
                 Có tất cả
                 {
@@ -190,7 +152,7 @@ const Home = () => {
                         newDataList.map((item, index) => (
                             <Card sx={{ height: 520, width: 250, border: `1px ${blue[200]} solid`, margin: "5px 5px" }} key={index}>
                                 <IconButton {...iconButtonSettings}>
-                                    <img src={projectImage} alt="Hình ảnh" style={{ width: "100%", height: 200, display: "inline-block" }} />
+                                    <img src={projectImage} alt="Mobile" style={{ width: "100%", height: 200, display: "inline-block" }} />
                                 </IconButton>
                                 <Typography
                                     variant="h5"
@@ -260,10 +222,10 @@ const Home = () => {
                                 <IconButton {...iconButtonSettings}>
                                     {
                                         item.categoryId === 1 ? (
-                                            <img src={PC_Logo} alt="Web" style={{ width: "100%", height: 200, display: "inline-block" }} />
+                                            <img src={PC_Logo} alt="Mobile" style={{ width: "100%", height: 200, display: "inline-block" }} />
                                         ) : (
                                             item.categoryId === 2 ? (
-                                                <img src={Software_Logo} alt="Software" style={{ width: "100%", height: 200, display: "inline-block" }} />
+                                                <img src={Software_Logo} alt="Mobile" style={{ width: "100%", height: 200, display: "inline-block" }} />
                                             ) : (
                                                 <img src={Mobile_Logo} alt="Mobile" style={{ width: "100%", height: 200, display: "inline-block" }} />
                                             )
