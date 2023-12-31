@@ -77,7 +77,7 @@ export default function Header() {
     return (
         <Box
             sx={{ flexGrow: 1 }}
-            style={{ width: '100vw', margin: 0 }}
+            style={{ width: '100%', margin: 0, position: "fixed", top: 0, zIndex: 1000 }}
         >
             <AppBar position="static">
                 <Toolbar
@@ -92,7 +92,7 @@ export default function Header() {
                         <Stack {...stackSettings}>
                             <Typography
                                 variant="h6"
-                                noWrap
+                                nowrap="true"
                                 component="div"
                                 sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
                             >
@@ -103,7 +103,7 @@ export default function Header() {
                             </Typography>
                             <Typography
                                 variant="h6"
-                                noWrap
+                                nowrap="true"
                                 component="div"
                                 sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
                             >
@@ -114,7 +114,7 @@ export default function Header() {
                             </Typography>
                             <Typography
                                 variant="h6"
-                                noWrap
+                                nowrap="true"
                                 component="div"
                                 sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
                             >
@@ -125,7 +125,7 @@ export default function Header() {
                             </Typography>
                             <Typography
                                 variant="h6"
-                                noWrap
+                                nowrap="true"
                                 component="div"
                                 sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
                             >
@@ -136,7 +136,7 @@ export default function Header() {
                             </Typography>
                             <Typography
                                 variant="h6"
-                                noWrap
+                                nowrap="true"
                                 component="div"
                                 sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
                             >
@@ -147,7 +147,7 @@ export default function Header() {
                             </Typography>
                             <Typography
                                 variant="h6"
-                                noWrap
+                                nowrap="true"
                                 component="div"
                                 sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
                             >
@@ -158,7 +158,7 @@ export default function Header() {
                             </Typography>
                             <Typography
                                 variant="h6"
-                                noWrap
+                                nowrap="true"
                                 component="div"
                                 sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
                             >
@@ -169,7 +169,7 @@ export default function Header() {
                             </Typography>
                             <Typography
                                 variant="h6"
-                                noWrap
+                                nowrap="true"
                                 component="div"
                                 sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
                             >
@@ -180,11 +180,14 @@ export default function Header() {
                             </Typography>
                             <Typography
                                 variant="h6"
-                                noWrap
+                                nowrap="true"
                                 component="div"
                                 sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
                             >
-                                <Button variant="contained" size="large">
+                                <Button
+                                    variant="contained"
+                                    size="large"
+                                >
                                     Create
                                 </Button>
                             </Typography>
@@ -205,7 +208,7 @@ export default function Header() {
                             </Search>
                             <IconButton
                                 variant="h6"
-                                noWrap
+                                nowrap="true"
                                 component="div"
                                 sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
                             >
@@ -213,7 +216,7 @@ export default function Header() {
                             </IconButton>
                             <IconButton
                                 variant="h6"
-                                noWrap
+                                nowrap="true"
                                 component="div"
                                 sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
                             >
@@ -221,7 +224,7 @@ export default function Header() {
                             </IconButton>
                             <IconButton
                                 variant="h6"
-                                noWrap
+                                nowrap="true"
                                 component="div"
                                 sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
                             >
@@ -229,7 +232,7 @@ export default function Header() {
                             </IconButton>
                             <Typography
                                 variant="h6"
-                                noWrap
+                                nowrap="true"
                                 component="div"
                                 sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
                             >
