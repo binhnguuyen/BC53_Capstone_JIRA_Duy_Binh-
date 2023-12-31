@@ -1,8 +1,40 @@
-/* * {
+* {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
-    color: #6B778C !important;
-    background-color: #ffffff;
-  } */
+    align-items: center;
+    align-content: center;
+    color: #6B778C;
+    /* background-color: #ffffff; */
+  }
+
+  /* giúp mình ẩn bớt những đoạn văn dài, biến nó thành ... */
+.truncate {
+  text-overflow: ellipsis;
+
+  overflow: hidden;
+
+  display: -webkit-box;
+
+  -webkit-box-orient: vertical;
+
+  /* số hàng hiển thị */
+  -webkit-line-clamp: 1;
+}
+
+.truncate--2 {
+  /* số hàng hiển thị */
+  -webkit-line-clamp: 2;
+
+  word-break: break-all;
+}
+
+.truncate--3 {
+  /* số hàng hiển thị */
+  -webkit-line-clamp: 3;
+
+  word-break: break-all;
+}
+
+
 
