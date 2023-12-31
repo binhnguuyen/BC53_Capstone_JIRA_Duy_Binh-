@@ -7,17 +7,18 @@ import Slider from 'react-slick'
 import { blue } from '@mui/material/colors';
 import { red } from '@mui/material/colors';
 import { styled } from '@mui/material/styles';
-import Paper from '@mui/material/Paper';
-import Mobile_Logo from "../../assets/img/Mobile_Logo.png"
 import { Scrollbar } from 'react-scrollbars-custom';
-// import Software_Logo from "../../assets/img/Software_Logo.png"
-// import PC_Logo from "../../assets/img/PC_Logo.webp"
+import Paper from '@mui/material/Paper';
+import PC_Logo from "../../assets/img/PC_Logo.webp"
+import Mobile_Logo from "../../assets/img/Mobile_Logo.png"
+import Software_Logo from "../../assets/img/Software_Logo.jpg"
 
 const Home = () => {
     const navigate = useNavigate();
     const [categoryId, setCategoryId] = useState("0");
     const [newDataList, setNewDataList] = useState("");
-    
+    const [projectImage, setProjectImage] = useState("");
+
     const Item = styled(Paper)(({ theme }) => ({
         backgroundColor: theme.palette.mode === 'grey' ? '#1A2027' : '#fff',
         ...theme.typography.body2,
@@ -25,7 +26,7 @@ const Home = () => {
         textAlign: 'center',
         color: theme.palette.text.secondary,
     }));
-    
+
     const sliderSettings = {
         className: "center",
         centerMode: true,
@@ -41,7 +42,7 @@ const Home = () => {
         swipeToSlide: true,
         customPaging: i => (
             <div
-            style={{
+                style={{
                     margin: "5px",
                     padding: "2px",
                     fontSize: 20,
@@ -49,12 +50,12 @@ const Home = () => {
                     border: `1px ${blue[500]} solid`,
                     borderRadius: "5px",
                 }}
-                >
+            >
                 {i + 1}
             </div>
         )
     };
-    
+
     const iconButtonSettings = {
         style: {
             fontSize: 50,
@@ -69,7 +70,6 @@ const Home = () => {
 
     const handleFirstDataList = () => {
         let newData = [];
-        console.log('categoryId: ', categoryId);
         for (let index in data) {
             if (categoryId === data[index].categoryId) {
                 newData.push(data[index]);
@@ -77,8 +77,8 @@ const Home = () => {
         }
         setNewDataList(newData);
     }
-    
-    
+
+
     const handleChangeCategoryName = (event) => {
         setCategoryId(event.target.value);
     };
@@ -90,11 +90,21 @@ const Home = () => {
             if (categoryId === data[index].categoryId) {
                 newData.push(data[index]);
             }
+            if (categoryId === 1) {
+                setProjectImage(PC_Logo);
+            }
+            else if (categoryId === 2) {
+                setProjectImage(Software_Logo);
+            }
+            else if (categoryId === 3) {
+                setProjectImage(Mobile_Logo);
+            }
         }
         setNewDataList(newData);
     }
-    
-    
+    console.log('projectImage: ', projectImage);
+
+
     // khi data thay đổi (>0) thì mặc định render ra thằng đầu tiên
     useEffect(() => {
         if (data.length > 0) {
@@ -140,9 +150,9 @@ const Home = () => {
                 {
                     newDataList.length > 0 ? (
                         newDataList.map((item, index) => (
-                            <Card sx={{ height: 520, width: 250, border: `1px ${blue[200]} solid`, margin: "5px 5px"}} key={index}>
+                            <Card sx={{ height: 520, width: 250, border: `1px ${blue[200]} solid`, margin: "5px 5px" }} key={index}>
                                 <IconButton {...iconButtonSettings}>
-                                    <img src={Mobile_Logo} alt="Mobile" style={{ width: "100%", height: 200, display: "inline-block" }} />
+                                    <img src={projectImage} alt="Mobile" style={{ width: "100%", height: 200, display: "inline-block" }} />
                                 </IconButton>
                                 <Typography
                                     variant="h5"
@@ -192,7 +202,7 @@ const Home = () => {
                                     </Typography>
                                 </CardContent>
                                 <CardActions>
-                                    <Button 
+                                    <Button
                                         size="medium"
                                         style={{
                                             color: "red",
@@ -210,7 +220,17 @@ const Home = () => {
                         data.map((item, index) => (
                             <Card sx={{ height: 520, width: 250, border: `1px ${blue[200]} solid`, margin: "5px 5px" }} key={index}>
                                 <IconButton {...iconButtonSettings}>
-                                    <img src={Mobile_Logo} alt="Mobile" style={{ width: "100%", height: 200, display: "inline-block" }} />
+                                    {
+                                        item.categoryId === 1 ? (
+                                            <img src={PC_Logo} alt="Mobile" style={{ width: "100%", height: 200, display: "inline-block" }} />
+                                        ) : (
+                                            item.categoryId === 2 ? (
+                                                <img src={Software_Logo} alt="Mobile" style={{ width: "100%", height: 200, display: "inline-block" }} />
+                                            ) : (
+                                                <img src={Mobile_Logo} alt="Mobile" style={{ width: "100%", height: 200, display: "inline-block" }} />
+                                            )
+                                        )
+                                    }
                                 </IconButton>
                                 <Typography
                                     variant="h5"
