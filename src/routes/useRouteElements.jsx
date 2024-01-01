@@ -1,5 +1,5 @@
 import { Navigate, Outlet, useRoutes } from "react-router-dom";
-import { lazy } from "react";
+import { Suspense, lazy } from "react";
 import { PATH } from "../utils/paths";
 import MainLayout from "../layouts/MainLayout";
 import AuthenticationLayout from "../layouts/AuthenticationLayout";
@@ -12,6 +12,8 @@ const NotFoundPage = lazy(() => import("../modules/error/NotFound"))
 const LoginPage = lazy(() => import("../modules/auth/Login"))
 const RegisterPage = lazy(() => import("../modules/auth/Register"))
 const AdminPage = lazy(() => import("../modules/admin"))
+const ProjectManagementPage = lazy(() => import("../modules/project/ProjectManagement"))
+const ProjectPage = lazy(() => import("../modules/project/Project"))
 
 const AuthenticateRouter = () => {
     // Check for authentication token
@@ -29,41 +31,82 @@ const useRouteElements = () => {
             children: [
                 {
                     path: "",
-                    element: <AuthenticationLayout />,
+                    element:
+                        <Suspense callBack={<div>Loading</div>}>
+                            <AuthenticationLayout />
+                        </Suspense>,
                     children: [
                         {
                             path: PATH.LOGIN,
-                            element: <LoginPage />,
+                            element:
+                                <Suspense callBack={<div>Loading</div>}>
+                                    <LoginPage />
+                                </Suspense>,
                         },
                         {
                             path: PATH.REGISTER,
-                            element: <RegisterPage />,
+                            element:
+                                <Suspense callBack={<div>Loading</div>}>
+                                    <RegisterPage />
+                                </Suspense>,
                         }
                     ]
                 }
             ]
         },
         {
-            path: PATH.HOME,
+            path: "",
             element: <MainLayout />,
             children: [
                 {
-                    index: true,
-                    element: <HomePage />,
+                    path: PATH.HOME,
+                    index: 1,
+                    element:
+                        <Suspense callBack={<div>Loading</div>}>
+                            <HomePage />
+                        </Suspense>,
+                },
+                {
+                    path: PATH.PROJECTMANAGEMENT,
+                    // index: 2,
+                    element:
+                        <Suspense callBack={<div>Loading</div>}>
+                            <ProjectManagementPage />,
+                        </Suspense>,
+                },
+                {
+                    path: PATH.PROJECT,
+                    // index: 3,
+                    element:
+                        <Suspense callBack={<div>Loading</div>}>
+                            <ProjectPage />
+                        </Suspense>,
                 },
             ],
         },
         {
             path: PATH.ADMIN,
-            element: <AdminLayout />,
+            element:
+                <Suspense callBack={<div>Loading</div>}>
+                    <AdminLayout />
+                </Suspense>,
             children: [
                 {
                     index: true,
-                    element: <AdminPage />,
+                    element:
+                        <Suspense callBack={<div>Loading</div>}>
+                            <AdminPage />
+                        </Suspense>,
                 },
             ],
         },
-        { path: "*", element: <NotFoundPage /> },
+        {
+            path: "*",
+            element:
+                <Suspense callBack={<div>Loading</div>}>
+                    <NotFoundPage />
+                </Suspense>,
+        }
     ]);
 
     return element;

@@ -148,7 +148,7 @@ const Home = () => {
                     </Typography>
                 </Box>
                 <Scrollbar
-                    class="ScrollbarsCustom-Content"
+                    className="ScrollbarsCustom-Content"
                     style={{ width: "100%", height: 1000 }}
                 >
                     <Grid container sx={{ margin: "30px 30px", alignItems: 'center', boxShadow: "0px 1px 10px 0px rgba(0,0,0,0.12)" }} spacing={{ xs: 2, md: 3, lg: 4 }} columns={{ xs: 4, sm: 6, md: 8, lg: 10, xl: 12 }} style={{ alignContent: "center" }}>

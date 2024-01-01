@@ -171,48 +171,49 @@ export default function Header(props) {
                             </IconButton>
                             <IconButton
                                 component="div"
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'block' } }}
+                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'block' } } }
                             >
                                 Công việc
                                 <KeyboardArrowDownIcon />
                             </IconButton>
                             <IconButton
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'block' } }}
                                 component="div"
+                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'block' } } }
+                                onClick={() => navigate(PATH.PROJECTMANAGEMENT)}
                             >
                                 Dự án
                                 <KeyboardArrowDownIcon />
                             </IconButton>
                             <IconButton
                                 component="div"
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'none', lg: 'block' } }}
+                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'none', lg: 'block' } } }
                             >
                                 Bộ lọc
                                 <KeyboardArrowDownIcon />
                             </IconButton>
                             <IconButton
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'none', lg: 'block' } }}
+                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'none', lg: 'block' } } }
                                 component="div"
                             >
                                 Tổng quan
                                 <KeyboardArrowDownIcon />
                             </IconButton>
                             <IconButton
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'none', lg: 'none', xl: 'block' } }}
+                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'none', lg: 'none', xl: 'block' } } }
                                 component="div"
                             >
                                 Nhóm
                                 <KeyboardArrowDownIcon />
                             </IconButton>
                             <IconButton
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'none', lg: 'none', xl: 'block' } }}
+                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'none', lg: 'none', xl: 'block' } } }
                                 component="div"
                             >
                                 Kế hoạch
                                 <KeyboardArrowDownIcon />
                             </IconButton>
                             <IconButton
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'none', lg: 'none', xl: 'block' } }}
+                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'none', lg: 'none', xl: 'block' } } }
                                 component="div"
                             >
                                 Ứng dụng
@@ -244,7 +245,7 @@ export default function Header(props) {
                                 variant="h6"
                                 nowrap="true"
                                 component="div"
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } } }
                             >
                                 <NotificationsActiveIcon />
                             </IconButton>
@@ -252,7 +253,7 @@ export default function Header(props) {
                                 variant="h6"
                                 nowrap="true"
                                 component="div"
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } } }
                             >
                                 <HelpOutlineIcon />
                             </IconButton>
@@ -260,7 +261,7 @@ export default function Header(props) {
                                 variant="h6"
                                 nowrap="true"
                                 component="div"
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } } }
                             >
                                 <SettingsIcon />
                             </IconButton>
@@ -268,7 +269,7 @@ export default function Header(props) {
                                 variant="h6"
                                 nowrap="true"
                                 component="div"
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } } }
                             >
                                 <AccountCircleIcon />
                             </IconButton>
