@@ -102,7 +102,6 @@ const Home = () => {
         }
         setNewDataList(newData);
     }
-    console.log('projectImage: ', projectImage);
 
 
     // khi data thay đổi (>0) thì mặc định render ra thằng đầu tiên
@@ -121,8 +120,7 @@ const Home = () => {
 
 
     return (
-        <Container style={{ maxWidth: "1600px" }} sx={{ margin: "50px 10px", padding: "50px 10px" }} spacing={4}>
-
+        <Container style={{ maxWidth: "2000px" }} sx={{ margin: "50px 10px", padding: "50px 10px" }} spacing={4}>
             <Select
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"

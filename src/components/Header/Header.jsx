@@ -6,15 +6,18 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import InputBase from '@mui/material/InputBase';
-import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
-import AppsIcon from '@mui/icons-material/Apps';
+import AppsIcon from '@mui/icons-material/apps';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import SettingsIcon from '@mui/icons-material/Settings';
 import Paper from '@mui/material/Paper';
-import { Button, Container, Divider, Stack } from '@mui/material';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { Button, Container, Divider, Drawer, List, ListItem, ListItemButton, ListItemText, Stack } from '@mui/material';
+import { blue } from '@mui/material/colors';
+import { useNavigate } from 'react-router';
+import { PATH } from "../../utils/paths/index"
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -61,141 +64,172 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
     ...theme.typography.body2,
-    padding: theme.spacing(1),
+    borderRadius: "0px",
+    // padding: theme.spacing(1),
+    boxShadow: "none",
     textAlign: 'center',
-    color: theme.palette.text.secondary,
-    flexGrow: 1,
+    // color: theme.palette.text.secondary,
+    display: "flex",
 }));
 
-export default function Header() {
+const drawerWidth = 350;
+
+export default function Header(props) {
+    const navigate = useNavigate();
+
     const stackSettings = {
+        width: "100%",
         spacing: 2,
         direction: "row",
         justifyContent: "space-between",
+        padding: "5px 30px"
     }
+
+    const { window } = props;
+    const [mobileOpen, setMobileOpen] = React.useState(false);
+
+    const handleDrawerToggle = () => {
+        setMobileOpen((prevState) => !prevState);
+    };
+
+    const drawer = (
+        <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
+            <Typography variant="h6" sx={{ my: 2 }}>
+                Jira Software
+            </Typography>
+            <Divider />
+            <List>
+                <Stack
+                    // disablePadding
+                    sx={{ display: { lg: 'block', xl: 'none' } }}
+                >
+                    <ListItemButton sx={{ textAlign: 'center', display: { md: 'none' } }}>
+                        <ListItemText primary="Công việc" />
+                        <KeyboardArrowDownIcon />
+                    </ListItemButton>
+                    <ListItemButton sx={{ textAlign: 'center', display: { md: 'none' } }}>
+                        <ListItemText primary="Dự án" />
+                        <KeyboardArrowDownIcon />
+                    </ListItemButton>
+                    <ListItemButton sx={{ textAlign: 'center', display: { lg: 'none' } }}>
+                        <ListItemText primary="Bộ lọc" />
+                        <KeyboardArrowDownIcon />
+                    </ListItemButton>
+                    <ListItemButton sx={{ textAlign: 'center', display: { lg: 'none' } }}>
+                        <ListItemText primary="Dashboards" />
+                        <KeyboardArrowDownIcon />
+                    </ListItemButton>
+                    <ListItemButton sx={{ textAlign: 'center' }}>
+                        <ListItemText primary="Nhóm" />
+                        <KeyboardArrowDownIcon />
+                    </ListItemButton>
+                    <ListItemButton sx={{ textAlign: 'center' }}>
+                        <ListItemText primary="Kế hoạch" />
+                        <KeyboardArrowDownIcon />
+                    </ListItemButton>
+                    <ListItemButton sx={{ textAlign: 'center' }}>
+                        <ListItemText primary="Ứng dụng" />
+                        <KeyboardArrowDownIcon />
+                    </ListItemButton>
+                </Stack>
+            </List>
+        </Box >
+    );
+
+    const container = window !== undefined ? () => window().document.body : undefined;
 
     return (
         <Box
-            sx={{ flexGrow: 1 }}
-            style={{ width: '100%', margin: 0, position: "fixed", top: 0, zIndex: 1000 }}
+            sx={{ width: "100%" ,flexGrow: 1, margin: 0, position: "fixed", top: 0, zIndex: 1000 }}
         >
-            <AppBar position="static">
+            <AppBar position="static" sx={{ width: "100%" }}>
                 <Toolbar
-                    style={{
+                    sx={{
                         color: "#6B778C",
                         backgroundColor: "white",
                     }}
                 >
-                    <Stack
-                        {...stackSettings}
-                    >
-                        <Stack {...stackSettings}>
-                            <Typography
-                                variant="h6"
-                                nowrap="true"
+                    <Stack {...stackSettings}>
+                        <Item >
+                            <IconButton
+                                sx={{ flexGrow: 1, display: { xl: 'none' } }}
+                                size="medium"
+                                edge="start"
+                                color="inherit"
+                                aria-label="open drawer"
                                 component="div"
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                                onClick={handleDrawerToggle}
                             >
-                                <IconButton>
-                                    <AppsIcon />
-                                    Jira Software
-                                </IconButton>
-                            </Typography>
-                            <Typography
-                                variant="h6"
-                                nowrap="true"
+                                <AppsIcon/>
+                            </IconButton>
+                            <IconButton
                                 component="div"
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                                sx={{ flexGrow: 1, fontSize: 28, color: `${blue[600]}`, fontWeight: 700, display: { sm: 'block' } }}
+                                onClick={() => navigate(PATH.HOME)}
                             >
-                                <IconButton>
-                                    Your Work
-                                    <KeyboardArrowDownIcon />
-                                </IconButton>
-                            </Typography>
-                            <Typography
-                                variant="h6"
-                                nowrap="true"
+                                Jira Software
+                            </IconButton>
+                            <IconButton
                                 component="div"
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'block' } }}
                             >
-                                <IconButton>
-                                    Projects
-                                    <KeyboardArrowDownIcon />
-                                </IconButton>
-                            </Typography>
-                            <Typography
-                                variant="h6"
-                                nowrap="true"
+                                Công việc
+                                <KeyboardArrowDownIcon />
+                            </IconButton>
+                            <IconButton
+                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'block' } }}
                                 component="div"
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
                             >
-                                <IconButton>
-                                    Filters
-                                    <KeyboardArrowDownIcon />
-                                </IconButton>
-                            </Typography>
-                            <Typography
-                                variant="h6"
-                                nowrap="true"
+                                Dự án
+                                <KeyboardArrowDownIcon />
+                            </IconButton>
+                            <IconButton
                                 component="div"
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'none', lg: 'block' } }}
                             >
-                                <IconButton>
-                                    Dashboards
-                                    <KeyboardArrowDownIcon />
-                                </IconButton>
-                            </Typography>
-                            <Typography
-                                variant="h6"
-                                nowrap="true"
+                                Bộ lọc
+                                <KeyboardArrowDownIcon />
+                            </IconButton>
+                            <IconButton
+                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'none', lg: 'block' } }}
                                 component="div"
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
                             >
-                                <IconButton>
-                                    Teams
-                                    <KeyboardArrowDownIcon />
-                                </IconButton>
-                            </Typography>
-                            <Typography
-                                variant="h6"
-                                nowrap="true"
+                                Tổng quan
+                                <KeyboardArrowDownIcon />
+                            </IconButton>
+                            <IconButton
+                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'none', lg: 'none', xl: 'block' } }}
                                 component="div"
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
                             >
-                                <IconButton>
-                                    Plans
-                                    <KeyboardArrowDownIcon />
-                                </IconButton>
-                            </Typography>
-                            <Typography
-                                variant="h6"
-                                nowrap="true"
+                                Nhóm
+                                <KeyboardArrowDownIcon />
+                            </IconButton>
+                            <IconButton
+                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'none', lg: 'none', xl: 'block' } }}
                                 component="div"
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
                             >
-                                <IconButton>
-                                    Apps
-                                    <KeyboardArrowDownIcon />
-                                </IconButton>
-                            </Typography>
-                            <Typography
-                                variant="h6"
-                                nowrap="true"
+                                Kế hoạch
+                                <KeyboardArrowDownIcon />
+                            </IconButton>
+                            <IconButton
+                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'none', lg: 'none', xl: 'block' } }}
                                 component="div"
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
                             >
-                                <Button
-                                    variant="contained"
-                                    size="large"
-                                >
-                                    Create
-                                </Button>
-                            </Typography>
-                        </Stack>
-                        <Stack {...stackSettings}>
+                                Ứng dụng
+                                <KeyboardArrowDownIcon />
+                            </IconButton>
+                            <Button
+                                variant="contained"
+                                size="medium"
+                            >
+                                Create
+                            </Button>
+                        </Item>
+                        <Item >
                             <Search
                                 style={{
-                                    border: "1px solid #6B778C"
+                                    border: "1px solid #6B778C",
+                                    width: "12vw"
                                 }}
                             >
                                 <SearchIconWrapper>
@@ -230,18 +264,35 @@ export default function Header() {
                             >
                                 <SettingsIcon />
                             </IconButton>
-                            <Typography
+                            <IconButton
                                 variant="h6"
                                 nowrap="true"
                                 component="div"
                                 sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
                             >
-                                { }
-                            </Typography>
-                        </Stack>
+                                <AccountCircleIcon />
+                            </IconButton>
+                        </Item>
                     </Stack>
                 </Toolbar>
             </AppBar>
-        </Box>
+            <nav>
+                <Drawer
+                    container={container}
+                    variant="temporary"
+                    open={mobileOpen}
+                    onClose={handleDrawerToggle}
+                    ModalProps={{
+                        keepMounted: true, // Better open performance on mobile.
+                    }}
+                    sx={{
+                        display: { xs: 'block', xl: 'none' },
+                        '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+                    }}
+                >
+                    {drawer}
+                </Drawer>
+            </nav>
+        </Box >
     );
 }
