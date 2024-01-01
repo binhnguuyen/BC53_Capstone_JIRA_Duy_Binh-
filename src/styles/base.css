@@ -45,5 +45,11 @@
   padding: 10px;
 }
 
+.ScrollbarsCustom-Track {
+  width: 20px !important;
+}
 
+.ScrollbarsCustom-Thumb {
+  height: 100px !important;
+}
 
