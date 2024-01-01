@@ -102,7 +102,6 @@ const Home = () => {
         }
         setNewDataList(newData);
     }
-    console.log('projectImage: ', projectImage);
 
 
     // khi data thay đổi (>0) thì mặc định render ra thằng đầu tiên
