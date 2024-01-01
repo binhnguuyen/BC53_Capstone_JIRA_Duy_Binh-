@@ -38,9 +38,12 @@
 
 .css-hyum1k-MuiToolbar-root {
   max-width: 100%;
-  /* justify-content: space-between;  */
 }
-
+.css-1s0ymei-MuiGrid-root {
+  width: 100%;
+  margin: 0px;
+  padding: 10px;
+}
 
 
 
