@@ -15,6 +15,9 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import SettingsIcon from '@mui/icons-material/Settings';
 import Paper from '@mui/material/Paper';
 import { Button, Container, Divider, Stack } from '@mui/material';
+import { blue } from '@mui/material/colors';
+import { useNavigate } from 'react-router';
+import { PATH } from "../../utils/paths/index"
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -68,6 +71,8 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 export default function Header() {
+    const navigate = useNavigate();
+
     const stackSettings = {
         spacing: 2,
         direction: "row",
@@ -91,89 +96,95 @@ export default function Header() {
                     >
                         <Stack {...stackSettings}>
                             <Typography
-                                variant="h6"
-                                nowrap="true"
-                                component="div"
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                                sx={{ flexGrow: 1 }}
                             >
-                                <IconButton>
+                                <IconButton
+                                    size="medium"
+                                    edge="start"
+                                    color="inherit"
+                                    aria-label="menu"
+                                    component="div"
+                                >
                                     <AppsIcon />
+                                </IconButton>
+                            </Typography>
+                            <Typography
+                                sx={{ flexGrow: 1 }}
+                            >
+                                <IconButton
+                                    component="div"
+                                    sx={{ fontSize: 28, color: `${blue[600]}`, fontWeight: 700, }}
+                                    onClick={() => navigate(PATH.HOME)}
+                                >
                                     Jira Software
                                 </IconButton>
                             </Typography>
                             <Typography
-                                variant="h6"
-                                nowrap="true"
-                                component="div"
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                                sx={{ flexGrow: 1 }}
                             >
-                                <IconButton>
+                                <IconButton
+                                    component="div"
+                                >
                                     Your Work
                                     <KeyboardArrowDownIcon />
                                 </IconButton>
                             </Typography>
                             <Typography
-                                variant="h6"
-                                nowrap="true"
-                                component="div"
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                                sx={{ flexGrow: 1 }}
                             >
-                                <IconButton>
+                                <IconButton
+                                    component="div"
+                                >
                                     Projects
                                     <KeyboardArrowDownIcon />
                                 </IconButton>
                             </Typography>
                             <Typography
-                                variant="h6"
-                                nowrap="true"
-                                component="div"
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                                sx={{ flexGrow: 1 }}
                             >
-                                <IconButton>
+                                <IconButton
+                                    component="div"
+                                >
                                     Filters
                                     <KeyboardArrowDownIcon />
                                 </IconButton>
                             </Typography>
                             <Typography
-                                variant="h6"
-                                nowrap="true"
-                                component="div"
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                                sx={{ flexGrow: 1 }}
                             >
-                                <IconButton>
+                                <IconButton
+                                    component="div"
+                                >
                                     Dashboards
                                     <KeyboardArrowDownIcon />
                                 </IconButton>
                             </Typography>
                             <Typography
-                                variant="h6"
-                                nowrap="true"
-                                component="div"
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                                sx={{ flexGrow: 1 }}
                             >
-                                <IconButton>
+                                <IconButton
+                                    component="div"
+                                >
                                     Teams
                                     <KeyboardArrowDownIcon />
                                 </IconButton>
                             </Typography>
                             <Typography
-                                variant="h6"
-                                nowrap="true"
-                                component="div"
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                                sx={{ flexGrow: 1 }}
                             >
-                                <IconButton>
+                                <IconButton
+                                    component="div"
+                                >
                                     Plans
                                     <KeyboardArrowDownIcon />
                                 </IconButton>
                             </Typography>
                             <Typography
-                                variant="h6"
-                                nowrap="true"
-                                component="div"
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                                sx={{ flexGrow: 1 }}
                             >
-                                <IconButton>
+                                <IconButton
+                                    component="div"
+                                >
                                     Apps
                                     <KeyboardArrowDownIcon />
                                 </IconButton>
@@ -242,6 +253,6 @@ export default function Header() {
                     </Stack>
                 </Toolbar>
             </AppBar>
-        </Box>
+        </Box >
     );
 }
