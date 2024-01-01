@@ -39,7 +39,7 @@ const Login = () => {
     const { mutate: handleSignin, isPending } = useMutation({
         mutationFn: (payload) => loginApi(payload),
         onSuccess: (values) => {
-            alert("Login successfully!");
+            alert("Đăng nhập thành công!");
             // save user's information to local storage (using values)
 
             // navigate to page home
@@ -87,16 +87,16 @@ const Login = () => {
                     required
                     fullWidth
                     id="email"
-                    label="Email Address"
+                    label="Email"
                     name="email"
                     type="email"
                     placeholder="example@gmail.com"
                     autoFocus
                     {...register("email", {
-                        required: "Please enter your email!",
+                        required: "Vui lòng nhập email!",
                         pattern: {
                             value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                            message: "Please enter a valid email!",
+                            message: "Vui lòng nhập email hợp lệ!",
                         },
                     })}
                     error={Boolean(errors.email)}
@@ -107,12 +107,12 @@ const Login = () => {
                     required
                     fullWidth
                     name="password"
-                    label="Password"
+                    label="Mật khẩu"
                     type={showPassword ? "text" : "password"}
                     id="password"
                     placeholder="**********"
                     {...register("password", {
-                        required: "Please enter your password!",
+                        required: "Vui lòng nhập mật khẩu!",
                     })}
                     error={Boolean(errors.password)}
                     helperText={
@@ -141,7 +141,7 @@ const Login = () => {
                     control={
                         <Checkbox value="remember" color="primary" />
                     }
-                    label="Remember me"
+                    label={<Typography component={"span"} variant="body2">Ghi nhớ đăng nhập</Typography>}
                 />
                 <LoadingButton
                     type="submit"
@@ -155,14 +155,14 @@ const Login = () => {
                 <Grid container>
                     <Grid item xs>
                         <Link href="#" variant="body2">
-                            Forgot password?
+                            Quên mật khẩu
                         </Link>
                     </Grid>
                     <Grid item>
                         <Typography>
-                            {"Don't have an account? "}
+                            {"Chưa có tài khoản? "}
                             <Link href="#" variant="body2">
-                                {"Sign Up"}
+                                {"Đăng ký"}
                             </Link>
                         </Typography>
                     </Grid>

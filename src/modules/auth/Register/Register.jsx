@@ -95,16 +95,16 @@ const Register = () => {
                             required
                             fullWidth
                             id="name"
-                            label="Your Name"
+                            label="Họ và tên"
                             name="name"
                             type="text"
                             placeholder="Nguyen Van A"
                             autoFocus
                             {...register("name", {
-                                required: "Please enter your name!",
+                                required: "Vui lòng nhập họ tên!",
                                 pattern: {
                                     value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{1,}$/,
-                                    message: "Please enter a valid name!",
+                                    message: "Vui lòng nhập họ tên hợp lệ!",
                                 },
                             })}
                             error={Boolean(errors.name)}
@@ -119,26 +119,26 @@ const Register = () => {
                             required
                             fullWidth
                             id="phoneNumber"
-                            label="Phone Number"
+                            label="Số điện thoại"
                             name="phoneNumber"
                             type="text"
                             placeholder="+84122346689"
                             {...register("phoneNumber", {
-                                required: "Please enter your phone number!",
+                                required: "Vui lòng nhập số điện thoại!",
                                 minLength: {
-                                    value: 9,
+                                    value: 10,
                                     message:
-                                        "Phone number must be at least 9 digits long",
+                                        "Số điện thoại phải có ít nhất 10 kí tự!",
                                 },
                                 maxLength: {
                                     value: 11,
                                     message:
-                                        "Phone number must be no more than 11 digits",
+                                        "Số điện thoại chỉ chứa tối đa 11 kí tự!",
                                 },
                                 pattern: {
                                     value: /^(?=.*\d).{1,}$/,
                                     message:
-                                        "Please enter a valid phone number!",
+                                        "Vui lòng nhập số điện thoại hợp lệ!",
                                 },
                             })}
                             error={Boolean(errors.phoneNumber)}
@@ -154,15 +154,15 @@ const Register = () => {
                     required
                     fullWidth
                     id="email"
-                    label="Email Address"
+                    label="Email"
                     name="email"
                     type="email"
                     placeholder="example@gmail.com"
                     {...register("email", {
-                        required: "Please enter your email!",
+                        required: "Vui lòng nhập email!",
                         pattern: {
                             value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                            message: "Please enter a valid email!",
+                            message: "Vui lòng nhập email hợp lệ!",
                         },
                     })}
                     error={Boolean(errors.email)}
@@ -173,26 +173,26 @@ const Register = () => {
                     required
                     fullWidth
                     name="password"
-                    label="Password"
+                    label="Mật khẩu"
                     type={showPassword ? "text" : "password"}
                     id="password"
                     placeholder="**********"
                     {...register("password", {
-                        required: "Please enter your password!",
+                        required: "Vui lòng nhập mật khẩu!",
                         minLength: {
                             value: 8,
                             message:
-                                "Password must be at least 8 characters long!",
+                                "Mật khẩu phải có ít nhất 8 kí tự!",
                         },
                         maxLength: {
                             value: 32,
                             message:
-                                "Password must be no more than 32 characters long!",
+                                "Mật khẩu phải chỉ chứa tối đa 32 kí tự!",
                         },
                         pattern: {
                             value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$!%*?&])[A-Za-z\d@#$!%*?&-]/,
                             message:
-                                "Password must contain at least 1 undercase, 1 uppercase, 1 digit and 1 special character!",
+                                "Mật khẩu phải chứa ít nhất 1 kí tự thường, 1 kí tự in hoa, 1 số và 1 kí tự đặc biệt!",
                         },
                     })}
                     error={Boolean(errors.password)}
@@ -223,17 +223,17 @@ const Register = () => {
                     required
                     fullWidth
                     name="confirmPassword"
-                    label="Confirm Password"
+                    label="Xác nhận mật khẩu"
                     type={showPassword ? "text" : "password"}
                     id="confirmPassword"
                     placeholder="**********"
                     {...register("confirmPassword", {
-                        required: "Please confirm your password!",
+                        required: "Vui lòng nhập lại mật khẩu!",
                         validate: (value) => {
                             const password = watch("password");
                             return (
                                 password == value ||
-                                "Password entered is not the same"
+                                "Mật khẩu không trùng khớp, vui lòng nhập lại!"
                             );
                         },
                     })}
@@ -273,8 +273,8 @@ const Register = () => {
                             }
                             label={
                                 <Typography component={"span"} variant="body2">
-                                    I accepted the{" "}
-                                    <Link to="#">terms and conditions</Link>
+                                    Tôi đồng ý với{" "}
+                                    <Link to="#">điều khoản sử dụng</Link>
                                 </Typography>
                             }
                         />
@@ -288,14 +288,14 @@ const Register = () => {
                     loading={isPending}
                     sx={{ mt: 3, mb: 2 }}
                 >
-                    Sign up
+                    Đăng Ký
                 </LoadingButton>
                 <Grid container>
                     <Grid item>
                         <Typography>
-                            {"Already have an account? "}
+                            {"Đã có tài khoản? "}
                             <Link href="#" variant="body2">
-                                {"Sign in"}
+                                {"Đăng nhập"}
                             </Link>
                         </Typography>
                     </Grid>
