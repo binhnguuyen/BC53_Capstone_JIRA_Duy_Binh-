@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardActions, CardContent, CardMedia, Container, Grid, IconButton, MenuItem, Select, Skeleton, Tab, Tabs, Typography } from '@mui/material'
+import { Box, Button, Card, CardActions, CardContent, CardMedia, Container, Divider, Grid, IconButton, MenuItem, Select, Skeleton, Tab, Tabs, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { getAllProject } from '../../apis/project.api';
@@ -156,16 +156,19 @@ const Home = () => {
                             newDataList.length > 0 ? (
                                 newDataList.map((item, index) => (
                                     <Card sx={{ height: 520, width: 250, border: `1px ${blue[200]} solid`, margin: "5px 5px" }} key={index}>
-                                        <IconButton {...iconButtonSettings}>
-                                            <img src={projectImage} alt="Mobile" style={{ width: "100%", height: 200, display: "inline-block" }} />
-                                        </IconButton>
-                                        <Typography
-                                            variant="h5"
-                                            style={{ fontWeight: 700 }}
-                                        >
-                                            {item.projectName}
-                                        </Typography>
                                         <CardContent>
+                                            <IconButton {...iconButtonSettings}>
+                                                <img src={projectImage} alt="Mobile"
+                                                    style={{ width: "100%", height: "auto", display: "inline-block" }}
+                                                />
+                                            </IconButton>
+                                            <Divider width="100%" />
+                                            <Typography
+                                                variant="h5"
+                                                style={{ fontWeight: 700 }}
+                                            >
+                                                {item.projectName}
+                                            </Typography>
                                             <Typography
                                                 variant="h6"
                                                 sx={{
@@ -175,26 +178,22 @@ const Home = () => {
                                                 Thành viên:
                                             </Typography>
                                             {
-                                                item.members?.map((member, index) => {
-                                                    return (
-                                                        <Typography
-                                                            className="truncate truncate--2"
-                                                            variant="h6"
-                                                            key={index}
-                                                            sx={{
-                                                                display: "inline",
-                                                                lineHeight: "20px",
-                                                                border: `1px ${blue[200]} solid`,
-                                                                backgroundColor: `${blue[100]}`,
-                                                                color: `${red[500]}`,
-                                                            }}
-                                                        >
-                                                            <IconButton>
+                                                item.members.length > 0 ? (
+                                                    item.members.map((member, index) => {
+                                                        return (
+                                                            <Button
+                                                                size='small'
+                                                                variant='outlined'
+                                                                sx={{ fontSize: "16px" }}>
                                                                 #{member.name}
-                                                            </IconButton>
-                                                        </Typography>
-                                                    )
-                                                })
+                                                            </Button>
+                                                        )
+                                                    })
+                                                ) : (
+                                                    <Typography color={"red"}>
+                                                        Chưa có
+                                                    </Typography>
+                                                )
                                             }
                                             <Typography
                                                 variant="h6"
@@ -207,10 +206,9 @@ const Home = () => {
                                             </Typography>
                                         </CardContent>
                                         <CardActions>
-                                            <Button
-                                                size="medium"
+                                        <Button size="medium"
                                                 style={{
-                                                    color: "red",
+                                                    color: `${blue[500]}`,
                                                 }}
                                                 onClick={() => {
                                                     // navigate(`movie/${item.maPhim}`)
@@ -224,26 +222,27 @@ const Home = () => {
                             ) : (
                                 data.map((item, index) => (
                                     <Card sx={{ height: 520, width: 250, border: `1px ${blue[200]} solid`, margin: "5px 5px" }} key={index}>
-                                        <IconButton {...iconButtonSettings}>
-                                            {
-                                                item.categoryId === 1 ? (
-                                                    <img src={PC_Logo} alt="Mobile" style={{ width: "100%", height: 200, display: "inline-block" }} />
-                                                ) : (
-                                                    item.categoryId === 2 ? (
-                                                        <img src={Software_Logo} alt="Mobile" style={{ width: "100%", height: 200, display: "inline-block" }} />
-                                                    ) : (
-                                                        <img src={Mobile_Logo} alt="Mobile" style={{ width: "100%", height: 200, display: "inline-block" }} />
-                                                    )
-                                                )
-                                            }
-                                        </IconButton>
-                                        <Typography
-                                            variant="h5"
-                                            style={{ fontWeight: 700 }}
-                                        >
-                                            {item.projectName}
-                                        </Typography>
                                         <CardContent>
+                                            <IconButton {...iconButtonSettings}>
+                                                {
+                                                    item.categoryId === 1 ? (
+                                                        <img src={PC_Logo} alt="Mobile" style={{ width: "100%", height: "auto", display: "inline-block" }} />
+                                                    ) : (
+                                                        item.categoryId === 2 ? (
+                                                            <img src={Software_Logo} alt="Mobile" style={{ width: "100%", height: "auto", display: "inline-block" }} />
+                                                        ) : (
+                                                            <img src={Mobile_Logo} alt="Mobile" style={{ width: "100%", height: "auto", display: "inline-block" }} />
+                                                        )
+                                                    )
+                                                }
+                                            </IconButton>
+                                            <Divider width="100%" />
+                                            <Typography
+                                                variant="h5"
+                                                style={{ fontWeight: 700 }}
+                                            >
+                                                {item.projectName}
+                                            </Typography>
                                             <Typography
                                                 variant="h6"
                                                 sx={{
@@ -253,26 +252,22 @@ const Home = () => {
                                                 Thành viên:
                                             </Typography>
                                             {
-                                                item.members?.map((member, index) => {
-                                                    return (
-                                                        <Typography
-                                                            className="truncate truncate--2"
-                                                            variant="h6"
-                                                            key={index}
-                                                            sx={{
-                                                                display: "inline",
-                                                                lineHeight: "20px",
-                                                                border: `1px ${blue[200]} solid`,
-                                                                backgroundColor: `${blue[100]}`,
-                                                                color: "black"
-                                                            }}
-                                                        >
-                                                            <IconButton>
+                                                item.members.length > 0 ? (
+                                                    item.members.map((member, index) => {
+                                                        return (
+                                                            <Button
+                                                                size='small'
+                                                                variant='outlined'
+                                                                sx={{ fontSize: "16px" }}>
                                                                 #{member.name}
-                                                            </IconButton>
-                                                        </Typography>
-                                                    )
-                                                })
+                                                            </Button>
+                                                        )
+                                                    })
+                                                ) : (
+                                                    <Typography color={"red"}>
+                                                        Chưa có
+                                                    </Typography>
+                                                )
                                             }
                                             <Typography
                                                 variant="h6"
@@ -287,7 +282,7 @@ const Home = () => {
                                         <CardActions>
                                             <Button size="medium"
                                                 style={{
-                                                    color: "red",
+                                                    color: `${blue[500]}`,
                                                 }}
                                                 onClick={() => {
                                                     // navigate(`movie/${item.maPhim}`)
