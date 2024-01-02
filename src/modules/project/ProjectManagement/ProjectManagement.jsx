@@ -16,10 +16,157 @@ import { getAllProject } from '../../../apis/project.api';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddBoxIcon from '@mui/icons-material/AddBox';
+import { DataGrid } from '@mui/x-data-grid';
 
 
 const ProjectManagement = () => {
   let { projectList } = useSelector((state) => state.project)
+  const [member, setMember] = useState("");
+
+  const renderDeleteButton = (params) => {
+    return (
+      <strong>
+        <Button
+          variant="contained"
+          color="primary"
+          size="small"
+          onClick={() => {
+            // parseName(params.row.col6)
+          }}
+        >
+          <DeleteIcon />
+        </Button>
+        <Button
+          variant="contained"
+          color="error"
+          size="small"
+          onClick={() => {
+            // parseName(params.row.col6)
+          }}
+        >
+          <EditIcon />
+        </Button>
+      </strong>
+    )
+  }
+
+
+  const renderAddCreatorButton = (params) => {
+    console.log('params: ', params);
+    return (
+      <strong>
+        <IconButton
+          variant="contained"
+          color="primary"
+          size="small"
+          sx={{ fontSize: "14px" }}
+          onClick={() => {
+            // parseName(params.row.col6)
+          }}
+        >
+          {/* <img src={item.avatar} alt={item.name} style={{width: "30px", height: "30px"}}/> */}
+          #{params.row.creator.name}&cedil;
+        </IconButton>
+      </strong >
+    )
+  }
+
+  const renderAddMemberButton = (params) => {
+    return (
+      <strong>
+        {
+          params.row.members.length < 2 ? (
+            params.row.members.map((item, index) => {
+              return (
+                <>
+                  <IconButton
+                    variant="contained"
+                    color="primary"
+                    size="small"
+                    sx={{ fontSize: "14px" }}
+                    onClick={() => {
+                      // parseName(params.row.col6)
+                    }}
+                  >
+                    {/* <img src={item.avatar} alt={item.name} style={{width: "30px", height: "30px"}}/> */}
+                    #{item.name}&cedil;
+                  </IconButton>
+                </>
+              )
+            })
+          ) : (
+            <>
+              <IconButton
+                variant="contained"
+                color="primary"
+                size="small"
+                sx={{ fontSize: "14px" }}
+                onClick={() => {
+                  // parseName(params.row.col6)
+                }}
+              >
+                {/* <img src={params.row.members[0].avatar} alt={params.row.members[0].name} style={{width: "30px", height: "30px"}}/> */}
+                #{params.row.members[0].name}&cedil;
+              </IconButton>
+              <IconButton
+                variant="contained"
+                color="primary"
+                size="small"
+                sx={{ fontSize: "14px" }}
+                onClick={() => {
+                  // parseName(params.row.col6)
+                }}
+              >
+                {/* <img src={params.row.members[1].avatar} alt={params.row.members[1].name} style={{width: "30px", height: "30px"}}/> */}
+                #{params.row.members[1].name}&cedil;
+              </IconButton>
+            </>
+          )
+        }
+        <Button>
+          <AddBoxIcon />
+        </Button>
+      </strong >
+    )
+  }
+
+  const columns = [
+    { field: 'id', headerName: 'ID', width: "60" },
+    { field: 'projectName', headerName: 'Dự án', width: "150" },
+    { field: 'categoryName', headerName: 'Phân loại', width: "130" },
+    {
+      field: 'creator', headerName: 'Người tạo', width: "120",
+      renderCell: renderAddCreatorButton,
+      // valueGetter: (params) => {
+      //   return `${params.value.name || "Không chủ"}`;
+      // }
+    },
+    {
+      field: 'members', headerName: 'Thành viên', width: "300",
+      // valueGetter: (params) =>
+      // {
+      //   let member = [];
+      //   if (params.value.length > 0) {
+      //     params.value.map((item, index) => {
+      //       member += item.name + ", ";
+      //     })
+      //   }
+      //   else {
+      //     member = "Chưa có";
+      //   }
+      //   if (member) {
+      //     // setMember(params.value);
+      //   }
+      //   return member;
+      // },
+      renderCell: renderAddMemberButton,
+    },
+    {
+      field: 'action', headerName: 'Hành động', width: "150",
+      renderCell: renderDeleteButton,
+      disableClickEventBubbling: true,
+    },
+  ];
 
 
   // nếu user ko chạy trang home trước mà vô trang management trước thì ko dùng dữ liệu từ store Redux đc mà phải tự gọi API
@@ -42,6 +189,10 @@ const ProjectManagement = () => {
     handleChangeData();
   }
 
+  const indicesToCopy = [1, 8, 2, 3, 7];
+  // Lấy các thành phần mong muốn từ mỗi đối tượng
+  const rows = projectList.map(({ id, projectName, categoryName, creator, members }) => ({ id, projectName, categoryName, creator, members }));
+
 
   return (
     <div style={{ display: "flex", justifyContent: "center", alignContent: "center" }}>
@@ -51,7 +202,21 @@ const ProjectManagement = () => {
             Bảng dự án
           </Typography>
         </Box>
-        <TableContainer component={Paper} style={{ maxWidth: "100%" }}>
+        <div style={{ height: 400, width: '100%' }}>
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            initialState={{
+              pagination: {
+                paginationModel: { page: 0, pageSize: 5 },
+              },
+            }}
+            pageSizeOptions={[5, 10]}
+            checkboxSelection
+            disableRowSelectionOnClick
+          />
+        </div>
+        {/* <TableContainer component={Paper} style={{ maxWidth: "100%" }}>
           <Table sx={{ maxWidth: "100%" }} aria-label="a dense table">
             <TableHead>
               <TableRow>
@@ -127,7 +292,8 @@ const ProjectManagement = () => {
               }
             </TableBody>
           </Table>
-        </TableContainer>
+        </TableContainer> */}
+
       </Container>
     </div>
   )
