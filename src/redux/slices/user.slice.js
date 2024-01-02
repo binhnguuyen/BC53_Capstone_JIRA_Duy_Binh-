@@ -26,5 +26,6 @@ const userSlice = createSlice({
     }
 });
 
+// set tên action là setCurrentUser
 export const { setCurrentUser } = userSlice.actions;
 export default userSlice;

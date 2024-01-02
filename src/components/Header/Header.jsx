@@ -107,7 +107,7 @@ export default function Header(props) {
                         <ListItemText primary="Công việc" />
                         <KeyboardArrowDownIcon />
                     </ListItemButton>
-                    <ListItemButton sx={{ textAlign: 'center', display: { md: 'none' } }}>
+                    <ListItemButton sx={{ textAlign: 'center', display: { md: 'none' } }} onClick={() => navigate(PATH.PROJECTMANAGEMENT)}>
                         <ListItemText primary="Dự án" />
                         <KeyboardArrowDownIcon />
                     </ListItemButton>
