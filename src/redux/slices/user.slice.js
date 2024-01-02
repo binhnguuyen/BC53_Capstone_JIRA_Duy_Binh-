@@ -6,6 +6,7 @@ const userLocal = getLocalStorage(CURRENT_USER)
 
 const initialState = {
     currentUser: userLocal,
+    showPassword: false
 }
 
 const userSlice = createSlice({
@@ -15,6 +16,13 @@ const userSlice = createSlice({
         setCurrentUser: (state, {payload}) => {
             state.currentUser = payload;
         },
+        setShowPassword: (state) => {
+            console.log("before: ", state.showPassword)
+
+            state.showPassword ? false : true
+
+            console.log("after: ", state.showPassword)
+        }
     }
 });
 
