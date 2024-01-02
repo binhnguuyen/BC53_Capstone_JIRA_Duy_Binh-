@@ -1,4 +1,4 @@
-import { Box, Button, Container, IconButton, Typography } from '@mui/material'
+import { Box, Button, Container, IconButton, Typography, Modal, Icon } from '@mui/material'
 import React, { useState } from 'react'
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -21,128 +21,176 @@ import { DataGrid } from '@mui/x-data-grid';
 
 const ProjectManagement = () => {
   let { projectList } = useSelector((state) => state.project)
-  const [member, setMember] = useState("");
 
+
+  // CSS
+  const typographySettings = {
+    variant: "h6",
+    style: {
+      fontSize: 20,
+      fontWeight: 700,
+    }
+  }
+  const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 450,
+    bgcolor: 'background.paper',
+    border: `1px ${blue[500]} solid`,
+    boxShadow: 24,
+    p: 4,
+  };
+
+
+  // Hàm để handle modal
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+
+  // hàm render nút Delete
   const renderDeleteButton = (params) => {
     return (
       <strong>
-        <Button
-          variant="contained"
-          color="primary"
-          size="small"
-          onClick={() => {
-            // parseName(params.row.col6)
-          }}
-        >
-          <DeleteIcon />
-        </Button>
-        <Button
+        <IconButton
           variant="contained"
           color="error"
           size="small"
+          sx={{
+            border: `1px ${green[500]} solid`
+          }}
           onClick={() => {
             // parseName(params.row.col6)
           }}
         >
           <EditIcon />
-        </Button>
+        </IconButton>
+        <IconButton
+          variant="contained"
+          color="primary"
+          size="small"
+          sx={{
+            border: `1px ${red[500]} solid`,
+            marginLeft: "10px",
+          }}
+          onClick={() => {
+            // parseName(params.row.col6)
+          }}
+        >
+          <DeleteIcon />
+        </IconButton>
       </strong>
     )
   }
 
 
+  // hàm render nút Add Creator
   const renderAddCreatorButton = (params) => {
-    console.log('params: ', params);
     return (
       <strong>
-        <IconButton
-          variant="contained"
+        <Button
+          variant="outlined"
           color="primary"
           size="small"
-          sx={{ fontSize: "14px" }}
+          sx={{ fontSize: "14px", border: `1px ${blue[500]} solid` }}
           onClick={() => {
             // parseName(params.row.col6)
           }}
         >
-          {/* <img src={item.avatar} alt={item.name} style={{width: "30px", height: "30px"}}/> */}
           #{params.row.creator.name}&cedil;
-        </IconButton>
-      </strong >
-    )
-  }
-
-  const renderAddMemberButton = (params) => {
-    return (
-      <strong>
-        {
-          params.row.members.length < 2 ? (
-            params.row.members.map((item, index) => {
-              return (
-                <>
-                  <IconButton
-                    variant="contained"
-                    color="primary"
-                    size="small"
-                    sx={{ fontSize: "14px" }}
-                    onClick={() => {
-                      // parseName(params.row.col6)
-                    }}
-                  >
-                    {/* <img src={item.avatar} alt={item.name} style={{width: "30px", height: "30px"}}/> */}
-                    #{item.name}&cedil;
-                  </IconButton>
-                </>
-              )
-            })
-          ) : (
-            <>
-              <IconButton
-                variant="contained"
-                color="primary"
-                size="small"
-                sx={{ fontSize: "14px" }}
-                onClick={() => {
-                  // parseName(params.row.col6)
-                }}
-              >
-                {/* <img src={params.row.members[0].avatar} alt={params.row.members[0].name} style={{width: "30px", height: "30px"}}/> */}
-                #{params.row.members[0].name}&cedil;
-              </IconButton>
-              <IconButton
-                variant="contained"
-                color="primary"
-                size="small"
-                sx={{ fontSize: "14px" }}
-                onClick={() => {
-                  // parseName(params.row.col6)
-                }}
-              >
-                {/* <img src={params.row.members[1].avatar} alt={params.row.members[1].name} style={{width: "30px", height: "30px"}}/> */}
-                #{params.row.members[1].name}&cedil;
-              </IconButton>
-            </>
-          )
-        }
-        <Button>
-          <AddBoxIcon />
         </Button>
       </strong >
     )
   }
 
+
+  // hàm render nút Add member
+  const renderAddMemberButton = (params) => {
+    return (
+      <strong>
+        {
+          params.row.members.length < 4 ? (
+            params.row.members.map((item, index) => {
+              return (
+                <IconButton
+                  key={index}
+                  variant="contained"
+                  color="primary"
+                  size="small"
+                  sx={{ fontSize: "14px" }}
+                  onClick={() => {
+                    // parseName(params.row.col6)
+                  }}
+                >
+                  <img src={item.avatar} alt={item.name} style={{ width: "30px", height: "30px", border: `1px ${blue[500]} solid` }} />
+                  {/* #{item.name}&cedil; */}
+                </IconButton>
+              )
+            })
+          ) : (
+            <>
+              <IconButton
+                key={index}
+                variant="contained"
+                color="primary"
+                size="small"
+                sx={{ fontSize: "14px" }}
+                onClick={() => {
+                  // parseName(params.row.col6)
+                }}
+              >
+                <img src={params.row.members[0].avatar} alt={params.row.members[0].name} style={{ width: "30px", height: "30px" }} />
+                {/* #{params.row.members[0].name}&cedil; */}
+              </IconButton>
+              <IconButton
+                variant="contained"
+                color="primary"
+                size="small"
+                sx={{ fontSize: "14px" }}
+                onClick={() => {
+                  // parseName(params.row.col6)
+                }}
+              >
+                <img src={params.row.members[1].avatar} alt={params.row.members[1].name} style={{ width: "30px", height: "30px" }} />
+                {/* #{params.row.members[1].name}&cedil; */}
+              </IconButton>
+            </>
+          )
+        }
+        <IconButton
+          sx={{
+            border: `1px ${blue[500]} solid`
+          }}
+          onClick={() => {
+            handleOpen();
+            handleSetProjectId(params.row.id);
+          }}
+        >
+          <AddBoxIcon />
+        </IconButton>
+      </strong >
+    )
+  }
+
+
+  // Tạo column hiển thị danh sách Project cho DataGrid
   const columns = [
     { field: 'id', headerName: 'ID', width: "60" },
-    { field: 'projectName', headerName: 'Dự án', width: "150" },
-    { field: 'categoryName', headerName: 'Phân loại', width: "130" },
+    { field: 'projectName', headerName: 'Dự án', width: "170" },
+    { field: 'categoryName', headerName: 'Phân loại', width: "150" },
     {
-      field: 'creator', headerName: 'Người tạo', width: "120",
+      field: 'creator', headerName: 'Người tạo', width: "190",
       renderCell: renderAddCreatorButton,
+      // valueGetter giúp lấy dữ liệu ko phải là string mà là array hoặc object
       // valueGetter: (params) => {
       //   return `${params.value.name || "Không chủ"}`;
       // }
     },
     {
-      field: 'members', headerName: 'Thành viên', width: "300",
+      field: 'members', headerName: 'Thành viên', width: "210",
+      // valueGetter giúp lấy dữ liệu ko phải là string mà là array hoặc object
       // valueGetter: (params) =>
       // {
       //   let member = [];
@@ -159,10 +207,11 @@ const ProjectManagement = () => {
       //   }
       //   return member;
       // },
+      // renderCell giúp cấy thêm component(Button...) vào bảng
       renderCell: renderAddMemberButton,
     },
     {
-      field: 'action', headerName: 'Hành động', width: "150",
+      field: 'action', headerName: 'Thao tác', width: "150",
       renderCell: renderDeleteButton,
       disableClickEventBubbling: true,
     },
@@ -170,7 +219,6 @@ const ProjectManagement = () => {
 
 
   // nếu user ko chạy trang home trước mà vô trang management trước thì ko dùng dữ liệu từ store Redux đc mà phải tự gọi API
-  // const [projectListData, setProjectListData] = useState("");
   let projectListData = [];
   const { data = [], isLoading, isError, error } = useQuery({
     queryKey: ["allProject"],
@@ -189,9 +237,28 @@ const ProjectManagement = () => {
     handleChangeData();
   }
 
-  const indicesToCopy = [1, 8, 2, 3, 7];
-  // Lấy các thành phần mong muốn từ mỗi đối tượng
+
+  // Lấy các thành phần mong muốn từ mỗi đối tượng vào đối tượng mới sau đó cho vào array rows
   const rows = projectList.map(({ id, projectName, categoryName, creator, members }) => ({ id, projectName, categoryName, creator, members }));
+
+
+  // Hàm để set Id của project để gọi đúng thành viên project đó
+  // const [projectId, setProjectId] = useState("");
+  const handleSetProjectId = (value) => {
+    // setProjectId(value);
+    handleChangeMemberByProjectId(value);
+  }
+
+
+  // Hàm để lấy danh sách member ra từ projectId
+  const [memberByProjectId, setMemberByProjectId] = useState("");
+  const handleChangeMemberByProjectId = (value) => {
+    for (let i in projectList) {
+      if (projectList[i].id === value) {
+        setMemberByProjectId(projectList[i].members)
+      }
+    }
+  }
 
 
   return (
@@ -202,7 +269,7 @@ const ProjectManagement = () => {
             Bảng dự án
           </Typography>
         </Box>
-        <div style={{ height: 400, width: '100%' }}>
+        <div style={{ height: "90%", width: '100%' }}>
           <DataGrid
             rows={rows}
             columns={columns}
@@ -211,91 +278,110 @@ const ProjectManagement = () => {
                 paginationModel: { page: 0, pageSize: 5 },
               },
             }}
-            pageSizeOptions={[5, 10]}
+            pageSizeOptions={[5, 10, 15, 20]}
             checkboxSelection
             disableRowSelectionOnClick
           />
         </div>
-        {/* <TableContainer component={Paper} style={{ maxWidth: "100%" }}>
-          <Table sx={{ maxWidth: "100%" }} aria-label="a dense table">
-            <TableHead>
-              <TableRow>
-                <TableCell width={"10%"} >Id</TableCell>
-                <TableCell width={"15%"} align="left" >Tên dự án</TableCell>
-                <TableCell width={"15%"} align="left">Phân loại</TableCell>
-                <TableCell width={"15%"} align="left">Người tạo</TableCell>
-                <TableCell width={"25%"} align="left">Thành viên</TableCell>
-                <TableCell width={"10%"} align="left">Hành động</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {
-                projectList.map((item, index) => (
-                  <TableRow
-                    key={index}
-                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                  >
-                    <TableCell component="th" scope="item">
-                      {item.id}
-                    </TableCell>
-                    <TableCell align="left">{item.projectName}</TableCell>
-                    <TableCell align="left">{item.categoryName}</TableCell>
-                    <TableCell align="left">{item.creator.name}</TableCell>
+        <Modal
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box sx={style}>
+            <Typography id="modal-modal-title" variant="h5" color={`${blue[500]}`} gutterBottom>
+              Danh sách thành viên
+            </Typography>
+            <Typography id="modal-modal-description" variant="h6" gutterBottom>
+              <Table>
+                <TableHead>
+                  <TableRow>
                     <TableCell
                       align="left"
-                      key={index}
+                      {...typographySettings}
                     >
-                      {
-                        item.members.length > 0 ?
-                          (
-                            item.members.map((member, index) => {
-                              return (
-                                <>
-                                  <IconButton
-                                    size="small"
-                                    sx={{ fontSize: "16px" }}
-                                    key={index}
-                                  >
-                                    #{member.name}
-                                  </IconButton>
-                                </>
-                              )
-                            })
-                          ) : (
-                            <>
-                              <IconButton
-                                size="small"
-                                sx={{ fontSize: "16px" }}
-                                key={index}
-                              >
-                                Chưa có
-                              </IconButton>
-                            </>
-                          )
-                      }
-                      <IconButton 
-                        onClick={() => {
-
-                        }}
-                      >
-                        ...<AddBoxIcon/>
-                      </IconButton>
+                      Id
                     </TableCell>
-                    <TableCell align="left">
-                      <Button variant="contained" size='small' startIcon={<EditIcon />}>
-                      </Button>
-                      <Button variant="contained" size='small' color="error" startIcon={<DeleteIcon />}>
-                      </Button>
+                    <TableCell
+                      align="left"
+                      {...typographySettings}
+                    >
+                      Avatar
+                    </TableCell>
+                    <TableCell
+                      align="left"
+                      {...typographySettings}
+                    >
+                      Tên
+                    </TableCell>
+                    <TableCell
+                      align="left"
+                      {...typographySettings}
+                    >
+                      Xoá
                     </TableCell>
                   </TableRow>
-                ))
-              }
-            </TableBody>
-          </Table>
-        </TableContainer> */}
-
+                </TableHead>
+                <TableBody>
+                  {
+                    memberByProjectId.length > 0 ? (
+                      memberByProjectId.map((item, index) => (
+                        <TableRow key={index}>
+                          <TableCell
+                            align="left"
+                          >
+                            <Typography
+                              variant='h6'
+                            >
+                              {item.userId}
+                            </Typography>
+                          </TableCell>
+                          <TableCell
+                            align="left"
+                          >
+                            <IconButton
+                              size="small"
+                              sx={{ fontSize: "16px" }}
+                            >
+                              <img src={item.avatar} alt={item.name} style={{ width: "30px", height: "30px" }} />
+                            </IconButton>
+                          </TableCell>
+                          <TableCell
+                            align="left"
+                          >
+                            <Typography
+                              variant='h6'
+                            >
+                              {item.name}
+                            </Typography>
+                          </TableCell>
+                          <TableCell
+                            align="left"
+                          >
+                            <IconButton
+                              onClick={() => {
+                                // 
+                              }}
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <Typography variant='h6' color={"error"}>
+                        Chưa có thành viên
+                      </Typography>
+                    )
+                  }
+                </TableBody>
+              </Table>
+            </Typography>
+          </Box>
+        </Modal>
       </Container>
-    </div>
+    </div >
   )
 }
 
