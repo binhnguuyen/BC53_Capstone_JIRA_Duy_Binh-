@@ -12,9 +12,12 @@ import Paper from '@mui/material/Paper';
 import PC_Logo from "../../assets/img/PC_Logo.webp"
 import Mobile_Logo from "../../assets/img/Mobile_Logo.png"
 import Software_Logo from "../../assets/img/Software_Logo.jpg"
+import { useDispatch } from 'react-redux';
+import { projectListAction } from "../../redux/slices/project.slice"
 
 const Home = () => {
     const navigate = useNavigate();
+    const dispatch= useDispatch();
     const [categoryId, setCategoryId] = useState("0");
     const [newDataList, setNewDataList] = useState("");
     const [projectImage, setProjectImage] = useState("");
@@ -66,6 +69,13 @@ const Home = () => {
         queryKey: ["allProject"],
         queryFn: getAllProject,
     });
+
+
+    // đưa data lên store của Redux để qua bên trang Project Management khỏi call API lần nữa
+    const sendDataToReduxStore = () => {
+        dispatch(projectListAction.setProjectList(data))
+    }
+    sendDataToReduxStore();
 
 
     const handleFirstDataList = () => {
@@ -184,7 +194,9 @@ const Home = () => {
                                                             <Button
                                                                 size='small'
                                                                 variant='outlined'
-                                                                sx={{ fontSize: "16px" }}>
+                                                                sx={{ fontSize: "16px" }}
+                                                                key={index}
+                                                                >
                                                                 #{member.name}
                                                             </Button>
                                                         )
@@ -258,7 +270,9 @@ const Home = () => {
                                                             <Button
                                                                 size='small'
                                                                 variant='outlined'
-                                                                sx={{ fontSize: "16px" }}>
+                                                                sx={{ fontSize: "16px" }}
+                                                                key={index}
+                                                                >
                                                                 #{member.name}
                                                             </Button>
                                                         )
