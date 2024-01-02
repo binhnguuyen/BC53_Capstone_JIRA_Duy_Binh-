@@ -72,10 +72,21 @@ const Home = () => {
 
 
     // đưa data lên store của Redux để qua bên trang Project Management khỏi call API lần nữa
-    const sendDataToReduxStore = () => {
-        dispatch(projectListAction.setProjectList(data))
+    const sendDataToReduxStore = async () => {
+        try {
+            const response = await data
+            if ( data && data.length > 0 ) {
+                dispatch(projectListAction.setProjectList(data));
+            }
+            return response;
+        }
+        catch (error) {
+            throw Error(error)
+        }
     }
-    sendDataToReduxStore();
+    if ( data && data.length > 0 ) {
+        sendDataToReduxStore();
+    }
 
 
     const handleFirstDataList = () => {
