@@ -1,12 +1,10 @@
-import { Box, Button, Container, IconButton, Typography, Modal, Icon } from '@mui/material'
+import { Box, Button, Container, IconButton, Typography, Modal } from '@mui/material'
 import React, { useState } from 'react'
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
 import { useSelector } from 'react-redux';
 import { blue } from '@mui/material/colors';
 import { red } from '@mui/material/colors';
@@ -25,10 +23,9 @@ const ProjectManagement = () => {
 
   // CSS
   const typographySettings = {
-    variant: "h6",
     style: {
-      fontSize: 20,
-      fontWeight: 700,
+      fontSize: 16,
+      fontWeight: 500,
     }
   }
   const style = {
@@ -94,7 +91,7 @@ const ProjectManagement = () => {
           variant="outlined"
           color="primary"
           size="small"
-          sx={{ fontSize: "14px", border: `1px ${blue[500]} solid` }}
+          sx={{ fontSize: "12px", border: `1px ${blue[500]} solid` }}
           onClick={() => {
             // parseName(params.row.col6)
           }}
@@ -111,7 +108,8 @@ const ProjectManagement = () => {
     return (
       <strong>
         {
-          params.row.members.length < 4 ? (
+          // có 3 thành viên trở lại thì render hết
+          params.row.members.length <= 3 ? (
             params.row.members.map((item, index) => {
               return (
                 <IconButton
@@ -119,7 +117,6 @@ const ProjectManagement = () => {
                   variant="contained"
                   color="primary"
                   size="small"
-                  sx={{ fontSize: "14px" }}
                   onClick={() => {
                     // parseName(params.row.col6)
                   }}
@@ -130,36 +127,46 @@ const ProjectManagement = () => {
               )
             })
           ) : (
+            // có 4 thành viên trở lên thì render 3 người đầu tiên
             <>
               <IconButton
-                key={index}
                 variant="contained"
                 color="primary"
                 size="small"
-                sx={{ fontSize: "14px" }}
                 onClick={() => {
                   // parseName(params.row.col6)
                 }}
               >
-                <img src={params.row.members[0].avatar} alt={params.row.members[0].name} style={{ width: "30px", height: "30px" }} />
+                <img src={params.row.members[0].avatar} alt={params.row.members[0].name} style={{ width: "30px", height: "30px", border: `1px ${blue[500]} solid` }} />
                 {/* #{params.row.members[0].name}&cedil; */}
               </IconButton>
               <IconButton
                 variant="contained"
                 color="primary"
                 size="small"
-                sx={{ fontSize: "14px" }}
                 onClick={() => {
                   // parseName(params.row.col6)
                 }}
               >
-                <img src={params.row.members[1].avatar} alt={params.row.members[1].name} style={{ width: "30px", height: "30px" }} />
+                <img src={params.row.members[1].avatar} alt={params.row.members[1].name} style={{ width: "30px", height: "30px", border: `1px ${blue[500]} solid` }} />
+                {/* #{params.row.members[1].name}&cedil; */}
+              </IconButton>
+              <IconButton
+                variant="contained"
+                color="primary"
+                size="small"
+                onClick={() => {
+                  // parseName(params.row.col6)
+                }}
+              >
+                <img src={params.row.members[2].avatar} alt={params.row.members[1].name} style={{ width: "30px", height: "30px", border: `1px ${blue[500]} solid` }} />
                 {/* #{params.row.members[1].name}&cedil; */}
               </IconButton>
             </>
           )
         }
         <IconButton
+          size="small"
           sx={{
             border: `1px ${blue[500]} solid`
           }}
@@ -181,7 +188,7 @@ const ProjectManagement = () => {
     { field: 'projectName', headerName: 'Dự án', width: "170" },
     { field: 'categoryName', headerName: 'Phân loại', width: "150" },
     {
-      field: 'creator', headerName: 'Người tạo', width: "190",
+      field: 'creator', headerName: 'Người tạo', width: "220",
       renderCell: renderAddCreatorButton,
       // valueGetter giúp lấy dữ liệu ko phải là string mà là array hoặc object
       // valueGetter: (params) => {
@@ -189,7 +196,7 @@ const ProjectManagement = () => {
       // }
     },
     {
-      field: 'members', headerName: 'Thành viên', width: "210",
+      field: 'members', headerName: 'Thành viên', width: "230",
       // valueGetter giúp lấy dữ liệu ko phải là string mà là array hoặc object
       // valueGetter: (params) =>
       // {
@@ -293,7 +300,7 @@ const ProjectManagement = () => {
             <Typography id="modal-modal-title" variant="h5" color={`${blue[500]}`} gutterBottom>
               Danh sách thành viên
             </Typography>
-            <Typography id="modal-modal-description" variant="h6" gutterBottom>
+            <Typography id="modal-modal-description" gutterBottom>
               <Table>
                 <TableHead>
                   <TableRow>
@@ -332,7 +339,7 @@ const ProjectManagement = () => {
                             align="left"
                           >
                             <Typography
-                              variant='h6'
+                              {...typographySettings}
                             >
                               {item.userId}
                             </Typography>
@@ -344,14 +351,14 @@ const ProjectManagement = () => {
                               size="small"
                               sx={{ fontSize: "16px" }}
                             >
-                              <img src={item.avatar} alt={item.name} style={{ width: "30px", height: "30px" }} />
+                              <img src={item.avatar} alt={item.name} style={{ width: "30px", height: "30px", border: `1px ${blue[500]} solid` }} />
                             </IconButton>
                           </TableCell>
                           <TableCell
                             align="left"
                           >
                             <Typography
-                              variant='h6'
+                              {...typographySettings}
                             >
                               {item.name}
                             </Typography>
@@ -360,6 +367,13 @@ const ProjectManagement = () => {
                             align="left"
                           >
                             <IconButton
+                              variant="contained"
+                              color="primary"
+                              size="small"
+                              sx={{
+                                border: `1px ${red[500]} solid`,
+                                marginLeft: "10px",
+                              }}
                               onClick={() => {
                                 // 
                               }}
@@ -370,7 +384,7 @@ const ProjectManagement = () => {
                         </TableRow>
                       ))
                     ) : (
-                      <Typography variant='h6' color={"error"}>
+                      <Typography {...typographySettings} color={"error"}>
                         Chưa có thành viên
                       </Typography>
                     )
