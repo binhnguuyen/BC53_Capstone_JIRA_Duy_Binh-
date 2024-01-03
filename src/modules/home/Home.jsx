@@ -17,7 +17,7 @@ import { projectListAction } from "../../redux/slices/project.slice"
 
 const Home = () => {
     const navigate = useNavigate();
-    const dispatch= useDispatch();
+    const dispatch = useDispatch();
     const [categoryId, setCategoryId] = useState("0");
     const [newDataList, setNewDataList] = useState("");
     const [projectImage, setProjectImage] = useState("");
@@ -75,7 +75,7 @@ const Home = () => {
     const sendDataToReduxStore = async () => {
         try {
             const response = await data
-            if ( data && data.length > 0 ) {
+            if (data && data.length > 0) {
                 dispatch(projectListAction.setProjectList(data));
             }
             return response;
@@ -84,7 +84,7 @@ const Home = () => {
             throw Error(error)
         }
     }
-    if ( data && data.length > 0 ) {
+    if (data && data.length > 0) {
         sendDataToReduxStore();
     }
 
@@ -148,13 +148,12 @@ const Home = () => {
                         labelId="demo-simple-select-label"
                         id="demo-simple-select"
                         value={categoryId}
-                        label="Dự án"
                         onChange={handleChangeCategoryName}
                     >
                         <MenuItem value={0}>Tất cả</MenuItem>
-                        <MenuItem value={1}>Dự án Web</MenuItem>
+                        <MenuItem value={1}>Dự án web</MenuItem>
                         <MenuItem value={2}>Dự án phần mềm</MenuItem>
-                        <MenuItem value={3}>Dự án Mobile</MenuItem>
+                        <MenuItem value={3}>Dự án di động</MenuItem>
                     </Select>
                     <Typography variant="h6" style={{ color: `${red[500]}` }}>
                         Có tất cả
@@ -207,7 +206,7 @@ const Home = () => {
                                                                 variant='outlined'
                                                                 sx={{ fontSize: "16px" }}
                                                                 key={index}
-                                                                >
+                                                            >
                                                                 #{member.name}
                                                             </Button>
                                                         )
@@ -229,7 +228,7 @@ const Home = () => {
                                             </Typography>
                                         </CardContent>
                                         <CardActions>
-                                        <Button size="medium"
+                                            <Button size="medium"
                                                 style={{
                                                     color: `${blue[500]}`,
                                                 }}
@@ -283,7 +282,7 @@ const Home = () => {
                                                                 variant='outlined'
                                                                 sx={{ fontSize: "16px" }}
                                                                 key={index}
-                                                                >
+                                                            >
                                                                 #{member.name}
                                                             </Button>
                                                         )

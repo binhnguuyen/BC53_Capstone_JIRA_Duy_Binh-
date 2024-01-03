@@ -14,11 +14,15 @@ import { getAllProject } from '../../../apis/project.api';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddBoxIcon from '@mui/icons-material/AddBox';
+import AddIcon from '@mui/icons-material/Add';
 import { DataGrid } from '@mui/x-data-grid';
+import { PATH } from '../../../utils/paths';
+import { useNavigate } from 'react-router-dom';
 
 
 const ProjectManagement = () => {
   let { projectList } = useSelector((state) => state.project)
+  const navigate = useNavigate();
 
 
   // CSS
@@ -271,10 +275,24 @@ const ProjectManagement = () => {
   return (
     <div style={{ display: "flex", justifyContent: "center", alignContent: "center" }}>
       <Container style={{ maxWidth: "80vw" }} sx={{ margin: "60px 60px", padding: "24px", boxShadow: "0px 1px 10px 0px rgba(0,0,0,0.12)" }}>
-        <Box style={{ padding: "10px", boxShadow: "0px 1px 10px 0px rgba(0,0,0,0.12)" }}>
+        <Box
+          style={{
+            padding: "10px",
+            boxShadow: "0px 1px 10px 0px rgba(0,0,0,0.12)",
+            display: "flex",
+            justifyContent: "space-between"
+          }}
+        >
           <Typography variant="h5" style={{ color: `${blue[500]}` }}>
             Bảng dự án
           </Typography>
+          <Button
+            variant="contained"
+            size="medium"
+            onClick={() => navigate(PATH.CREATEPROJECT)}
+          >
+            Tạo dự án
+          </Button>
         </Box>
         <div style={{ height: "90%", width: '100%' }}>
           <DataGrid

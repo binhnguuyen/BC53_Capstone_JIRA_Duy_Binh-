@@ -5,4 +5,5 @@ export const PATH = {
     ADMIN: "/admin",
     PROJECT: "/project",
     PROJECTMANAGEMENT: "/projectmanagement",
+    CREATEPROJECT:"/createproject"
 }
