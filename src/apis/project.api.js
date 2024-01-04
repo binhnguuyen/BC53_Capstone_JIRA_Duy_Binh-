@@ -12,6 +12,21 @@ export const getAllProject = async () => {
   }
 };
 
+// Link:
+// https://jiranew.cybersoft.edu.vn/api/Project/getProjectDetail
+export const getProjectDetail = async (projectId) => {
+  try {
+    const response = await fetcher.get("/Project/getProjectDetail", {
+      params: {
+        id: projectId,
+      },
+    });
+    return response.data.content;
+  } catch (error) {
+    throw "Lỗi get API";
+  }
+};
+
 
 // Link:
 // https://jiranew.cybersoft.edu.vn/api/Project/createProject
@@ -21,5 +36,53 @@ export const creatProject = async (payload) => {
     return response.data.content;
   } catch (error) {
     throw "Lỗi post API";
+  }
+};
+
+// Link:
+// https://jiranew.cybersoft.edu.vn/api/Project/createProjectAuthorize
+export const creatProjectAuthorize = async (payload) => {
+  try {
+    const response = await fetcher.post("/Project/createProjectAuthorize", payload);
+    return response.data.content;
+  } catch (error) {
+    throw "Lỗi post API";
+  }
+};
+
+// Link:
+// https://jiranew.cybersoft.edu.vn/api/Project/updateProject
+export const editProject = async (payload) => {
+  try {
+    const response = await fetcher.put("/Project/updateProject", payload,
+      {
+        params: {
+          projectId: payload.id,
+        },
+      }
+    );
+    return response.data.content;
+  } catch (error) {
+    throw "Lỗi put API";
+  }
+};
+
+
+// Link:
+// https://jiranew.cybersoft.edu.vn/api/Project/deleteProject
+export const deleteProject = async (projectId) => {
+  console.log('projectId: ', projectId);
+  try {
+    const response = await fetcher.delete("/Project/deleteProject",
+      {
+        params: {
+          projectId: projectId,
+        },
+      }
+    )
+    console.log(response.data.content);
+    return response.data.content;
+  } catch (error) {
+    throw "Lỗi delete API";
   }
 };

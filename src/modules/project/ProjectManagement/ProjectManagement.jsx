@@ -5,12 +5,12 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { blue } from '@mui/material/colors';
 import { red } from '@mui/material/colors';
 import { green } from '@mui/material/colors';
-import { useQuery } from '@tanstack/react-query';
-import { getAllProject } from '../../../apis/project.api';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { deleteProject, getAllProject } from '../../../apis/project.api';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddBoxIcon from '@mui/icons-material/AddBox';
@@ -18,11 +18,23 @@ import AddIcon from '@mui/icons-material/Add';
 import { DataGrid } from '@mui/x-data-grid';
 import { PATH } from '../../../utils/paths';
 import { useNavigate } from 'react-router-dom';
+import { projectListAction } from "../../../redux/slices/project.slice"
+
+// Thư viện Swal
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 
 
 const ProjectManagement = () => {
-  let { projectList } = useSelector((state) => state.project)
+  let { projectList } = useSelector((state) => state.project);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const queryClient = useQueryClient();
+
+
+
+  // thư viện SweetAlert
+  const MySwal = withReactContent(Swal);
 
 
   // CSS
@@ -63,7 +75,7 @@ const ProjectManagement = () => {
             border: `1px ${green[500]} solid`
           }}
           onClick={() => {
-            // parseName(params.row.col6)
+            handleProjectIdToEdit(params.row.id);
           }}
         >
           <EditIcon />
@@ -77,7 +89,7 @@ const ProjectManagement = () => {
             marginLeft: "10px",
           }}
           onClick={() => {
-            // parseName(params.row.col6)
+            handleDeleteProject(params.row.id);
           }}
         >
           <DeleteIcon />
@@ -270,6 +282,37 @@ const ProjectManagement = () => {
       }
     }
   }
+
+
+  // Hàm để truyền dữ liệu Project muống edit lên store Redux và chuyển hướng qua trang CreateProject
+  const handleProjectIdToEdit = (value) => {
+    if (value) {
+      dispatch(projectListAction.setProjectIdToEdit(value));
+    }
+    navigate(PATH.CREATEPROJECT);
+  }
+
+
+
+  // dùng useMutation để Delete Project trên API
+  const { mutate: handleDeleteProject, isPending } = useMutation({
+    mutationFn: (id) => deleteProject(id),
+    onSuccess: () => {
+      MySwal.fire({
+        icon: "success",
+        title: "Bạn đã xoá dự án thành công",
+        // text: "Quay lại trang quản lý dự án",
+        confirmButtonText: "Đồng ý"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          queryClient.invalidateQueries({ queryKey: ["deleteProject"] });
+        }
+      })
+    },
+    onError: (error) => {
+      alert(error);
+    }
+  });
 
 
   return (

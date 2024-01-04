@@ -1,12 +1,11 @@
 import { Box, Button, Container, FormControl, FormControlLabel, FormHelperText, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material'
 import { blue } from '@mui/material/colors'
+import { green } from '@mui/material/colors'
 import { LoadingButton } from "@mui/lab";
 import { Link, useNavigate } from "react-router-dom";
 import Copyright from "../../../components/Copyright";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
-import React, { useState } from 'react'
-import { Controller, useForm } from 'react-hook-form';
-import { Textarea } from '@mui/joy';
+import React, { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form';
 
 // Thư viện Swal
 import Swal from 'sweetalert2'
@@ -15,9 +14,13 @@ import withReactContent from 'sweetalert2-react-content'
 // Thư viện Yup giúp mình validate Hook Form
 import * as yup from "yup"
 import { yupResolver } from "@hookform/resolvers/yup"
-import { creatProject } from '../../../apis/project.api';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+
+import { creatProject, getProjectDetail } from '../../../apis/project.api';
+import { creatProjectAuthorize } from '../../../apis/project.api';
+import { editProject } from '../../../apis/project.api';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { PATH } from '../../../utils/paths'
+import { useSelector } from 'react-redux';
 
 // Thư viện Yup resolver
 const schemaCreateProject = yup.object({
@@ -33,8 +36,8 @@ const schemaCreateProject = yup.object({
 
 const CreateProject = () => {
     const navigate = useNavigate();
-    const [categoryId, setCategoryId] = useState("0");
     const queryClient = useQueryClient();
+    const { projectIdToEdit } = useSelector(state => state.project);
 
 
     // thư viện SweetAlert
@@ -50,15 +53,10 @@ const CreateProject = () => {
     }
 
 
-    // định nghĩa hàm
-    const handleChangeCategoryName = (event) => {
-        setCategoryId(event.target.value);
-    };
-
-
     // Validation
     const { register, handleSubmit, formState: { errors } } = useForm({
         defaultValues: {
+            id: 0,
             projectName: "",
             description: "",
             categoryId: 0,
@@ -70,36 +68,144 @@ const CreateProject = () => {
     });
 
 
-    // dùng useMutation, khi có 1 thao tác thì mới thực hiện POST lên API
-    const { mutate: handlecreateProject, isPending } = useMutation({
-        mutationFn: (payload) => creatProject(payload),
+    // Xử lý formValue (raw data lấy từ form)
+    const [formValue, setFormValue] = useState({
+        id: 0,
+        projectName: "",
+        creator: 0,
+        categoryId: "",
+        description: "",
+        alias: "",
+    });
+
+
+    // Xử lý formProjectToEdit
+    const [formProjectToEdit, setFormProjectToEdit] = useState({
+        id: 0,
+        projectName: "",
+        creator: 0,
+        categoryId: "",
+        description: "",
+    });
+
+
+    // lấy projectToEdit về bằng getProjectDetail API
+    const { data: projectToEdit, isLoading, isError, error } = useQuery({
+        queryKey: ["projectIdToEdit", projectIdToEdit],
+        queryFn: () => getProjectDetail(projectIdToEdit),
+        // chỉ kích hoạt nếu có dữ liệu trong projectIdToEdit (lấy từ store của Redux về do Home đưa lên)
+        enabled: !!projectIdToEdit,
+    });
+
+
+    // dùng useMutation để POST lên API (dùng creatProject thì sau đó ko xoá đc nên ko dùng)
+    const { mutate: handleCreateProject, isPending: isAdding } = useMutation({
+        mutationFn: (payload) => creatProjectAuthorize(payload),
         onSuccess: () => {
             MySwal.fire({
                 icon: "success",
-                title: "Bạn đã đặt vé thành công",
-                text: "Quay lại trang phim",
+                title: "Bạn đã tạo dự án thành công",
+                text: "Quay lại trang quản lý dự án",
                 confirmButtonText: "Đồng ý"
             }).then((result) => {
                 if (result.isConfirmed) {
-                    queryClient.invalidateQueries({ queryKey: [""] });
+                    queryClient.invalidateQueries({ queryKey: ["creatProjectAuthorize"] });
                     navigate(PATH.PROJECTMANAGEMENT);
                 }
             })
         },
         onError: (error) => {
-            Alert(errors);
+            alert(error);
         }
-
     });
 
+
+    // dùng useMutation để PUT lên API
+    const { mutate: handleEditProject, isPending: isEditting } = useMutation({
+        mutationFn: (payload) => editProject(payload),
+        onSuccess: () => {
+            MySwal.fire({
+                icon: "success",
+                title: "Bạn đã sửa dự án thành công",
+                text: "Quay lại trang quản lý dự án",
+                confirmButtonText: "Đồng ý"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    queryClient.invalidateQueries({ queryKey: ["editProject"] });
+                    navigate(PATH.PROJECTMANAGEMENT);
+                }
+            })
+        },
+        onError: (error) => {
+            alert(error);
+        }
+    });
+
+
+    const handleSetProjectToEdit = () => {
+        // console.log('formValue: ', formValue);
+        setFormProjectToEdit({
+            ...formProjectToEdit,
+            id: projectToEdit.id,
+            projectName: formValue.projectName,
+            creator: 0,
+            categoryId: formValue.categoryId,
+            description: formValue.description,
+        })
+    }
+    
+    
     const onSubmit = (formValues) => {
-        handlecreateProject(formValues);
+        // hàm set giá trị cho cái project mà mình muốn update
+        if (projectToEdit) {
+            handleSetProjectToEdit();
+        }
+        // console.log('formProjectToEdit: ', formProjectToEdit);
+        // có projectToEdit thì sửa
+        // cái formValue này đc định nghĩa theo cấu trúc để bài yêu cầu bài bằng useState phía trên, các thành phần trong đó đc đưa vào bằng hàm handleSetFormValue ( bên trong có hàm setFormValue )
+        if (projectToEdit) {
+            handleEditProject(formProjectToEdit);
+        }
+        // ko có projectToEdit thì thêm
+        // tham số formValues này là do xài useForm, nó tự lấy từ trong form mình ra, nên chỉ cần làm cái form đúng theo yêu cầu đề bài là đc
+        else {
+            handleCreateProject(formValues);
+        }
+
+        // clear form sau khi addProduct
+        setFormValue({
+            id: "",
+            projectName: "",
+            creator: "",
+            categoryId: 0,
+            description: "",
+            alias: "",
+        });
     };
 
-    const onError = (errors) => {
-        Alert(errors);
+    const onError = (error) => {
+        alert(error);
     };
 
+
+    // Hàm xử lý formValue
+    const handleSetFormValue = (value) => event => {
+        setFormValue({
+            // clone lại vì những cái setFormValue sau dòng này sẽ làm mất giá trị id
+            ...formValue,
+            // có dấu ngoặc vuông là dynamic, thì nó sẽ hiểu đây là thuộc tính để truyền vào
+            [value]: event.target.value,
+        })
+    }
+
+
+    // khi ấn sửa thì projectToEdit đc hình thành, hàm setFormValue hạy và formValue có giá trị. Giá trị này đc gán vào value={} trong TextField hoặc Select bên dưới
+    useEffect(() => {
+        if (projectToEdit) {
+            setFormValue(projectToEdit);
+            handleSetProjectToEdit();
+        }
+    }, [projectToEdit])
 
 
 
@@ -124,11 +230,29 @@ const CreateProject = () => {
                         sx={{ mt: 1 }}
                         onSubmit={handleSubmit(onSubmit, onError)}
                     >
+                        {
+                            projectToEdit === undefined ? (
+                                <>
+                                </>
+                            ) : (
+                                <TextField
+                                    required
+                                    fullWidth
+                                    id="projectId"
+                                    label={Boolean(!formValue.id) && "Id dự án"}
+                                    name="projectId"
+                                    type="number"
+                                    style={{ marginBottom: 10 }}
+                                    disabled
+                                    value={formValue.id}
+                                />
+                            )
+                        }
                         <TextField
                             required
                             fullWidth
                             id="projectName"
-                            label="Tên dự án"
+                            label={"Tên dự án"}
                             name="projectName"
                             type="text"
                             placeholder="Dự án JIRA"
@@ -137,10 +261,11 @@ const CreateProject = () => {
                             {...register("projectName")}
                             error={Boolean(errors.projectName)}
                             helperText={Boolean(errors.projectName) && errors.projectName.message}
+                            value={formValue.projectName}
+                            onChange={handleSetFormValue("projectName")}
                         />
                         <FormControl fullWidth
-
-                            error={!categoryId}
+                            error={Boolean((!formValue.categoryId) && (!projectToEdit?.projectCategory.id)) || 0}
                             style={{ marginBottom: 10 }}
                         >
                             <InputLabel id="demo-simple-select-label" >Chọn dự án</InputLabel>
@@ -149,23 +274,22 @@ const CreateProject = () => {
                                 {...register("categoryId")}
                                 required
                                 id="categoryId"
-                                label="Chọn dự án"
-                                autoFocus
-                                value={categoryId}
-                                onChange={handleChangeCategoryName}
+                                label={"Chọn dự án"}
+                                value={(formValue.categoryId ? formValue.categoryId : projectToEdit?.projectCategory.id) || 0}
+                                onChange={handleSetFormValue("categoryId")}
                             >
                                 <MenuItem value={0}>...</MenuItem>
                                 <MenuItem value={1}>Dự án web</MenuItem>
                                 <MenuItem value={2}>Dự án phần mềm</MenuItem>
                                 <MenuItem value={3}>Dự án di động</MenuItem>
                             </Select>
-                            <FormHelperText>{Boolean(!categoryId) && "Xin vui lòng chọng dự án phù hợp"}</FormHelperText>
+                            <FormHelperText>{Boolean((!formValue.categoryId) && (!projectToEdit?.projectCategory.id) || 0) && "Xin vui lòng chọng dự án phù hợp"}</FormHelperText>
                         </FormControl>
                         <TextField
                             required
                             fullWidth
                             name="description"
-                            placeholder="Nội dung …"
+                            placeholder="Nội dung..."
                             label="Miêu tả"
                             variant="outlined"
                             style={{ height: "300", marginBottom: 10 }}
@@ -177,12 +301,14 @@ const CreateProject = () => {
                             {...register("description")}
                             error={Boolean(errors.description)}
                             helperText={Boolean(errors.description) && errors.description.message}
+                            value={formValue.description}
+                            onChange={handleSetFormValue("description")}
                         />
                         <TextField
                             required
                             fullWidth
                             name="alias"
-                            placeholder="Nội dung"
+                            placeholder="Nội dung..."
                             label="Bí danh"
                             variant="outlined"
                             style={{ height: "50px", marginBottom: 40 }}
@@ -191,17 +317,34 @@ const CreateProject = () => {
                             {...register("alias")}
                             error={Boolean(errors.alias)}
                             helperText={Boolean(errors.alias) && errors.alias.message}
+                            value={formValue.alias}
+                            onChange={handleSetFormValue("alias")}
                         />
-                        <LoadingButton
-                            variant="contained"
-                            color="primary"
-                            size="large"
-                            sx={{ fontSize: "14px", border: `1px ${blue[500]} solid` }}
-                            type="submit"
-                            loading={isPending}
-                        >
-                            Tạo dự án
-                        </LoadingButton>
+                        {
+                            projectToEdit === undefined ? (
+                                <LoadingButton
+                                    variant="contained"
+                                    color="primary"
+                                    size="large"
+                                    sx={{ fontSize: "14px", border: `1px ${blue[500]} solid` }}
+                                    type="submit"
+                                    loading={isAdding}
+                                >
+                                    Tạo dự án
+                                </LoadingButton>
+                            ) : (
+                                <LoadingButton
+                                    variant="contained"
+                                    color="success"
+                                    size="large"
+                                    sx={{ fontSize: "14px", border: `1px ${green[500]} solid` }}
+                                    type="submit"
+                                    loading={isEditting}
+                                >
+                                    Sửa dự án
+                                </LoadingButton>
+                            )
+                        }
                     </Box>
                 </div>
                 <Copyright sx={{ mt: 5 }} />
