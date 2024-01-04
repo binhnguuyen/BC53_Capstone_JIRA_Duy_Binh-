@@ -12,7 +12,7 @@ const fetcher = axios.create({
 fetcher.interceptors.request.use((config) => {
     const user = getLocalStorage(CURRENT_USER);
     if (user) {
-        config.headers.Authorization = user.accessToken;
+        config.headers.Authorization =  `Bearer ${user.accessToken}`;
     }
     return config;
 })
