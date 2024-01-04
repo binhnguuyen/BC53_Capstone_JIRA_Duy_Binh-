@@ -6,6 +6,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
     projectList: [],
+    projectIdToEdit: undefined,
 }
 
 const projectSlice = createSlice({
@@ -15,6 +16,10 @@ const projectSlice = createSlice({
         setProjectList: (state, {payload}) => {
             // console.log('payload: ', payload);
             state.projectList = payload;
+        },
+        setProjectIdToEdit: (state, { payload }) => {
+            // console.log("payload", payload);
+            state.projectIdToEdit = payload;
         },
     }
 });

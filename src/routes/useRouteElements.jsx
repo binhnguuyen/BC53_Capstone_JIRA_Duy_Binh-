@@ -14,6 +14,8 @@ const RegisterPage = lazy(() => import("../modules/auth/Register"))
 const AdminPage = lazy(() => import("../modules/admin"))
 const ProjectManagementPage = lazy(() => import("../modules/project/ProjectManagement"))
 const ProjectPage = lazy(() => import("../modules/project/Project"))
+const CreateProjectPage = lazy(() => import("../modules/project/CreateProject"))
+
 
 const AuthenticateRouter = () => {
     // Check for authentication token
@@ -80,6 +82,14 @@ const useRouteElements = () => {
                     element:
                         <Suspense callBack={<div>Loading</div>}>
                             <ProjectPage />
+                        </Suspense>,
+                },
+                {
+                    path: PATH.CREATEPROJECT,
+                    // index: 3,
+                    element:
+                        <Suspense callBack={<div>Loading</div>}>
+                            <CreateProjectPage />
                         </Suspense>,
                 },
             ],

@@ -20,6 +20,8 @@ import Copyright from "../../../components/Copyright";
 import logo from "../../../assets/img/logo.png";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useState } from "react";
+import { CURRENT_USER } from "../../../utils/constants";
+import { setLocalStorage } from "../../../utils/helpers";
 
 const Login = () => {
     const {
@@ -41,7 +43,8 @@ const Login = () => {
         onSuccess: (values) => {
             alert("Đăng nhập thành công!");
             // save user's information to local storage (using values)
-
+            // save sau khi login POST thành công lên API để có Access Token
+            setLocalStorage(CURRENT_USER , values);
             // navigate to page home
             navigate(`${PATH.HOME}`);
         },
@@ -50,9 +53,8 @@ const Login = () => {
             alert(error.message);
         },
     });
-
+    
     const onSubmit = async (values) => {
-        console.log("values", values);
 
         // call api
         handleSignin(values);
