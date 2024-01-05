@@ -71,7 +71,6 @@ export const editProject = async (payload) => {
 // Link:
 // https://jiranew.cybersoft.edu.vn/api/Project/deleteProject
 export const deleteProject = async (projectId) => {
-  console.log('projectId: ', projectId);
   try {
     const response = await fetcher.delete("/Project/deleteProject",
       {
@@ -80,9 +79,32 @@ export const deleteProject = async (projectId) => {
         },
       }
     )
-    console.log(response.data.content);
     return response.data.content;
   } catch (error) {
     throw "Lỗi delete API";
+  }
+};
+
+
+// Link:
+// https://jiranew.cybersoft.edu.vn/api/Project/assignUserProject
+export const assignUserProject = async (payload) => {
+  try {
+    const response = await fetcher.post("/Project/assignUserProject", payload);
+    return response.data.content;
+  } catch (error) {
+    throw "Lỗi assign USER API";
+  }
+};
+
+
+// Link:
+// https://jiranew.cybersoft.edu.vn/api/Project/removeUserFromProject
+export const removeUserFromProject = async (payload) => {
+  try {
+    const response = await fetcher.delete("/Project/removeUserFromProject", payload);
+    return response.data.content;
+  } catch (error) {
+    throw "Lỗi delete User từ dự án API";
   }
 };

@@ -1,5 +1,5 @@
-import { Box, Button, Container, IconButton, Typography, Modal } from '@mui/material'
-import React, { useState } from 'react'
+import { Box, Button, Container, IconButton, Typography, Modal, Stack, Autocomplete, TextField } from '@mui/material'
+import React, { useEffect, useState } from 'react'
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -10,7 +10,7 @@ import { blue } from '@mui/material/colors';
 import { red } from '@mui/material/colors';
 import { green } from '@mui/material/colors';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { deleteProject, getAllProject } from '../../../apis/project.api';
+import { deleteProject, getAllProject, assignUserProject, removeUserFromProject } from '../../../apis/project.api';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddBoxIcon from '@mui/icons-material/AddBox';
@@ -19,10 +19,58 @@ import { DataGrid } from '@mui/x-data-grid';
 import { PATH } from '../../../utils/paths';
 import { useNavigate } from 'react-router-dom';
 import { projectListAction } from "../../../redux/slices/project.slice"
+import SearchIcon from '@mui/icons-material/Search';
+import InputBase from '@mui/material/InputBase';
+import { styled, alpha } from '@mui/material/styles';
+
+
+// Style của ô Search
+const Search = styled('div')(({ theme }) => ({
+  position: 'relative',
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: alpha(theme.palette.common.white, 0.15),
+  '&:hover': {
+    backgroundColor: alpha(theme.palette.common.white, 0.25),
+  },
+  marginLeft: 0,
+  width: '100%',
+  [theme.breakpoints.up('sm')]: {
+    marginLeft: theme.spacing(1),
+    width: 'auto',
+  },
+}));
+const SearchIconWrapper = styled('div')(({ theme }) => ({
+  padding: theme.spacing(0, 2),
+  height: '100%',
+  position: 'absolute',
+  pointerEvents: 'none',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+}));
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+  color: 'inherit',
+  width: '100%',
+  '& .MuiInputBase-input': {
+    padding: theme.spacing(1, 1, 1, 0),
+    // vertical padding + font size from searchIcon
+    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    transition: theme.transitions.create('width'),
+    [theme.breakpoints.up('sm')]: {
+      width: '12ch',
+      '&:focus': {
+        width: '20ch',
+      },
+    },
+  },
+}));
+
 
 // Thư viện Swal
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
+import { getUser } from '../../../apis/user.api';
+import { LoadingButton } from '@mui/lab';
 
 
 const ProjectManagement = () => {
@@ -30,7 +78,19 @@ const ProjectManagement = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
-
+  const [memberByProjectId, setMemberByProjectId] = useState("");
+  const [searchMemberInput, setSearchMemberInput] = useState("");
+  const [searchMemberResult, setSearchMemberResult] = useState("");
+  const [projectId, setProjectId] = useState("");
+  const [memberId, setMemberId] = useState("");
+  const [memberToAssign, setMemberToAssign] = useState({
+    projectId: "",
+    userId: "",
+  });
+  const [memberToRemove, setMemberToRemove] = useState({
+    projectId: "",
+    userId: "",
+  });
 
 
   // thư viện SweetAlert
@@ -49,7 +109,8 @@ const ProjectManagement = () => {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 450,
+    width: 500,
+    height: "auto",
     bgcolor: 'background.paper',
     border: `1px ${blue[500]} solid`,
     boxShadow: 24,
@@ -61,6 +122,9 @@ const ProjectManagement = () => {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const [openModalAddUser, setOpenModalAddUser] = useState(false);
+  const handleOpenModalAddUser = () => setOpenModalAddUser(true);
+  const handleCloseModalAddUser = () => setOpenModalAddUser(false);
 
 
   // hàm render nút Delete
@@ -89,7 +153,20 @@ const ProjectManagement = () => {
             marginLeft: "10px",
           }}
           onClick={() => {
-            handleDeleteProject(params.row.id);
+            MySwal.fire({
+              icon: "question",
+              title: "Bạn có chắc muốn xoá dự án này?",
+              text: "Xoá xong tạo lại thì cũng đơn giản lắm nha, xoá thoải mái!",
+              showCancelButton: true,
+              confirmButtonText: "Đồng ý"
+            }).then((result) => {
+              if (result.isConfirmed) {
+                handleDeleteProject(params.row.id);
+              }
+              else {
+                // do nothing
+              }
+            })
           }}
         >
           <DeleteIcon />
@@ -134,7 +211,8 @@ const ProjectManagement = () => {
                   color="primary"
                   size="small"
                   onClick={() => {
-                    // parseName(params.row.col6)
+                    handleOpen();
+                    handleSetProjectId(params.row.id);
                   }}
                 >
                   <img src={item.avatar} alt={item.name} style={{ width: "30px", height: "30px", border: `1px ${blue[500]} solid` }} />
@@ -150,7 +228,8 @@ const ProjectManagement = () => {
                 color="primary"
                 size="small"
                 onClick={() => {
-                  // parseName(params.row.col6)
+                  handleOpen();
+                  handleSetProjectId(params.row.id);
                 }}
               >
                 <img src={params.row.members[0].avatar} alt={params.row.members[0].name} style={{ width: "30px", height: "30px", border: `1px ${blue[500]} solid` }} />
@@ -161,7 +240,8 @@ const ProjectManagement = () => {
                 color="primary"
                 size="small"
                 onClick={() => {
-                  // parseName(params.row.col6)
+                  handleOpen();
+                  handleSetProjectId(params.row.id);
                 }}
               >
                 <img src={params.row.members[1].avatar} alt={params.row.members[1].name} style={{ width: "30px", height: "30px", border: `1px ${blue[500]} solid` }} />
@@ -172,7 +252,8 @@ const ProjectManagement = () => {
                 color="primary"
                 size="small"
                 onClick={() => {
-                  // parseName(params.row.col6)
+                  handleOpen();
+                  handleSetProjectId(params.row.id);
                 }}
               >
                 <img src={params.row.members[2].avatar} alt={params.row.members[1].name} style={{ width: "30px", height: "30px", border: `1px ${blue[500]} solid` }} />
@@ -187,7 +268,7 @@ const ProjectManagement = () => {
             border: `1px ${blue[500]} solid`
           }}
           onClick={() => {
-            handleOpen();
+            handleOpenModalAddUser();
             handleSetProjectId(params.row.id);
           }}
         >
@@ -243,10 +324,10 @@ const ProjectManagement = () => {
 
   // nếu user ko chạy trang home trước mà vô trang management trước thì ko dùng dữ liệu từ store Redux đc mà phải tự gọi API
   let projectListData = [];
-  const { data = [], isLoading, isError, error } = useQuery({
+  const { data = [], isLoading, isError, error, refetch } = useQuery({
     queryKey: ["allProject"],
     queryFn: getAllProject,
-    // chỉ kích hoạt nếu có dữ liệu trong projectList (lấy từ store của Redux về do Home đưa lên)
+    // chỉ kích hoạt khi chưa có dữ liệu trong projectList (lấy từ store của Redux về do Home đưa lên)
     enabled: !!projectList,
   });
   // tạo hàm handleChangeData để push dữ liệu lấy đc từ API vào projectListData
@@ -266,15 +347,13 @@ const ProjectManagement = () => {
 
 
   // Hàm để set Id của project để gọi đúng thành viên project đó
-  // const [projectId, setProjectId] = useState("");
   const handleSetProjectId = (value) => {
-    // setProjectId(value);
+    setProjectId(value);
     handleChangeMemberByProjectId(value);
   }
 
 
   // Hàm để lấy danh sách member ra từ projectId
-  const [memberByProjectId, setMemberByProjectId] = useState("");
   const handleChangeMemberByProjectId = (value) => {
     for (let i in projectList) {
       if (projectList[i].id === value) {
@@ -306,6 +385,8 @@ const ProjectManagement = () => {
       }).then((result) => {
         if (result.isConfirmed) {
           queryClient.invalidateQueries({ queryKey: ["deleteProject"] });
+          // delete xong re-render lại
+          refetch();
         }
       })
     },
@@ -313,6 +394,114 @@ const ProjectManagement = () => {
       alert(error);
     }
   });
+
+
+  // Hàm getUser để lấy dữ liệu user về
+  const { data: foundMember, isLoading: searchingMember } = useQuery({
+    queryKey: ["getUser"],
+    queryFn: getUser,
+    // chỉ kích hoạt nếu có dữ liệu trong searchMember (lấy từ ô search ra)
+    // enabled: !!searchMember,
+  });
+
+
+  // Hàm tìm kiếm searchMemberResult trong foundMember
+  const handleSetMemberToAssign = () => {
+    let memberToAssignId = "";
+    let searchName = searchMemberResult.trim()?.toLowerCase();
+    for (let i in foundMember) {
+      if (foundMember[i].name.toLowerCase().includes(searchName)) {
+        memberToAssignId = foundMember[i].userId;
+        break;
+      }
+    }
+    // setSearchMemberInput("");
+    setSearchMemberResult("");
+    setMemberToAssign({
+      ...memberToAssign,
+      projectId: projectId,
+      userId: memberToAssignId,
+    })
+  }
+  if (searchMemberInput && searchMemberResult) {
+    handleSetMemberToAssign();
+  }
+
+
+  // Hàm assignUserProject để thêm vào project
+  const { mutate: handleAssignUserProject, isPending: isAssigningUser } = useMutation({
+    mutationFn: (payload) => assignUserProject(payload),
+    onSuccess: () => {
+      handleCloseModalAddUser();
+      MySwal.fire({
+        icon: "success",
+        title: "Bạn đã gán thành viên và dự án thành công",
+        // text: "Quay lại trang quản lý dự án",
+        confirmButtonText: "Đồng ý"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          queryClient.invalidateQueries({ queryKey: ["assignUserProject"] });
+          refetch();
+        }
+      })
+    },
+    onError: (error) => {
+      alert(error);
+    }
+  });
+
+
+  // Hàm removeUserFromProject để xoá user ra khỏi project
+  const { mutate: handleRemoveUserFromProject, isPending: isRemovingUserFromProject } = useMutation({
+    mutationFn: (payload) => removeUserFromProject(payload),
+    onSuccess: () => {
+      MySwal.fire({
+        icon: "success",
+        title: "Bạn đã gán thành viên và dự án thành công",
+        // text: "Quay lại trang quản lý dự án",
+        confirmButtonText: "Đồng ý"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          queryClient.invalidateQueries({ queryKey: ["removeUserFromProject"] });
+          refetch();
+        }
+      })
+    },
+    onError: (error) => {
+      alert(error);
+    }
+  });
+
+
+  // Hàm set member để xoá ra khỏi project
+  const handleSetMemberToRemove = (value) => {
+    setMemberId(value);
+    if (memberId !== "") {
+      setMemberToRemove({
+        ...memberToRemove,
+        projectId: projectId,
+        userId: value,
+      })
+    }
+
+    if (memberToRemove !== "") {
+      handleClose();
+      MySwal.fire({
+        icon: "question",
+        title: "Bạn có chắc muốn xoá thành viên này?",
+        text: "Xoá là bị giận đó, ko giỡn!",
+        showCancelButton: true,
+        confirmButtonText: "Đồng ý"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          removeUserFromProject(memberToRemove);
+        }
+        else {
+          // do nothing
+        }
+      })
+    }
+  }
 
 
   return (
@@ -354,14 +543,14 @@ const ProjectManagement = () => {
         <Modal
           open={open}
           onClose={handleClose}
-          aria-labelledby="modal-modal-title"
-          aria-describedby="modal-modal-description"
+          aria-labelledby="modal-list-member"
+          aria-describedby="modal-list-member-description"
         >
           <Box sx={style}>
-            <Typography id="modal-modal-title" variant="h5" color={`${blue[500]}`} gutterBottom>
+            <Typography id="modal-list-member" variant="h5" color={`${blue[500]}`} gutterBottom>
               Danh sách thành viên
             </Typography>
-            <Typography id="modal-modal-description" gutterBottom>
+            <Typography id="modal-list-member-description" gutterBottom>
               <Table>
                 <TableHead>
                   <TableRow>
@@ -436,7 +625,7 @@ const ProjectManagement = () => {
                                 marginLeft: "10px",
                               }}
                               onClick={() => {
-                                // 
+                                handleSetMemberToRemove(item.userId);
                               }}
                             >
                               <DeleteIcon />
@@ -452,6 +641,71 @@ const ProjectManagement = () => {
                   }
                 </TableBody>
               </Table>
+            </Typography>
+          </Box>
+        </Modal>
+        <Modal
+          open={openModalAddUser}
+          onClose={handleCloseModalAddUser}
+          aria-labelledby="modal-add-member"
+          aria-describedby="modal-add-member-description"
+        >
+          <Box sx={style}>
+            <Typography id="modal-add-member" variant="h5" color={`${blue[500]}`} gutterBottom>
+              Tìm kiếm và thêm thành viên
+            </Typography>
+            <Typography id="modal-add-member-description" gutterBottom>
+              {
+                foundMember ? (
+                  <Stack spacing={2} sx={{ width: "100%", margin: "20px 0" }}>
+                    <Autocomplete
+                      freeSolo
+                      id="free-solo-2-demo"
+                      disableClearable
+                      options={foundMember.map((member) => member.name)}
+                      onChange={(event, newValue) => {
+                        setSearchMemberResult(newValue);
+                      }}
+                      onInputChange={(event, newInputValue) => {
+                        setSearchMemberInput(newInputValue);
+                      }}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Tìm kiếm thành viên"
+                          InputProps={{
+                            ...params.InputProps,
+                            type: 'search',
+                          }}
+                        />
+                      )}
+                    />
+                  </Stack>
+                ) : (
+                  <Typography {...typographySettings} color={"error"}>
+                    Không tìm được thành viên
+                  </Typography>
+                )
+              }
+              {
+                memberToAssign ? (
+                  <LoadingButton
+                    variant="contained"
+                    color="primary"
+                    size="large"
+                    sx={{ fontSize: "14px", border: `1px ${blue[500]} solid` }}
+                    type="submit"
+                    loading={isAssigningUser}
+                    onClick={() => {
+                      handleAssignUserProject(memberToAssign);
+                    }}
+                  >
+                    Thêm
+                  </LoadingButton>
+                ) : (
+                  <></>
+                )
+              }
             </Typography>
           </Box>
         </Modal>
