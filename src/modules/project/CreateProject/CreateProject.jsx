@@ -111,7 +111,7 @@ const CreateProject = () => {
             }).then((result) => {
                 if (result.isConfirmed) {
                     queryClient.invalidateQueries({ queryKey: ["creatProjectAuthorize"] });
-                    
+
                     getAllProject();
                     navigate(PATH.PROJECTMANAGEMENT);
                 }
@@ -135,6 +135,15 @@ const CreateProject = () => {
             }).then((result) => {
                 if (result.isConfirmed) {
                     queryClient.invalidateQueries({ queryKey: ["editProject"] });
+                    // clear form sau khi addProduct
+                    setFormValue({
+                        id: "",
+                        projectName: "",
+                        // creator: "",
+                        categoryId: 0,
+                        description: "",
+                        alias: "",
+                    });
                     // sửa xong re-render lại
                     getAllProject();
                     navigate(PATH.PROJECTMANAGEMENT);
@@ -147,44 +156,37 @@ const CreateProject = () => {
     });
 
 
-    const handleSetProjectToEdit = () => {
-        setFormProjectToEdit({
-            ...formProjectToEdit,
-            id: projectToEdit.id,
-            projectName: formValue.projectName,
-            creator: 0,
-            categoryId: formValue.categoryId,
-            description: formValue.description,
-        })
-    }
-    
-    
     const onSubmit = (formValues) => {
         // hàm set giá trị cho cái project mà mình muốn update
         if (projectToEdit) {
-            handleSetProjectToEdit();
+            if (formProjectToEdit.projectName !== "" && formProjectToEdit.description !== "" && formProjectToEdit.categoryId !== 0) {
+                MySwal.fire({
+                    icon: "question",
+                    title: "Bạn có chắc muốn sửa dự án này không?",
+                    text: "Sửa bậy một phát là tiêu đời nha, ko giỡn!",
+                    showCancelButton: true,
+                    confirmButtonText: "Đồng ý"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        handleEditProject(formProjectToEdit);
+                    }
+                    else {
+                        // do nothing
+                    }
+                })
+            }
         }
         // có projectToEdit thì sửa
         // cái formValue này đc định nghĩa theo cấu trúc để bài yêu cầu bài bằng useState phía trên, các thành phần trong đó đc đưa vào bằng hàm handleSetFormValue ( bên trong có hàm setFormValue )
-        if (projectToEdit) {
-            handleEditProject(formProjectToEdit);
-        }
         // ko có projectToEdit thì thêm
         // tham số formValues này là do xài useForm, nó tự lấy từ trong form mình ra, nên chỉ cần làm cái form đúng theo yêu cầu đề bài là đc
         else {
             handleCreateProject(formValues);
         }
 
-        // clear form sau khi addProduct
-        setFormValue({
-            id: "",
-            projectName: "",
-            creator: "",
-            categoryId: 0,
-            description: "",
-            alias: "",
-        });
+
     };
+
 
     const onError = (error) => {
         alert(error);
@@ -199,14 +201,36 @@ const CreateProject = () => {
             // có dấu ngoặc vuông là dynamic, thì nó sẽ hiểu đây là thuộc tính để truyền vào
             [value]: event.target.value,
         })
+
+        // nhân tiện set luôn cho thằng formProjectToEdit
+        setFormProjectToEdit({
+            ...formProjectToEdit,
+            id: projectToEdit.id,
+            creator: 0,
+            [value]: event.target.value,
+        })
     }
 
 
     // khi ấn sửa thì projectToEdit đc hình thành, hàm setFormValue hạy và formValue có giá trị. Giá trị này đc gán vào value={} trong TextField hoặc Select bên dưới
     useEffect(() => {
         if (projectToEdit) {
-            setFormValue(projectToEdit);
-            handleSetProjectToEdit();
+            setFormValue({
+                ...formValue,
+                id: projectToEdit.id,
+                projectName: projectToEdit.projectName,
+                categoryId: projectToEdit.projectCategory?.id,
+                description: projectToEdit.description,
+                alias: projectToEdit.alias,
+            });
+            setFormProjectToEdit({
+                ...formProjectToEdit,
+                id: projectToEdit.id,
+                projectName: projectToEdit.projectName,
+                creator: 0,
+                categoryId: projectToEdit.projectCategory.id,
+                description: projectToEdit.description,
+            })
         }
     }, [projectToEdit])
 
