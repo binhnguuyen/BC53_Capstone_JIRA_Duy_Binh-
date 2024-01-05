@@ -10,7 +10,7 @@ import { blue } from '@mui/material/colors';
 import { red } from '@mui/material/colors';
 import { green } from '@mui/material/colors';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { deleteProject, getAllProject, assignUserProject } from '../../../apis/project.api';
+import { deleteProject, getAllProject, assignUserProject, removeUserFromProject } from '../../../apis/project.api';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddBoxIcon from '@mui/icons-material/AddBox';
@@ -78,10 +78,16 @@ const ProjectManagement = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
+  const [memberByProjectId, setMemberByProjectId] = useState("");
   const [searchMemberInput, setSearchMemberInput] = useState("");
   const [searchMemberResult, setSearchMemberResult] = useState("");
   const [projectId, setProjectId] = useState("");
+  const [memberId, setMemberId] = useState("");
   const [memberToAssign, setMemberToAssign] = useState({
+    projectId: "",
+    userId: "",
+  });
+  const [memberToRemove, setMemberToRemove] = useState({
     projectId: "",
     userId: "",
   });
@@ -147,7 +153,20 @@ const ProjectManagement = () => {
             marginLeft: "10px",
           }}
           onClick={() => {
-            handleDeleteProject(params.row.id);
+            MySwal.fire({
+              icon: "question",
+              title: "Bạn có chắc muốn xoá dự án",
+              text: "Quay lại trang quản lý dự án",
+              showCancelButton: true,
+              confirmButtonText: "Đồng ý"
+            }).then((result) => {
+              if (result.isConfirmed) {
+                handleDeleteProject(params.row.id);
+              }
+              else {
+                // do nothing
+              }
+            })
           }}
         >
           <DeleteIcon />
@@ -301,8 +320,8 @@ const ProjectManagement = () => {
       disableClickEventBubbling: true,
     },
   ];
-  
-  
+
+
   // nếu user ko chạy trang home trước mà vô trang management trước thì ko dùng dữ liệu từ store Redux đc mà phải tự gọi API
   let projectListData = [];
   const { data = [], isLoading, isError, error, refetch } = useQuery({
@@ -328,7 +347,6 @@ const ProjectManagement = () => {
 
 
   // Hàm để set Id của project để gọi đúng thành viên project đó
-  // const [projectId, setProjectId] = useState("");
   const handleSetProjectId = (value) => {
     setProjectId(value);
     handleChangeMemberByProjectId(value);
@@ -336,7 +354,6 @@ const ProjectManagement = () => {
 
 
   // Hàm để lấy danh sách member ra từ projectId
-  const [memberByProjectId, setMemberByProjectId] = useState("");
   const handleChangeMemberByProjectId = (value) => {
     for (let i in projectList) {
       if (projectList[i].id === value) {
@@ -424,6 +441,7 @@ const ProjectManagement = () => {
       }).then((result) => {
         if (result.isConfirmed) {
           queryClient.invalidateQueries({ queryKey: ["assignUserProject"] });
+          refetch();
         }
       })
     },
@@ -431,6 +449,57 @@ const ProjectManagement = () => {
       alert(error);
     }
   });
+
+
+  // Hàm removeUserFromProject để xoá user ra khỏi project
+  const { mutate: handleRemoveUserFromProject, isPending: isRemovingUserFromProject } = useMutation({
+    mutationFn: (payload) => removeUserFromProject(payload),
+    onSuccess: () => {
+      MySwal.fire({
+        icon: "success",
+        title: "Bạn đã gán thành viên và dự án thành công",
+        // text: "Quay lại trang quản lý dự án",
+        confirmButtonText: "Đồng ý"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          queryClient.invalidateQueries({ queryKey: ["removeUserFromProject"] });
+          refetch();
+        }
+      })
+    },
+    onError: (error) => {
+      alert(error);
+    }
+  });
+
+
+  // Hàm set member để xoá ra khỏi project
+  const handleSetMemberToRemove = (value) => {
+    setMemberId(value);
+    setMemberToRemove({
+      ...memberToRemove,
+      projectId: projectId,
+      userId: value,
+    })
+    
+    if ( memberToRemove !== "" ) {
+      handleClose();
+      MySwal.fire({
+        icon: "question",
+        title: "Bạn có chắc muốn xoá dự án",
+        text: "Quay lại trang quản lý dự án",
+        showCancelButton: true,
+        confirmButtonText: "Đồng ý"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          removeUserFromProject(memberToRemove);
+        }
+        else {
+          // do nothing
+        }
+      })
+    }
+  }
 
 
   return (
@@ -554,7 +623,7 @@ const ProjectManagement = () => {
                                 marginLeft: "10px",
                               }}
                               onClick={() => {
-                                // 
+                                handleSetMemberToRemove(item.userId);
                               }}
                             >
                               <DeleteIcon />
