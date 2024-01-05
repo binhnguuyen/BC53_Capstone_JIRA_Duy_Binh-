@@ -102,7 +102,7 @@ export const assignUserProject = async (payload) => {
 // https://jiranew.cybersoft.edu.vn/api/Project/removeUserFromProject
 export const removeUserFromProject = async (payload) => {
   try {
-    const response = await fetcher.delete("/Project/removeUserFromProject", payload);
+    const response = await fetcher.post("/Project/removeUserFromProject", payload);
     return response.data.content;
   } catch (error) {
     throw "Lỗi delete User từ dự án API";
