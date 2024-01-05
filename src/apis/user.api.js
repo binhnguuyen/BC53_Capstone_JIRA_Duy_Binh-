@@ -31,3 +31,18 @@ export const registerApi = async (payload) => {
         throw error.response.data
     }
 }
+
+
+/***
+ * TODO: getUser 
+ * * @param None
+ */ 
+export const getUser = async () => {
+    try {
+        const response = await fetcher.get("/Users/getUser")
+        return response.data.content;
+    }
+    catch(error) {
+        throw error.response.data
+    }
+}

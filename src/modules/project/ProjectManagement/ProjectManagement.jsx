@@ -1,4 +1,4 @@
-import { Box, Button, Container, IconButton, Typography, Modal } from '@mui/material'
+import { Box, Button, Container, IconButton, Typography, Modal, Stack, Autocomplete, TextField } from '@mui/material'
 import React, { useState } from 'react'
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -10,7 +10,7 @@ import { blue } from '@mui/material/colors';
 import { red } from '@mui/material/colors';
 import { green } from '@mui/material/colors';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { deleteProject, getAllProject } from '../../../apis/project.api';
+import { deleteProject, getAllProject, assignUserProject } from '../../../apis/project.api';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddBoxIcon from '@mui/icons-material/AddBox';
@@ -19,10 +19,57 @@ import { DataGrid } from '@mui/x-data-grid';
 import { PATH } from '../../../utils/paths';
 import { useNavigate } from 'react-router-dom';
 import { projectListAction } from "../../../redux/slices/project.slice"
+import SearchIcon from '@mui/icons-material/Search';
+import InputBase from '@mui/material/InputBase';
+import { styled, alpha } from '@mui/material/styles';
+
+
+// Style của ô Search
+const Search = styled('div')(({ theme }) => ({
+  position: 'relative',
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: alpha(theme.palette.common.white, 0.15),
+  '&:hover': {
+    backgroundColor: alpha(theme.palette.common.white, 0.25),
+  },
+  marginLeft: 0,
+  width: '100%',
+  [theme.breakpoints.up('sm')]: {
+    marginLeft: theme.spacing(1),
+    width: 'auto',
+  },
+}));
+const SearchIconWrapper = styled('div')(({ theme }) => ({
+  padding: theme.spacing(0, 2),
+  height: '100%',
+  position: 'absolute',
+  pointerEvents: 'none',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+}));
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+  color: 'inherit',
+  width: '100%',
+  '& .MuiInputBase-input': {
+    padding: theme.spacing(1, 1, 1, 0),
+    // vertical padding + font size from searchIcon
+    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    transition: theme.transitions.create('width'),
+    [theme.breakpoints.up('sm')]: {
+      width: '12ch',
+      '&:focus': {
+        width: '20ch',
+      },
+    },
+  },
+}));
+
 
 // Thư viện Swal
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
+import { getUser } from '../../../apis/user.api';
 
 
 const ProjectManagement = () => {
@@ -30,7 +77,8 @@ const ProjectManagement = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
-
+  const [searchMemberInput, setSearchMemberInput] = useState("");
+  const [searchMemberResult, setSearchMemberResult] = useState("");
 
 
   // thư viện SweetAlert
@@ -49,7 +97,8 @@ const ProjectManagement = () => {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 450,
+    width: 500,
+    height: "auto",
     bgcolor: 'background.paper',
     border: `1px ${blue[500]} solid`,
     boxShadow: 24,
@@ -61,6 +110,9 @@ const ProjectManagement = () => {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const [openModalAddUser, setOpenModalAddUser] = useState(false);
+  const handleOpenModalAddUser = () => setOpenModalAddUser(true);
+  const handleCloseModalAddUser = () => setOpenModalAddUser(false);
 
 
   // hàm render nút Delete
@@ -134,7 +186,8 @@ const ProjectManagement = () => {
                   color="primary"
                   size="small"
                   onClick={() => {
-                    // parseName(params.row.col6)
+                    handleOpen();
+                    handleSetProjectId(params.row.id);
                   }}
                 >
                   <img src={item.avatar} alt={item.name} style={{ width: "30px", height: "30px", border: `1px ${blue[500]} solid` }} />
@@ -150,7 +203,8 @@ const ProjectManagement = () => {
                 color="primary"
                 size="small"
                 onClick={() => {
-                  // parseName(params.row.col6)
+                  handleOpen();
+                  handleSetProjectId(params.row.id);
                 }}
               >
                 <img src={params.row.members[0].avatar} alt={params.row.members[0].name} style={{ width: "30px", height: "30px", border: `1px ${blue[500]} solid` }} />
@@ -161,7 +215,8 @@ const ProjectManagement = () => {
                 color="primary"
                 size="small"
                 onClick={() => {
-                  // parseName(params.row.col6)
+                  handleOpen();
+                  handleSetProjectId(params.row.id);
                 }}
               >
                 <img src={params.row.members[1].avatar} alt={params.row.members[1].name} style={{ width: "30px", height: "30px", border: `1px ${blue[500]} solid` }} />
@@ -172,7 +227,8 @@ const ProjectManagement = () => {
                 color="primary"
                 size="small"
                 onClick={() => {
-                  // parseName(params.row.col6)
+                  handleOpen();
+                  handleSetProjectId(params.row.id);
                 }}
               >
                 <img src={params.row.members[2].avatar} alt={params.row.members[1].name} style={{ width: "30px", height: "30px", border: `1px ${blue[500]} solid` }} />
@@ -187,8 +243,7 @@ const ProjectManagement = () => {
             border: `1px ${blue[500]} solid`
           }}
           onClick={() => {
-            handleOpen();
-            handleSetProjectId(params.row.id);
+            handleOpenModalAddUser();
           }}
         >
           <AddBoxIcon />
@@ -315,6 +370,15 @@ const ProjectManagement = () => {
   });
 
 
+  // Hàm get User
+  const { data: foundMember, isLoading: searchingMember } = useQuery({
+    queryKey: ["allUser"],
+    queryFn: getUser,
+    // chỉ kích hoạt nếu có dữ liệu trong searchMember (lấy từ ô search ra)
+    // enabled: !!searchMember,
+  });
+
+
   return (
     <div style={{ display: "flex", justifyContent: "center", alignContent: "center" }}>
       <Container style={{ maxWidth: "80vw" }} sx={{ margin: "60px 60px", padding: "24px", boxShadow: "0px 1px 10px 0px rgba(0,0,0,0.12)" }}>
@@ -354,14 +418,14 @@ const ProjectManagement = () => {
         <Modal
           open={open}
           onClose={handleClose}
-          aria-labelledby="modal-modal-title"
-          aria-describedby="modal-modal-description"
+          aria-labelledby="modal-list-member"
+          aria-describedby="modal-list-member-description"
         >
           <Box sx={style}>
-            <Typography id="modal-modal-title" variant="h5" color={`${blue[500]}`} gutterBottom>
+            <Typography id="modal-list-member" variant="h5" color={`${blue[500]}`} gutterBottom>
               Danh sách thành viên
             </Typography>
-            <Typography id="modal-modal-description" gutterBottom>
+            <Typography id="modal-list-member-description" gutterBottom>
               <Table>
                 <TableHead>
                   <TableRow>
@@ -452,6 +516,52 @@ const ProjectManagement = () => {
                   }
                 </TableBody>
               </Table>
+            </Typography>
+          </Box>
+        </Modal>
+        <Modal
+          open={openModalAddUser}
+          onClose={handleCloseModalAddUser}
+          aria-labelledby="modal-add-member"
+          aria-describedby="modal-add-member-description"
+        >
+          <Box sx={style}>
+            <Typography id="modal-add-member" variant="h5" color={`${blue[500]}`} gutterBottom>
+              Tìm kiếm và thêm thành viên
+            </Typography>
+            <Typography id="modal-add-member-description" gutterBottom>
+              {
+                foundMember ? (
+                  <Stack spacing={2} sx={{ width: "100%" }}>
+                    <Autocomplete
+                      freeSolo
+                      id="free-solo-2-demo"
+                      disableClearable
+                      options={foundMember.map((member) => member.name)}
+                      onChange={(event, newValue) => {
+                        setSearchMemberResult(newValue);
+                      }}
+                      onInputChange={(event, newInputValue) => {
+                        setSearchMemberInput(newInputValue);
+                      }}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Tìm kiếm thành viên"
+                          InputProps={{
+                            ...params.InputProps,
+                            type: 'search',
+                          }}
+                        />
+                      )}
+                    />
+                  </Stack>
+                ) : (
+                  <Typography {...typographySettings} color={"error"}>
+                    Không tìm được thành viên
+                  </Typography>
+                )
+              }
             </Typography>
           </Box>
         </Modal>

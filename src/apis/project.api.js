@@ -86,3 +86,15 @@ export const deleteProject = async (projectId) => {
     throw "Lỗi delete API";
   }
 };
+
+
+// Link:
+// https://jiranew.cybersoft.edu.vn/api/Project/assignUserProject
+export const assignUserProject = async (payload) => {
+  try {
+    const response = await fetcher.post("/Project/assignUserProject", payload);
+    return response.data.content;
+  } catch (error) {
+    throw "Lỗi assign USER API";
+  }
+};
