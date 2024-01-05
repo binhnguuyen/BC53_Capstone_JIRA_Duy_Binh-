@@ -172,6 +172,7 @@ export default function Header(props) {
                             <IconButton
                                 component="div"
                                 sx={{ fontSize: 18, flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'block' } }}
+                                onClick={() => navigate(PATH.TASK)}
                             >
                                 Công việc
                                 <KeyboardArrowDownIcon />

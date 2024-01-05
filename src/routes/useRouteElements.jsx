@@ -15,6 +15,7 @@ const AdminPage = lazy(() => import("../modules/admin"))
 const ProjectManagementPage = lazy(() => import("../modules/project/ProjectManagement"))
 const ProjectPage = lazy(() => import("../modules/project/Project"))
 const CreateProjectPage = lazy(() => import("../modules/project/CreateProject"))
+const TaskPage = lazy(() => import("../modules/task"))
 
 
 const AuthenticateRouter = () => {
@@ -90,6 +91,14 @@ const useRouteElements = () => {
                     element:
                         <Suspense callBack={<div>Loading</div>}>
                             <CreateProjectPage />
+                        </Suspense>,
+                },
+                {
+                    path: PATH.TASK,
+                    // index: 2,
+                    element:
+                        <Suspense callBack={<div>Loading</div>}>
+                            <TaskPage />
                         </Suspense>,
                 },
             ],
