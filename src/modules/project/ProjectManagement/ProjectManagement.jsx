@@ -484,7 +484,7 @@ const ProjectManagement = () => {
       })
     }
 
-    if (memberToRemove !== "") {
+    if (memberToRemove.userId !== "" && memberToRemove.projectId !== "") {
       handleClose();
       MySwal.fire({
         icon: "question",
@@ -494,7 +494,7 @@ const ProjectManagement = () => {
         confirmButtonText: "Đồng ý"
       }).then((result) => {
         if (result.isConfirmed) {
-          removeUserFromProject(memberToRemove);
+          handleRemoveUserFromProject(memberToRemove);
         }
         else {
           // do nothing
