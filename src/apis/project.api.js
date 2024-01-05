@@ -63,7 +63,7 @@ export const editProject = async (payload) => {
     );
     return response.data.content;
   } catch (error) {
-    throw "Lỗi put API";
+    // throw "Lỗi put API";
   }
 };
 
