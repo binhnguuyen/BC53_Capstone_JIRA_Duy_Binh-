@@ -15,12 +15,13 @@ import withReactContent from 'sweetalert2-react-content'
 import * as yup from "yup"
 import { yupResolver } from "@hookform/resolvers/yup"
 
-import { creatProject, getProjectDetail } from '../../../apis/project.api';
+import { getAllProject, getProjectDetail } from '../../../apis/project.api';
 import { creatProjectAuthorize } from '../../../apis/project.api';
 import { editProject } from '../../../apis/project.api';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { PATH } from '../../../utils/paths'
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { projectListAction } from '../../../redux/slices/project.slice';
 
 // Thư viện Yup resolver
 const schemaCreateProject = yup.object({
@@ -110,6 +111,8 @@ const CreateProject = () => {
             }).then((result) => {
                 if (result.isConfirmed) {
                     queryClient.invalidateQueries({ queryKey: ["creatProjectAuthorize"] });
+                    
+                    getAllProject();
                     navigate(PATH.PROJECTMANAGEMENT);
                 }
             })
@@ -132,6 +135,8 @@ const CreateProject = () => {
             }).then((result) => {
                 if (result.isConfirmed) {
                     queryClient.invalidateQueries({ queryKey: ["editProject"] });
+                    // sửa xong re-render lại
+                    getAllProject();
                     navigate(PATH.PROJECTMANAGEMENT);
                 }
             })
@@ -143,7 +148,6 @@ const CreateProject = () => {
 
 
     const handleSetProjectToEdit = () => {
-        // console.log('formValue: ', formValue);
         setFormProjectToEdit({
             ...formProjectToEdit,
             id: projectToEdit.id,
@@ -160,7 +164,6 @@ const CreateProject = () => {
         if (projectToEdit) {
             handleSetProjectToEdit();
         }
-        // console.log('formProjectToEdit: ', formProjectToEdit);
         // có projectToEdit thì sửa
         // cái formValue này đc định nghĩa theo cấu trúc để bài yêu cầu bài bằng useState phía trên, các thành phần trong đó đc đưa vào bằng hàm handleSetFormValue ( bên trong có hàm setFormValue )
         if (projectToEdit) {

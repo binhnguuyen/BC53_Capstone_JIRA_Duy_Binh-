@@ -1,5 +1,5 @@
 import { Box, Button, Container, IconButton, Typography, Modal, Stack, Autocomplete, TextField } from '@mui/material'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -70,6 +70,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import { getUser } from '../../../apis/user.api';
+import { LoadingButton } from '@mui/lab';
 
 
 const ProjectManagement = () => {
@@ -79,6 +80,11 @@ const ProjectManagement = () => {
   const queryClient = useQueryClient();
   const [searchMemberInput, setSearchMemberInput] = useState("");
   const [searchMemberResult, setSearchMemberResult] = useState("");
+  const [projectId, setProjectId] = useState("");
+  const [memberToAssign, setMemberToAssign] = useState({
+    projectId: "",
+    userId: "",
+  });
 
 
   // thư viện SweetAlert
@@ -244,6 +250,7 @@ const ProjectManagement = () => {
           }}
           onClick={() => {
             handleOpenModalAddUser();
+            handleSetProjectId(params.row.id);
           }}
         >
           <AddBoxIcon />
@@ -294,14 +301,14 @@ const ProjectManagement = () => {
       disableClickEventBubbling: true,
     },
   ];
-
-
+  
+  
   // nếu user ko chạy trang home trước mà vô trang management trước thì ko dùng dữ liệu từ store Redux đc mà phải tự gọi API
   let projectListData = [];
-  const { data = [], isLoading, isError, error } = useQuery({
+  const { data = [], isLoading, isError, error, refetch } = useQuery({
     queryKey: ["allProject"],
     queryFn: getAllProject,
-    // chỉ kích hoạt nếu có dữ liệu trong projectList (lấy từ store của Redux về do Home đưa lên)
+    // chỉ kích hoạt khi chưa có dữ liệu trong projectList (lấy từ store của Redux về do Home đưa lên)
     enabled: !!projectList,
   });
   // tạo hàm handleChangeData để push dữ liệu lấy đc từ API vào projectListData
@@ -323,7 +330,7 @@ const ProjectManagement = () => {
   // Hàm để set Id của project để gọi đúng thành viên project đó
   // const [projectId, setProjectId] = useState("");
   const handleSetProjectId = (value) => {
-    // setProjectId(value);
+    setProjectId(value);
     handleChangeMemberByProjectId(value);
   }
 
@@ -361,6 +368,8 @@ const ProjectManagement = () => {
       }).then((result) => {
         if (result.isConfirmed) {
           queryClient.invalidateQueries({ queryKey: ["deleteProject"] });
+          // delete xong re-render lại
+          refetch();
         }
       })
     },
@@ -370,12 +379,57 @@ const ProjectManagement = () => {
   });
 
 
-  // Hàm get User
+  // Hàm getUser để lấy dữ liệu user về
   const { data: foundMember, isLoading: searchingMember } = useQuery({
-    queryKey: ["allUser"],
+    queryKey: ["getUser"],
     queryFn: getUser,
     // chỉ kích hoạt nếu có dữ liệu trong searchMember (lấy từ ô search ra)
     // enabled: !!searchMember,
+  });
+
+
+  // Hàm tìm kiếm searchMemberResult trong foundMember
+  const handleSetMemberToAssign = () => {
+    let memberToAssignId = "";
+    let searchName = searchMemberResult.trim()?.toLowerCase();
+    for (let i in foundMember) {
+      if (foundMember[i].name.toLowerCase().includes(searchName)) {
+        memberToAssignId = foundMember[i].userId;
+        break;
+      }
+    }
+    // setSearchMemberInput("");
+    setSearchMemberResult("");
+    setMemberToAssign({
+      ...memberToAssign,
+      projectId: projectId,
+      userId: memberToAssignId,
+    })
+  }
+  if (searchMemberInput && searchMemberResult) {
+    handleSetMemberToAssign();
+  }
+
+
+  // Hàm assignUserProject để thêm vào project
+  const { mutate: handleAssignUserProject, isPending: isAssigningUser } = useMutation({
+    mutationFn: (payload) => assignUserProject(payload),
+    onSuccess: () => {
+      handleCloseModalAddUser();
+      MySwal.fire({
+        icon: "success",
+        title: "Bạn đã gán thành viên và dự án thành công",
+        // text: "Quay lại trang quản lý dự án",
+        confirmButtonText: "Đồng ý"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          queryClient.invalidateQueries({ queryKey: ["assignUserProject"] });
+        }
+      })
+    },
+    onError: (error) => {
+      alert(error);
+    }
   });
 
 
@@ -532,7 +586,7 @@ const ProjectManagement = () => {
             <Typography id="modal-add-member-description" gutterBottom>
               {
                 foundMember ? (
-                  <Stack spacing={2} sx={{ width: "100%" }}>
+                  <Stack spacing={2} sx={{ width: "100%", margin: "20px 0" }}>
                     <Autocomplete
                       freeSolo
                       id="free-solo-2-demo"
@@ -560,6 +614,25 @@ const ProjectManagement = () => {
                   <Typography {...typographySettings} color={"error"}>
                     Không tìm được thành viên
                   </Typography>
+                )
+              }
+              {
+                memberToAssign ? (
+                  <LoadingButton
+                    variant="contained"
+                    color="primary"
+                    size="large"
+                    sx={{ fontSize: "14px", border: `1px ${blue[500]} solid` }}
+                    type="submit"
+                    loading={isAssigningUser}
+                    onClick={() => {
+                      handleAssignUserProject(memberToAssign);
+                    }}
+                  >
+                    Thêm
+                  </LoadingButton>
+                ) : (
+                  <></>
                 )
               }
             </Typography>

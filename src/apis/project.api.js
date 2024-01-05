@@ -71,7 +71,6 @@ export const editProject = async (payload) => {
 // Link:
 // https://jiranew.cybersoft.edu.vn/api/Project/deleteProject
 export const deleteProject = async (projectId) => {
-  console.log('projectId: ', projectId);
   try {
     const response = await fetcher.delete("/Project/deleteProject",
       {
@@ -80,7 +79,6 @@ export const deleteProject = async (projectId) => {
         },
       }
     )
-    console.log(response.data.content);
     return response.data.content;
   } catch (error) {
     throw "Lỗi delete API";
