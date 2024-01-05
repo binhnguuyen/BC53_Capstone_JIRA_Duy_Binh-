@@ -506,7 +506,7 @@ const ProjectManagement = () => {
 
   return (
     <div style={{ display: "flex", justifyContent: "center", alignContent: "center" }}>
-      <Container style={{ maxWidth: "80vw" }} sx={{ margin: "60px 60px", padding: "24px", boxShadow: "0px 1px 10px 0px rgba(0,0,0,0.12)" }}>
+      <Container style={{ maxWidth: "100%" }} sx={{ margin: "60px 60px", padding: "24px", boxShadow: "0px 1px 10px 0px rgba(0,0,0,0.12)" }}>
         <Box
           style={{
             padding: "10px",
@@ -516,23 +516,26 @@ const ProjectManagement = () => {
           }}
         >
           <Typography variant="h5" style={{ color: `${blue[500]}` }}>
-            Bảng dự án
+            Bảng quản lý dự án
           </Typography>
           <Button
             variant="contained"
-            size="medium"
+            size="small"
+            sx={{
+              height: 40,
+            }}
             onClick={() => navigate(PATH.CREATEPROJECT)}
           >
             Tạo dự án
           </Button>
         </Box>
-        <div style={{ height: "90%", width: '100%' }}>
+        <div style={{ height: "80vh", width: '100%' }}>
           <DataGrid
             rows={rows}
             columns={columns}
             initialState={{
               pagination: {
-                paginationModel: { page: 0, pageSize: 5 },
+                paginationModel: { page: 0, pageSize: 10 },
               },
             }}
             pageSizeOptions={[5, 10, 15, 20]}

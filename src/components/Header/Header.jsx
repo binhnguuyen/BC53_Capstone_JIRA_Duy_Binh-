@@ -150,7 +150,7 @@ export default function Header(props) {
                     }}
                 >
                     <Stack {...stackSettings}>
-                        <Item >
+                        <Item sx={{ textAlign: "center", alignItems: "center"}}>
                             <IconButton
                                 sx={{ flexGrow: 1, display: { xl: 'none' } }}
                                 size="medium"
@@ -164,21 +164,21 @@ export default function Header(props) {
                             </IconButton>
                             <IconButton
                                 component="div"
-                                sx={{ flexGrow: 1, fontSize: 28, color: `${blue[600]}`, fontWeight: 700, display: { sm: 'block' } }}
+                                sx={{ flexGrow: 1, fontSize: 24, color: `${blue[600]}`, fontWeight: 700, display: { sm: 'block' } }}
                                 onClick={() => navigate(PATH.HOME)}
                             >
                                 Jira Software
                             </IconButton>
                             <IconButton
                                 component="div"
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'block' } }}
+                                sx={{ fontSize: 18, flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'block' } }}
                             >
                                 Công việc
                                 <KeyboardArrowDownIcon />
                             </IconButton>
                             <IconButton
                                 component="div"
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'block' } }}
+                                sx={{ fontSize: 18, flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'block' } }}
                                 onClick={() => navigate(PATH.PROJECTMANAGEMENT)}
                             >
                                 Dự án
@@ -186,34 +186,34 @@ export default function Header(props) {
                             </IconButton>
                             <IconButton
                                 component="div"
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'none', lg: 'block' } }}
+                                sx={{ fontSize: 18, flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'none', lg: 'block' } }}
                             >
                                 Bộ lọc
                                 <KeyboardArrowDownIcon />
                             </IconButton>
                             <IconButton
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'none', lg: 'block' } }}
+                                sx={{ fontSize: 18, flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'none', lg: 'block' } }}
                                 component="div"
                             >
                                 Tổng quan
                                 <KeyboardArrowDownIcon />
                             </IconButton>
                             <IconButton
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'none', lg: 'none', xl: 'block' } }}
+                                sx={{ fontSize: 18, flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'none', lg: 'none', xl: 'block' } }}
                                 component="div"
                             >
                                 Nhóm
                                 <KeyboardArrowDownIcon />
                             </IconButton>
                             <IconButton
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'none', lg: 'none', xl: 'block' } }}
+                                sx={{ fontSize: 18, flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'none', lg: 'none', xl: 'block' } }}
                                 component="div"
                             >
                                 Kế hoạch
                                 <KeyboardArrowDownIcon />
                             </IconButton>
                             <IconButton
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'none', lg: 'none', xl: 'block' } }}
+                                sx={{ fontSize: 18, flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'none', lg: 'none', xl: 'block' } }}
                                 component="div"
                             >
                                 Ứng dụng
@@ -221,17 +221,23 @@ export default function Header(props) {
                             </IconButton>
                             <Button
                                 variant="contained"
-                                size="medium"
+                                size="small"
+                                sx={{
+                                    height: 40,
+                                    marginLeft: 10,
+                                }}
                                 onClick={() => navigate(PATH.CREATEPROJECT)}
                             >
                                 Tạo dự án
                             </Button>
                         </Item>
-                        <Item >
+                        <Item sx={{ textAlign: "center", alignItems: "center"}}>
                             <Search
                                 style={{
                                     border: "1px solid #6B778C",
-                                    width: "12vw"
+                                    width: "12vw",
+                                    height: 40,
+                                    marginRight: 10,
                                 }}
                             >
                                 <SearchIconWrapper>
@@ -246,7 +252,7 @@ export default function Header(props) {
                                 variant="h6"
                                 nowrap="true"
                                 component="div"
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                                sx={{ fontSize: 10, flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
                             >
                                 <NotificationsActiveIcon />
                             </IconButton>
@@ -254,7 +260,7 @@ export default function Header(props) {
                                 variant="h6"
                                 nowrap="true"
                                 component="div"
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                                sx={{ fontSize: 10, flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
                             >
                                 <HelpOutlineIcon />
                             </IconButton>
@@ -262,7 +268,7 @@ export default function Header(props) {
                                 variant="h6"
                                 nowrap="true"
                                 component="div"
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                                sx={{ fontSize: 10, flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
                             >
                                 <SettingsIcon />
                             </IconButton>
@@ -270,7 +276,7 @@ export default function Header(props) {
                                 variant="h6"
                                 nowrap="true"
                                 component="div"
-                                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                                sx={{ fontSize: 10, flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
                             >
                                 <AccountCircleIcon />
                             </IconButton>

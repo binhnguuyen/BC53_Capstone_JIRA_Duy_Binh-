@@ -143,19 +143,20 @@ const Home = () => {
     return (
         <div style={{ display: "flex", justifyContent: "center", alignContent: "center" }}>
             <Container style={{ maxWidth: "80vw" }} sx={{ margin: "60px 60px", padding: "24px", boxShadow: "0px 1px 10px 0px rgba(0,0,0,0.12)" }}>
-                <Box style={{ padding: "10px", boxShadow: "0px 1px 10px 0px rgba(0,0,0,0.12)" }}>
+                <Box style={{ fontSize: 18, padding: "10px", boxShadow: "0px 1px 10px 0px rgba(0,0,0,0.12)" }}>
                     <Select
                         labelId="demo-simple-select-label"
                         id="demo-simple-select"
                         value={categoryId}
                         onChange={handleChangeCategoryName}
+                        sx={{ height: "40px" }}
                     >
                         <MenuItem value={0}>Tất cả</MenuItem>
                         <MenuItem value={1}>Dự án web</MenuItem>
                         <MenuItem value={2}>Dự án phần mềm</MenuItem>
                         <MenuItem value={3}>Dự án di động</MenuItem>
                     </Select>
-                    <Typography variant="h6" style={{ color: `${red[500]}` }}>
+                    <Typography style={{ color: `${red[500]}`, marginTop: 10 }}>
                         Có tất cả
                         {
                             newDataList.length > 0 ? (
@@ -175,27 +176,26 @@ const Home = () => {
                         {
                             newDataList.length > 0 ? (
                                 newDataList.map((item, index) => (
-                                    <Card sx={{ height: 520, width: 250, border: `1px ${blue[200]} solid`, margin: "5px 5px" }} key={index}>
+                                    <Card sx={{ height: 400, width: 200, border: `1px ${blue[200]} solid`, margin: "5px 5px" }} key={index}>
                                         <CardContent>
                                             <IconButton {...iconButtonSettings}>
                                                 <img src={projectImage} alt="Mobile"
-                                                    style={{ width: "100%", height: "auto", display: "inline-block" }}
+                                                    style={{ width: "90%", height: "auto", display: "inline-block" }}
                                                 />
                                             </IconButton>
                                             <Divider width="100%" />
                                             <Typography
-                                                variant="h5"
-                                                style={{ fontWeight: 700 }}
+                                                style={{ fontWeight: 700, fontSize: 20 }}
                                             >
                                                 {item.projectName}
                                             </Typography>
                                             <Typography
-                                                variant="h6"
                                                 sx={{
                                                     display: "inline",
-                                                    fontWeight: 700,
+                                                    fontSize: 18,
+                                                    fontWeight: 500,
                                                 }}>
-                                                Thành viên:
+                                                Thành viên1:
                                             </Typography>
                                             {
                                                 item.members.length > 0 ? (
@@ -204,7 +204,7 @@ const Home = () => {
                                                             <Button
                                                                 size='small'
                                                                 variant='outlined'
-                                                                sx={{ fontSize: "16px" }}
+                                                                sx={{ fontSize: 12 }}
                                                                 key={index}
                                                             >
                                                                 #{member.name}
@@ -218,17 +218,17 @@ const Home = () => {
                                                 )
                                             }
                                             <Typography
-                                                variant="h6"
                                                 component="div"
                                                 className="truncate truncate--2"
                                                 sx={{
-                                                    fontWeight: 700,
+                                                    fontWeight: 500,
+                                                    fontSize: 18,
                                                 }}>
                                                 Miêu tả: {item.description}
                                             </Typography>
                                         </CardContent>
                                         <CardActions>
-                                            <Button size="medium"
+                                            <Button size="small"
                                                 style={{
                                                     color: `${blue[500]}`,
                                                 }}
@@ -243,12 +243,12 @@ const Home = () => {
                                 ))
                             ) : (
                                 data.map((item, index) => (
-                                    <Card sx={{ height: 520, width: 250, border: `1px ${blue[200]} solid`, margin: "5px 5px" }} key={index}>
+                                    <Card sx={{ height: 400, width: 200, border: `1px ${blue[200]} solid`, margin: "5px 5px" }} key={index}>
                                         <CardContent>
                                             <IconButton {...iconButtonSettings}>
                                                 {
                                                     item.categoryId === 1 ? (
-                                                        <img src={PC_Logo} alt="Mobile" style={{ width: "100%", height: "auto", display: "inline-block" }} />
+                                                        <img src={PC_Logo} alt="Mobile" style={{ width: "90%", height: "auto", display: "inline-block" }} />
                                                     ) : (
                                                         item.categoryId === 2 ? (
                                                             <img src={Software_Logo} alt="Mobile" style={{ width: "100%", height: "auto", display: "inline-block" }} />
@@ -260,16 +260,15 @@ const Home = () => {
                                             </IconButton>
                                             <Divider width="100%" />
                                             <Typography
-                                                variant="h5"
-                                                style={{ fontWeight: 700 }}
+                                                style={{ fontWeight: 700, fontSize: 20 }}
                                             >
                                                 {item.projectName}
                                             </Typography>
                                             <Typography
-                                                variant="h6"
                                                 sx={{
                                                     display: "inline",
-                                                    fontWeight: 700,
+                                                    fontWeight: 500,
+                                                    fontSize: 18,
                                                 }}>
                                                 Thành viên:
                                             </Typography>
@@ -280,7 +279,7 @@ const Home = () => {
                                                             <Button
                                                                 size='small'
                                                                 variant='outlined'
-                                                                sx={{ fontSize: "16px" }}
+                                                                sx={{ fontSize: 12 }}
                                                                 key={index}
                                                             >
                                                                 #{member.name}
@@ -294,17 +293,17 @@ const Home = () => {
                                                 )
                                             }
                                             <Typography
-                                                variant="h6"
                                                 component="div"
                                                 className="truncate truncate--2"
                                                 sx={{
-                                                    fontWeight: 700,
+                                                    fontWeight: 500,
+                                                    fontSize: 18,
                                                 }}>
                                                 Miêu tả: {item.description}
                                             </Typography>
                                         </CardContent>
                                         <CardActions>
-                                            <Button size="medium"
+                                            <Button size="small"
                                                 style={{
                                                     color: `${blue[500]}`,
                                                 }}

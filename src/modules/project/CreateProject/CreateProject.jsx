@@ -224,7 +224,7 @@ const CreateProject = () => {
                     }}
                 >
                     <Typography variant="h5" style={{ color: `${blue[500]}` }}>
-                        Bảng dự án
+                        Bảng tạo dự án
                     </Typography>
                 </Box>
                 <div style={{ height: "90%", width: '100%' }}>
