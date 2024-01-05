@@ -101,7 +101,6 @@ export const assignUserProject = async (payload) => {
 // Link:
 // https://jiranew.cybersoft.edu.vn/api/Project/removeUserFromProject
 export const removeUserFromProject = async (payload) => {
-  console.log('payload: ', payload);
   try {
     const response = await fetcher.delete("/Project/removeUserFromProject", payload);
     return response.data.content;

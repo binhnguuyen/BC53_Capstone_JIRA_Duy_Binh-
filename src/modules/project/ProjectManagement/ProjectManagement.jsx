@@ -155,8 +155,8 @@ const ProjectManagement = () => {
           onClick={() => {
             MySwal.fire({
               icon: "question",
-              title: "Bạn có chắc muốn xoá dự án",
-              text: "Quay lại trang quản lý dự án",
+              title: "Bạn có chắc muốn xoá dự án này?",
+              text: "Xoá xong tạo lại thì cũng đơn giản lắm nha, xoá thoải mái!",
               showCancelButton: true,
               confirmButtonText: "Đồng ý"
             }).then((result) => {
@@ -476,18 +476,20 @@ const ProjectManagement = () => {
   // Hàm set member để xoá ra khỏi project
   const handleSetMemberToRemove = (value) => {
     setMemberId(value);
-    setMemberToRemove({
-      ...memberToRemove,
-      projectId: projectId,
-      userId: value,
-    })
-    
-    if ( memberToRemove !== "" ) {
+    if (memberId !== "") {
+      setMemberToRemove({
+        ...memberToRemove,
+        projectId: projectId,
+        userId: value,
+      })
+    }
+
+    if (memberToRemove !== "") {
       handleClose();
       MySwal.fire({
         icon: "question",
-        title: "Bạn có chắc muốn xoá dự án",
-        text: "Quay lại trang quản lý dự án",
+        title: "Bạn có chắc muốn xoá thành viên này?",
+        text: "Xoá là bị giận đó, ko giỡn!",
         showCancelButton: true,
         confirmButtonText: "Đồng ý"
       }).then((result) => {
