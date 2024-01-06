@@ -20,6 +20,7 @@ import { yupResolver } from "@hookform/resolvers/yup"
 // Thư viện Swal
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
+import { getUser } from '../../apis/user.api';
 
 
 // thư viện SweetAlert
@@ -57,6 +58,8 @@ const Task = () => {
     const [searchPriorityResult, setSearchPriorityResult] = useState("");
     const [searchTaskTypeInput, setSearchTaskTypeInput] = useState("");
     const [searchTaskTypeResult, setSearchTaskTypeResult] = useState("");
+    const [searchMemberInput, setSearchMemberInput] = useState("");
+    const [searchMemberResult, setSearchMemberResult] = useState("");
 
 
     // Xử lý formValue (raw data lấy từ form)
@@ -149,6 +152,13 @@ const Task = () => {
         queryFn: getTaskType,
     });
     console.log('taskType: ', taskType);
+
+    // Hàm getUser
+    const { data: allUser, isLoading: isLoadingAllUser } = useQuery({
+        queryKey: ["getUser"],
+        queryFn: getUser,
+    });
+    console.log('allUser: ', allUser);
 
 
     // Hàm xử lý formValue
@@ -289,7 +299,7 @@ const Task = () => {
                                 }
                             </Typography>
                         </Box>
-                        <Stack 
+                        <Stack
                             spacing={3}
                             justifyContent={"center"}
                             alignItems={"center"}
@@ -375,6 +385,52 @@ const Task = () => {
                                     }
                                 </Typography>
                             </Box>
+                        </Stack>
+                        <Stack
+                            spacing={3}
+                            justifyContent={"center"}
+                            alignItems={"center"}
+                            direction={"row"}
+                        >
+                            <Box sx={{ width: "100%", margin: "0 0 15px" }}>
+                                <Typography {...typographySettings} sx={{ margin: "0 0 5px" }}>
+                                    Gán thành viên
+                                </Typography>
+                                <Typography>
+                                    {
+                                        allUser ? (
+                                            <Stack spacing={2}>
+                                                <Autocomplete
+                                                    id="free-solo-2-demo"
+                                                    disableClearable
+                                                    options={allUser.map((user) => user.name)}
+                                                    onChange={(event, newValue) => {
+                                                        setSearchMemberResult(newValue);
+                                                    }}
+                                                    onInputChange={(event, newInputValue) => {
+                                                        setSearchMemberInput(newInputValue);
+                                                    }}
+                                                    renderInput={(params) => (
+                                                        <TextField
+                                                            {...params}
+                                                            label="Thành viên"
+                                                            InputProps={{
+                                                                ...params.InputProps,
+                                                                type: 'search',
+                                                            }}
+                                                        />
+                                                    )}
+                                                />
+                                            </Stack>
+                                        ) : (
+                                            <Typography {...typographySettings} color={"error"}>
+                                                Không tải được thành viên
+                                            </Typography>
+                                        )
+                                    }
+                                </Typography>
+                            </Box>
+
                         </Stack>
                     </Box>
                 </div>
