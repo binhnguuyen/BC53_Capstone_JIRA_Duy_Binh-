@@ -186,8 +186,6 @@ const Task = () => {
             [value]: event.target.value,
         })
     }
-
-
     console.log('projectList: ', projectList);
     console.log('formValue: ', formValue);
 
@@ -470,6 +468,21 @@ const Task = () => {
                             </Box>
 
                         </Stack>
+                        <Box sx={{ width: "100%", margin: "0 0 15px" }}>
+                            <Typography {...typographySettings} sx={{ margin: "0 0 5px" }}>
+                                Nội dung công việc
+                            </Typography>
+                            <TextField
+                                required
+                                fullWidth
+                                label="Nội dung"
+                                variant="outlined"
+                                placeholder="Find bug and fix..."
+                                multiline
+                                rows={6}
+                                defaultValue=""
+                            />
+                        </Box>
                     </Box>
                 </div>
                 <Copyright sx={{ mt: 5 }} />
