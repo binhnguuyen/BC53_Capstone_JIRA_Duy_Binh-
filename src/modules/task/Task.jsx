@@ -10,7 +10,7 @@ import { useForm } from 'react-hook-form';
 
 // API
 import { getAllProject } from '../../apis/project.api';
-import { getAllStatus } from '../../apis/task.api';
+import { getAllStatus, getTaskType } from '../../apis/task.api';
 import { getAllPriority } from '../../apis/priority.api';
 
 // Thư viện Yup giúp mình validate Hook Form
@@ -55,6 +55,8 @@ const Task = () => {
     const [searchStatusResult, setSearchStatusResult] = useState("");
     const [searchPriorityInput, setSearchPriorityInput] = useState("");
     const [searchPriorityResult, setSearchPriorityResult] = useState("");
+    const [searchTaskTypeInput, setSearchTaskTypeInput] = useState("");
+    const [searchTaskTypeResult, setSearchTaskTypeResult] = useState("");
 
 
     // Xử lý formValue (raw data lấy từ form)
@@ -133,14 +135,20 @@ const Task = () => {
         queryFn: getAllStatus,
     });
     console.log('allStatus: ', allStatus);
-    
 
-    // hàm GET allStatus
+    // hàm GET allPriority
     const { data: allPriority, isLoadingAllPriority, refetch: refetchAllPriority } = useQuery({
         queryKey: ["allPriority"],
         queryFn: getAllPriority,
     });
     console.log('allPriority: ', allPriority);
+
+    // hàm GET taskType
+    const { data: taskType, isLoadingTaskType, refetch: refetchTaskType } = useQuery({
+        queryKey: ["taskType"],
+        queryFn: getTaskType,
+    });
+    console.log('taskType: ', taskType);
 
 
     // Hàm xử lý formValue
@@ -281,46 +289,93 @@ const Task = () => {
                                 }
                             </Typography>
                         </Box>
-                        <Box sx={{ width: "50%", margin: "0 0 15px" }}>
-                            <Typography {...typographySettings} sx={{ margin: "0 0 5px" }}>
-                                Ưu tiên
-                            </Typography>
-                            <Typography>
-                                {
-                                    allPriority ? (
-                                        <Stack spacing={2}>
-                                            <Autocomplete
-                                                id="free-solo-2-demo"
-                                                disableClearable
-                                                options={allPriority.map((priority) => priority.priority)}
-                                                defaultValue={allPriority[0]?.priority}
-                                                onChange={(event, newValue) => {
-                                                    setSearchPriorityResult(newValue);
-                                                }}
-                                                onInputChange={(event, newInputValue) => {
-                                                    setSearchPriorityInput(newInputValue);
+                        <Stack 
+                            spacing={3}
+                            justifyContent={"center"}
+                            alignItems={"center"}
+                            direction={"row"}
+                        >
+                            <Box sx={{ width: "100%", margin: "0 0 15px" }}>
+                                <Typography {...typographySettings} sx={{ margin: "0 0 5px" }}>
+                                    Ưu tiên
+                                </Typography>
+                                <Typography>
+                                    {
+                                        allPriority ? (
+                                            <Stack spacing={2}>
+                                                <Autocomplete
+                                                    id="free-solo-2-demo"
+                                                    disableClearable
+                                                    options={allPriority.map((priority) => priority.priority)}
+                                                    defaultValue={allPriority[0]?.priority}
+                                                    onChange={(event, newValue) => {
+                                                        setSearchPriorityResult(newValue);
+                                                    }}
+                                                    onInputChange={(event, newInputValue) => {
+                                                        setSearchPriorityInput(newInputValue);
 
-                                                }}
-                                                renderInput={(params) => (
-                                                    <TextField
-                                                        {...params}
-                                                        label="Ưu tiên"
-                                                        InputProps={{
-                                                            ...params.InputProps,
-                                                            type: 'search',
-                                                        }}
-                                                    />
-                                                )}
-                                            />
-                                        </Stack>
-                                    ) : (
-                                        <Typography {...typographySettings} color={"error"}>
-                                            Không tải được trạng thái
-                                        </Typography>
-                                    )
-                                }
-                            </Typography>
-                        </Box>
+                                                    }}
+                                                    renderInput={(params) => (
+                                                        <TextField
+                                                            {...params}
+                                                            label="Ưu tiên"
+                                                            InputProps={{
+                                                                ...params.InputProps,
+                                                                type: 'search',
+                                                            }}
+                                                        />
+                                                    )}
+                                                />
+                                            </Stack>
+                                        ) : (
+                                            <Typography {...typographySettings} color={"error"}>
+                                                Không tải được trạng thái
+                                            </Typography>
+                                        )
+                                    }
+                                </Typography>
+                            </Box>
+                            <Box sx={{ width: "100%", margin: "0 0 15px" }}>
+                                <Typography {...typographySettings} sx={{ margin: "0 0 5px" }}>
+                                    Loại công việc
+                                </Typography>
+                                <Typography>
+                                    {
+                                        taskType ? (
+                                            <Stack spacing={2}>
+                                                <Autocomplete
+                                                    id="free-solo-2-demo"
+                                                    disableClearable
+                                                    options={taskType.map((taskType) => taskType.taskType)}
+                                                    defaultValue={taskType[0]?.taskType}
+                                                    onChange={(event, newValue) => {
+                                                        setSearchTaskTypeResult(newValue);
+                                                    }}
+                                                    onInputChange={(event, newInputValue) => {
+                                                        setSearchTaskTypeInput(newInputValue);
+
+                                                    }}
+                                                    renderInput={(params) => (
+                                                        <TextField
+                                                            {...params}
+                                                            label="Loại công việc"
+                                                            InputProps={{
+                                                                ...params.InputProps,
+                                                                type: 'search',
+                                                            }}
+                                                        />
+                                                    )}
+                                                />
+                                            </Stack>
+                                        ) : (
+                                            <Typography {...typographySettings} color={"error"}>
+                                                Không tải được trạng thái
+                                            </Typography>
+                                        )
+                                    }
+                                </Typography>
+                            </Box>
+                        </Stack>
                     </Box>
                 </div>
                 <Copyright sx={{ mt: 5 }} />
