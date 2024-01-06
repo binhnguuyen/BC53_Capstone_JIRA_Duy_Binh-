@@ -7,6 +7,6 @@ export const getAllStatus = async () => {
         const response = await fetcher.get("/Status/getAll");
         return response.data.content;
     } catch (error) {
-        throw "Lỗi get Stats API";
+        throw "Lỗi get Status API";
     }
 };

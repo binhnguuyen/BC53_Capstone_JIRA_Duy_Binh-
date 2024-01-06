@@ -5,6 +5,13 @@ import Copyright from "../../components/Copyright";
 import { styled, alpha } from '@mui/material/styles';
 import { LoadingButton } from '@mui/lab';
 import { useSelector } from 'react-redux';
+import { useQuery } from '@tanstack/react-query';
+import { useForm } from 'react-hook-form';
+
+// API
+import { getAllProject } from '../../apis/project.api';
+import { getAllStatus } from '../../apis/task.api';
+import { getAllPriority } from '../../apis/priority.api';
 
 // Thư viện Yup giúp mình validate Hook Form
 import * as yup from "yup"
@@ -13,10 +20,7 @@ import { yupResolver } from "@hookform/resolvers/yup"
 // Thư viện Swal
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
-import { useQuery } from '@tanstack/react-query';
-import { getAllProject } from '../../apis/project.api';
-import { useForm } from 'react-hook-form';
-import { getAllStatus } from '../../apis/task';
+
 
 // thư viện SweetAlert
 const MySwal = withReactContent(Swal);
@@ -49,6 +53,8 @@ const Task = () => {
     const [searchProjectResult, setSearchProjectResult] = useState("");
     const [searchStatusInput, setSearchStatusInput] = useState("");
     const [searchStatusResult, setSearchStatusResult] = useState("");
+    const [searchPriorityInput, setSearchPriorityInput] = useState("");
+    const [searchPriorityResult, setSearchPriorityResult] = useState("");
 
 
     // Xử lý formValue (raw data lấy từ form)
@@ -125,11 +131,17 @@ const Task = () => {
     const { data: allStatus, isLoadingAllStatus, refetch: refetchAllStatus } = useQuery({
         queryKey: ["allStatus"],
         queryFn: getAllStatus,
-        // chỉ kích hoạt khi chưa có dữ liệu trong projectList (lấy từ store của Redux về do Home đưa lên)
-        // enabled: !!projectList,
     });
     console.log('allStatus: ', allStatus);
     
+
+    // hàm GET allStatus
+    const { data: allPriority, isLoadingAllPriority, refetch: refetchAllPriority } = useQuery({
+        queryKey: ["allPriority"],
+        queryFn: getAllPriority,
+    });
+    console.log('allPriority: ', allPriority);
+
 
     // Hàm xử lý formValue
     const handleSetFormValue = (value) => event => {
@@ -180,12 +192,12 @@ const Task = () => {
                                                 id="free-solo-2-demo"
                                                 disableClearable
                                                 options={projectList.map((project) => project.projectName)}
+                                                defaultValue={projectList[0]?.projectName}
                                                 onChange={(event, newValue) => {
                                                     setSearchProjectResult(newValue);
                                                 }}
                                                 onInputChange={(event, newInputValue) => {
                                                     setSearchProjectInput(newInputValue);
-
                                                 }}
                                                 renderInput={(params) => (
                                                     <TextField
@@ -241,6 +253,7 @@ const Task = () => {
                                                 id="free-solo-2-demo"
                                                 disableClearable
                                                 options={allStatus.map((status) => status.statusName)}
+                                                defaultValue={allStatus[0]?.statusName}
                                                 onChange={(event, newValue) => {
                                                     setSearchStatusResult(newValue);
                                                 }}
@@ -251,7 +264,47 @@ const Task = () => {
                                                 renderInput={(params) => (
                                                     <TextField
                                                         {...params}
-                                                        label="Tìm kiếm trạng thái"
+                                                        label="Trạng thái"
+                                                        InputProps={{
+                                                            ...params.InputProps,
+                                                            type: 'search',
+                                                        }}
+                                                    />
+                                                )}
+                                            />
+                                        </Stack>
+                                    ) : (
+                                        <Typography {...typographySettings} color={"error"}>
+                                            Không tải được trạng thái
+                                        </Typography>
+                                    )
+                                }
+                            </Typography>
+                        </Box>
+                        <Box sx={{ width: "50%", margin: "0 0 15px" }}>
+                            <Typography {...typographySettings} sx={{ margin: "0 0 5px" }}>
+                                Ưu tiên
+                            </Typography>
+                            <Typography>
+                                {
+                                    allPriority ? (
+                                        <Stack spacing={2}>
+                                            <Autocomplete
+                                                id="free-solo-2-demo"
+                                                disableClearable
+                                                options={allPriority.map((priority) => priority.priority)}
+                                                defaultValue={allPriority[0]?.priority}
+                                                onChange={(event, newValue) => {
+                                                    setSearchPriorityResult(newValue);
+                                                }}
+                                                onInputChange={(event, newInputValue) => {
+                                                    setSearchPriorityInput(newInputValue);
+
+                                                }}
+                                                renderInput={(params) => (
+                                                    <TextField
+                                                        {...params}
+                                                        label="Ưu tiên"
                                                         InputProps={{
                                                             ...params.InputProps,
                                                             type: 'search',
