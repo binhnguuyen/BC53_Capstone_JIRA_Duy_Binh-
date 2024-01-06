@@ -468,6 +468,66 @@ const Task = () => {
                             </Box>
 
                         </Stack>
+                        <Stack
+                            spacing={3}
+                            justifyContent={"center"}
+                            alignItems={"center"}
+                            direction={"row"}
+                            sx={{ margin: "0 0 15px" }}
+                        >
+                            <Box sx={{ width: "50%" }}>
+                                <Typography {...typographySettings} sx={{ margin: "0 0 5px" }}>
+                                    Thời gian dự định
+                                </Typography>
+                                <Typography>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        id="estimatedTime"
+                                        label={"Thời gian dự định"}
+                                        name="estimatedTime"
+                                        type="text"
+                                        placeholder="5"
+                                    />
+                                </Typography>
+                            </Box>
+                            <Box sx={{ width: "25%" }}>
+                                <Typography {...typographySettings} sx={{ margin: "0 0 5px" }}>
+                                    Thời gian đã qua
+                                </Typography>
+                                <Typography>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        id="passedTime"
+                                        label={"Thời gian đã qua"}
+                                        name="passedTime"
+                                        type="text"
+                                        placeholder="3"
+                                    />
+                                </Typography>
+                            </Box>
+                            <Box sx={{ width: "25%", textAlign: "center" }}>
+                                <Typography gutterBottom
+                                    sx={{
+                                        textAlign: "left"
+                                    }}
+                                >
+                                    Thời gian còn lại
+                                </Typography>
+                                <Typography>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        id="remainedTime"
+                                        label={"Thời gian còn lại"}
+                                        name="remainedTime"
+                                        type="text"
+                                        placeholder="2"
+                                    />
+                                </Typography>
+                            </Box>
+                        </Stack>
                         <Box sx={{ width: "100%", margin: "0 0 15px" }}>
                             <Typography {...typographySettings} sx={{ margin: "0 0 5px" }}>
                                 Nội dung công việc
