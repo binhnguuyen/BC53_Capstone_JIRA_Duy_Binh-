@@ -1,11 +1,11 @@
-import React from 'react'
+import ProjectTable from "./ProjectTable";
 
 const AdminDashBoard = () => {
     return (
-        <div>
-            Admin Dashboard
-        </div>
-    )
-}
+        <>
+            <ProjectTable />
+        </>
+    );
+};
 
-export default AdminDashBoard
+export default AdminDashBoard;
