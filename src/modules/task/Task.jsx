@@ -16,6 +16,7 @@ import withReactContent from 'sweetalert2-react-content'
 import { useQuery } from '@tanstack/react-query';
 import { getAllProject } from '../../apis/project.api';
 import { useForm } from 'react-hook-form';
+import { getAllStatus } from '../../apis/task';
 
 // thư viện SweetAlert
 const MySwal = withReactContent(Swal);
@@ -46,6 +47,8 @@ const Task = () => {
     let { projectList } = useSelector((state) => state.project);
     const [searchprojectInput, setSearchProjectInput] = useState("");
     const [searchProjectResult, setSearchProjectResult] = useState("");
+    const [searchStatusInput, setSearchStatusInput] = useState("");
+    const [searchStatusResult, setSearchStatusResult] = useState("");
 
 
     // Xử lý formValue (raw data lấy từ form)
@@ -100,7 +103,7 @@ const Task = () => {
 
     // nếu user ko chạy trang home trước mà vô trang management trước thì ko dùng dữ liệu từ store Redux đc mà phải tự gọi API
     let projectListData = [];
-    const { data = [], isLoading, isError, error, refetch } = useQuery({
+    const { data = [], isLoadingAllProject, refetch: refetchAllProject } = useQuery({
         queryKey: ["allProject"],
         queryFn: getAllProject,
         // chỉ kích hoạt khi chưa có dữ liệu trong projectList (lấy từ store của Redux về do Home đưa lên)
@@ -118,6 +121,16 @@ const Task = () => {
     }
 
 
+    // hàm GET allStatus
+    const { data: allStatus, isLoadingAllStatus, refetch: refetchAllStatus } = useQuery({
+        queryKey: ["allStatus"],
+        queryFn: getAllStatus,
+        // chỉ kích hoạt khi chưa có dữ liệu trong projectList (lấy từ store của Redux về do Home đưa lên)
+        // enabled: !!projectList,
+    });
+    console.log('allStatus: ', allStatus);
+    
+
     // Hàm xử lý formValue
     const handleSetFormValue = (value) => event => {
         setFormValue({
@@ -127,8 +140,9 @@ const Task = () => {
             [value]: event.target.value,
         })
     }
-    console.log('projectList: ', projectList);
 
+
+    console.log('projectList: ', projectList);
     console.log('formValue: ', formValue);
 
 
@@ -213,6 +227,45 @@ const Task = () => {
                                     value={formValue.taskName}
                                     onChange={handleSetFormValue("taskName")}
                                 />
+                            </Typography>
+                        </Box>
+                        <Box sx={{ width: "100%", margin: "0 0 15px" }}>
+                            <Typography {...typographySettings} sx={{ margin: "0 0 5px" }}>
+                                Trạng thái
+                            </Typography>
+                            <Typography>
+                                {
+                                    allStatus ? (
+                                        <Stack spacing={2}>
+                                            <Autocomplete
+                                                id="free-solo-2-demo"
+                                                disableClearable
+                                                options={allStatus.map((status) => status.statusName)}
+                                                onChange={(event, newValue) => {
+                                                    setSearchStatusResult(newValue);
+                                                }}
+                                                onInputChange={(event, newInputValue) => {
+                                                    setSearchStatusInput(newInputValue);
+
+                                                }}
+                                                renderInput={(params) => (
+                                                    <TextField
+                                                        {...params}
+                                                        label="Tìm kiếm trạng thái"
+                                                        InputProps={{
+                                                            ...params.InputProps,
+                                                            type: 'search',
+                                                        }}
+                                                    />
+                                                )}
+                                            />
+                                        </Stack>
+                                    ) : (
+                                        <Typography {...typographySettings} color={"error"}>
+                                            Không tải được trạng thái
+                                        </Typography>
+                                    )
+                                }
                             </Typography>
                         </Box>
                     </Box>
