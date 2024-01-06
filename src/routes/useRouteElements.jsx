@@ -94,7 +94,7 @@ const useRouteElements = () => {
                         </Suspense>,
                 },
                 {
-                    path: PATH.TASK,
+                    path: `${PATH.TASK}/:projectId`,
                     // index: 2,
                     element:
                         <Suspense callBack={<div>Loading</div>}>

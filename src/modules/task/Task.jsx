@@ -2,9 +2,14 @@ import React from 'react'
 import { Box, Container, Typography } from '@mui/material'
 import { blue } from '@mui/material/colors'
 import Copyright from "../../components/Copyright";
+import { useParams } from 'react-router-dom';
 
 
 const Task = () => {
+    // dùng useParams lấy id sau dầu : trong URL của details về
+    const { projectId } = useParams();
+    console.log('projectId: ', projectId);
+
     return (
         <div style={{ display: "flex", justifyContent: "center", alignContent: "center" }}>
             <Container style={{ maxWidth: "80vw" }} sx={{ margin: "60px 60px", padding: "24px", boxShadow: "0px 1px 10px 0px rgba(0,0,0,0.12)" }}>
