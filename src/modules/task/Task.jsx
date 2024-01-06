@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Autocomplete, Box, Container, Stack, TextField, Typography } from '@mui/material'
+import { Autocomplete, Box, Container, Slider, Stack, TextField, Typography } from '@mui/material'
 import { blue } from '@mui/material/colors'
 import Copyright from "../../components/Copyright";
 import { styled, alpha } from '@mui/material/styles';
@@ -7,6 +7,7 @@ import { LoadingButton } from '@mui/lab';
 import { useSelector } from 'react-redux';
 import { useQuery } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
+import Tooltip from '@mui/material/Tooltip';
 
 // API
 import { getAllProject } from '../../apis/project.api';
@@ -48,6 +49,8 @@ const style = {
 };
 
 
+
+
 const Task = () => {
     let { projectList } = useSelector((state) => state.project);
     const [searchprojectInput, setSearchProjectInput] = useState("");
@@ -60,6 +63,7 @@ const Task = () => {
     const [searchTaskTypeResult, setSearchTaskTypeResult] = useState("");
     const [searchMemberInput, setSearchMemberInput] = useState("");
     const [searchMemberResult, setSearchMemberResult] = useState("");
+    const [timeTracking, setTimeTracking] = useState("");
 
 
     // Xử lý formValue (raw data lấy từ form)
@@ -110,6 +114,18 @@ const Task = () => {
         // sự kiện này có onChange, onBlue, onSubmit
         mode: "all",
     });
+
+
+    // thư viện Slider từ MUI
+    function ValueLabelComponent(props) {
+        const { children, value } = props;
+        setTimeTracking(value);
+        return (
+            <Tooltip enterTouchDelay={0} placement="top" title={value}>
+                {children}
+            </Tooltip>
+        );
+    }
 
 
     // nếu user ko chạy trang home trước mà vô trang management trước thì ko dùng dữ liệu từ store Redux đc mà phải tự gọi API
@@ -304,8 +320,9 @@ const Task = () => {
                             justifyContent={"center"}
                             alignItems={"center"}
                             direction={"row"}
+                            sx={{ margin: "0 0 15px" }}
                         >
-                            <Box sx={{ width: "100%", margin: "0 0 15px" }}>
+                            <Box sx={{ width: "100%" }}>
                                 <Typography {...typographySettings} sx={{ margin: "0 0 5px" }}>
                                     Ưu tiên
                                 </Typography>
@@ -345,7 +362,7 @@ const Task = () => {
                                     }
                                 </Typography>
                             </Box>
-                            <Box sx={{ width: "100%", margin: "0 0 15px" }}>
+                            <Box sx={{ width: "100%" }}>
                                 <Typography {...typographySettings} sx={{ margin: "0 0 5px" }}>
                                     Loại công việc
                                 </Typography>
@@ -391,8 +408,9 @@ const Task = () => {
                             justifyContent={"center"}
                             alignItems={"center"}
                             direction={"row"}
+                            sx={{ margin: "0 0 15px" }}
                         >
-                            <Box sx={{ width: "100%", margin: "0 0 15px" }}>
+                            <Box sx={{ width: "100%" }}>
                                 <Typography {...typographySettings} sx={{ margin: "0 0 5px" }}>
                                     Gán thành viên
                                 </Typography>
@@ -429,6 +447,26 @@ const Task = () => {
                                         )
                                     }
                                 </Typography>
+                            </Box>
+                            <Box sx={{ width: "100%", textAlign: "center" }}>
+                                <Typography gutterBottom
+                                    sx={{
+                                        textAlign: "left"
+                                    }}
+                                >Thời gian cần</Typography>
+                                <Slider
+                                    valueLabelDisplay="auto"
+                                    slots={{
+                                        valueLabel: ValueLabelComponent,
+                                    }}
+                                    aria-label="custom thumb label"
+                                    defaultValue={14}
+                                    sx={{
+                                        width: "95%",
+                                        color: 'success.main',
+                                        textAlign: "center"
+                                    }}
+                                ></Slider>
                             </Box>
 
                         </Stack>
