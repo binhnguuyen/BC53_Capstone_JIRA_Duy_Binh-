@@ -289,7 +289,7 @@ const ProjectManagement = () => {
           size="small"
           sx={{ fontSize: 12, border: 0 }}
           onClick={() => {
-            navigate(`${PATH.TASK}/${params.id}`)
+            navigate(`${PATH.PROJECT}/${params.id}`)
           }}
         >
           {params.id}
@@ -309,7 +309,7 @@ const ProjectManagement = () => {
           size="small"
           sx={{ fontSize: 12, border: 0 }}
           onClick={() => {
-            navigate(`${PATH.TASK}/${params.id}`)
+            navigate(`${PATH.PROJECT}/${params.id}`)
           }}
         >
           {params.row.projectName}
