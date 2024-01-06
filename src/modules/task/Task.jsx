@@ -1,6 +1,9 @@
 import React, { useState } from 'react'
 import { Autocomplete, Box, Container, Slider, Stack, TextField, Typography } from '@mui/material'
 import { blue } from '@mui/material/colors'
+import { green } from '@mui/material/colors'
+import { orange } from '@mui/material/colors'
+import { red } from '@mui/material/colors'
 import Copyright from "../../components/Copyright";
 import { styled, alpha } from '@mui/material/styles';
 import { LoadingButton } from '@mui/lab';
@@ -542,6 +545,29 @@ const Task = () => {
                                 rows={6}
                                 defaultValue=""
                             />
+                        </Box>
+                        <Box sx={{ width: "100%", margin: "0 0 15px", textAlign: "right" }}>
+                            <LoadingButton
+                                variant="outlined"
+                                size="large"
+                                color='error'
+                                sx={{ fontSize: "14px", border: `1px ${red[500]} solid` }}
+                                type="submit"
+                            // loading={}
+                            >
+                                Huỷ
+                            </LoadingButton>
+                            <LoadingButton
+                                variant="contained"
+                                color="primary"
+                                size="large"
+                                sx={{ fontSize: "14px", border: `1px ${blue[500]} solid`, marginLeft: 3 }}
+                                type="submit"
+                            // loading={}
+                            >
+                                Tạo
+                            </LoadingButton>
+
                         </Box>
                     </Box>
                 </div>
