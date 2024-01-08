@@ -347,6 +347,7 @@ const CreateProject = () => {
                                     variant="contained"
                                     color="primary"
                                     size="large"
+                                    title="Tạo dự án"
                                     sx={{ fontSize: "14px", border: `1px ${blue[500]} solid` }}
                                     type="submit"
                                     loading={isAdding}
@@ -358,6 +359,7 @@ const CreateProject = () => {
                                     variant="contained"
                                     color="success"
                                     size="large"
+                                    title="Sửa dự án"
                                     sx={{ fontSize: "14px", border: `1px ${green[500]} solid` }}
                                     type="submit"
                                     loading={isEditting}

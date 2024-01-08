@@ -135,9 +135,8 @@ const ProjectManagement = () => {
           variant="contained"
           color="error"
           size="small"
-          sx={{
-            border: `1px ${green[500]} solid`
-          }}
+          title="Sửa dự án"
+          style={{ width: "30px", height: "30px", border: `1px ${green[500]} solid`, borderRadius: "30px", marginRight: "5px" }}
           onClick={() => {
             handleProjectIdToEdit(params.row.id);
           }}
@@ -148,10 +147,8 @@ const ProjectManagement = () => {
           variant="contained"
           color="primary"
           size="small"
-          sx={{
-            border: `1px ${red[500]} solid`,
-            marginLeft: "10px",
-          }}
+          title="Xoá dự án"
+          style={{ width: "30px", height: "30px", border: `1px ${red[500]} solid`, borderRadius: "30px" }}
           onClick={() => {
             MySwal.fire({
               icon: "question",
@@ -185,6 +182,7 @@ const ProjectManagement = () => {
           color="primary"
           size="small"
           sx={{ fontSize: 12, border: `1px ${blue[500]} solid` }}
+          title={params.row.creator.name}
           onClick={() => {
             // parseName(params.row.col6)
           }}
@@ -210,12 +208,13 @@ const ProjectManagement = () => {
                   variant="contained"
                   color="primary"
                   size="small"
+                  title={item.name}
                   onClick={() => {
                     handleOpen();
                     handleSetProjectId(params.row.id);
                   }}
                 >
-                  <img src={item.avatar} alt={item.name} style={{ width: "30px", height: "30px", border: `1px ${blue[500]} solid` }} />
+                  <img src={item.avatar} alt={item.name} style={{ width: "30px", height: "30px", border: `1px ${blue[500]} solid`, borderRadius: "30px" }} />
                   {/* #{item.name}&cedil; */}
                 </IconButton>
               )
@@ -227,36 +226,39 @@ const ProjectManagement = () => {
                 variant="contained"
                 color="primary"
                 size="small"
+                title={params.row.members.name}
                 onClick={() => {
                   handleOpen();
                   handleSetProjectId(params.row.id);
                 }}
               >
-                <img src={params.row.members[0].avatar} alt={params.row.members[0].name} style={{ width: "30px", height: "30px", border: `1px ${blue[500]} solid` }} />
+                <img src={params.row.members[0].avatar} alt={params.row.members[0].name} style={{ width: "30px", height: "30px", border: `1px ${blue[500]} solid`, borderRadius: "30px" }} />
                 {/* #{params.row.members[0].name}&cedil; */}
               </IconButton>
               <IconButton
                 variant="contained"
                 color="primary"
                 size="small"
+                title={params.row.members.name}
                 onClick={() => {
                   handleOpen();
                   handleSetProjectId(params.row.id);
                 }}
               >
-                <img src={params.row.members[1].avatar} alt={params.row.members[1].name} style={{ width: "30px", height: "30px", border: `1px ${blue[500]} solid` }} />
+                <img src={params.row.members[1].avatar} alt={params.row.members[1].name} style={{ width: "30px", height: "30px", border: `1px ${blue[500]} solid`, borderRadius: "30px" }} />
                 {/* #{params.row.members[1].name}&cedil; */}
               </IconButton>
               <IconButton
                 variant="contained"
                 color="primary"
                 size="small"
+                title={params.row.name}
                 onClick={() => {
                   handleOpen();
                   handleSetProjectId(params.row.id);
                 }}
               >
-                <img src={params.row.members[2].avatar} alt={params.row.members[1].name} style={{ width: "30px", height: "30px", border: `1px ${blue[500]} solid` }} />
+                <img src={params.row.members[2].avatar} alt={params.row.members[1].name} style={{ width: "30px", height: "30px", border: `1px ${blue[500]} solid`, borderRadius: "30px" }} />
                 {/* #{params.row.members[1].name}&cedil; */}
               </IconButton>
             </>
@@ -264,9 +266,8 @@ const ProjectManagement = () => {
         }
         <IconButton
           size="small"
-          sx={{
-            border: `1px ${blue[500]} solid`
-          }}
+          title="Thêm thành viên"
+          style={{ width: "30px", height: "30px", border: `1px ${blue[500]} solid`, borderRadius: "30px" }}
           onClick={() => {
             handleOpenModalAddUser();
             handleSetProjectId(params.row.id);
@@ -287,6 +288,7 @@ const ProjectManagement = () => {
           variant="outlined"
           color="primary"
           size="small"
+          title="Xem chi tiết"
           sx={{ fontSize: 12, border: 0 }}
           onClick={() => {
             navigate(`${PATH.PROJECT}/${params.id}`)
@@ -307,6 +309,7 @@ const ProjectManagement = () => {
           variant="outlined"
           color="primary"
           size="small"
+          title="Xem chi tiết"
           sx={{ fontSize: 12, border: 0 }}
           onClick={() => {
             navigate(`${PATH.PROJECT}/${params.id}`)
@@ -670,6 +673,7 @@ const ProjectManagement = () => {
                               variant="contained"
                               color="primary"
                               size="small"
+                              title="Loại thành viên"
                               sx={{
                                 border: `1px ${red[500]} solid`,
                                 marginLeft: "10px",
@@ -743,6 +747,7 @@ const ProjectManagement = () => {
                     variant="contained"
                     color="primary"
                     size="large"
+                    title="Thêm thành viên"
                     sx={{ fontSize: "14px", border: `1px ${blue[500]} solid` }}
                     type="submit"
                     loading={isAssigningUser}
