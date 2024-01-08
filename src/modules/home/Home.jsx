@@ -195,7 +195,7 @@ const Home = () => {
                                                     fontSize: 18,
                                                     fontWeight: 500,
                                                 }}>
-                                                Thành viên1:
+                                                Thành viên:
                                             </Typography>
                                             {
                                                 item.members.length > 0 ? (
