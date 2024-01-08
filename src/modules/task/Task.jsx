@@ -179,12 +179,23 @@ const Task = () => {
             MySwal.fire({
                 icon: "success",
                 title: "Bạn đã tạo dự án thành công",
-                text: "Quay lại trang quản lý dự án",
+                // text: "Quay lại trang quản lý dự án",
                 confirmButtonText: "Đồng ý"
             }).then((result) => {
                 if (result.isConfirmed) {
-                    queryClient.invalidateQueries({ queryKey: ["creatProjectAuthorize"] });
-                    // navigate(PATH.PROJECTMANAGEMENT);
+                    queryClient.invalidateQueries({ queryKey: ["createTask"] });
+                    setFormValue({
+                        listUserAsign: [],
+                        taskName: "",
+                        description: "",
+                        statusId: "",
+                        originalEstimate: 0,
+                        timeTrackingSpent: 0,
+                        timeTrackingRemaining: 0,
+                        projectId: 0,
+                        typeId: 0,
+                        priorityId: 0,
+                    });
                 }
             })
         },
@@ -235,7 +246,7 @@ const Task = () => {
             })
         }
         if (projectList.length > 0) {
-            // formValue.listUserAsign = [];
+            formValue.listUserAsign = [];
             for (let i in allUser) {
                 for (let j in searchMemberResult) {
                     if (allUser[i].name.toLowerCase().trim().includes(searchMemberResult[j]
@@ -245,18 +256,17 @@ const Task = () => {
                 }
             }
         }
-        if( formValue.originalEstimate ) {
+        if (formValue.originalEstimate) {
             formValue.originalEstimate = parseInt(formValue.originalEstimate);
         }
-        if( formValue.timeTrackingSpent ) {
+        if (formValue.timeTrackingSpent) {
             formValue.timeTrackingSpent = parseInt(formValue.timeTrackingSpent);
         }
-        if( formValue.timeTrackingRemaining ) {
+        if (formValue.timeTrackingRemaining) {
             formValue.timeTrackingRemaining = parseInt(formValue.timeTrackingRemaining);
         }
-        
+
         if (
-            // formValue.listUserAsign.length > 0 &&
             formValue.description !== "" &&
             formValue.statusId !== "" &&
             formValue.originalEstimate !== 0 &&
@@ -289,7 +299,7 @@ const Task = () => {
 
 
     const onError = (error) => {
-        alert("Bạn có chắc muốn tạo Task?");
+        alert("Lỗi Form");
     };
 
 
