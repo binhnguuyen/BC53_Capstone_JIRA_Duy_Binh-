@@ -78,14 +78,6 @@ const useRouteElements = () => {
                         </Suspense>,
                 },
                 {
-                    path: PATH.PROJECT,
-                    // index: 3,
-                    element:
-                        <Suspense callBack={<div>Loading</div>}>
-                            <ProjectPage />
-                        </Suspense>,
-                },
-                {
                     path: PATH.CREATEPROJECT,
                     // index: 3,
                     element:
@@ -99,6 +91,14 @@ const useRouteElements = () => {
                     element:
                         <Suspense callBack={<div>Loading</div>}>
                             <TaskPage />
+                        </Suspense>,
+                },
+                {
+                    path: `${PATH.PROJECT}/:projectId`,
+                    // index: 3,
+                    element:
+                        <Suspense callBack={<div>Loading</div>}>
+                            <ProjectPage />
                         </Suspense>,
                 },
             ],

@@ -183,8 +183,6 @@ const CreateProject = () => {
         else {
             handleCreateProject(formValues);
         }
-
-
     };
 
 
@@ -315,16 +313,13 @@ const CreateProject = () => {
                         <TextField
                             required
                             fullWidth
-                            name="description"
-                            placeholder="Nội dung..."
-                            label="Miêu tả"
+                            label="Nội dung"
                             variant="outlined"
-                            style={{ height: "300", marginBottom: 10 }}
-                            inputProps={{
-                                style: {
-                                    height: "100px",
-                                },
-                            }}
+                            placeholder="Find bug and fix..."
+                            style={{ marginBottom: 10 }}
+                            multiline
+                            rows={6}
+                            defaultValue=""
                             {...register("description")}
                             error={Boolean(errors.description)}
                             helperText={Boolean(errors.description) && errors.description.message}
@@ -334,10 +329,9 @@ const CreateProject = () => {
                         <TextField
                             required
                             fullWidth
-                            name="alias"
-                            placeholder="Nội dung..."
                             label="Bí danh"
                             variant="outlined"
+                            placeholder="Nội dung..."
                             style={{ height: "50px", marginBottom: 40 }}
                             multiline
                             maxRows={6}

@@ -11,6 +11,7 @@ import { red } from '@mui/material/colors';
 import { green } from '@mui/material/colors';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { deleteProject, getAllProject, assignUserProject, removeUserFromProject } from '../../../apis/project.api';
+import { getUser } from '../../../apis/user.api';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddBoxIcon from '@mui/icons-material/AddBox';
@@ -69,7 +70,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 // Thư viện Swal
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
-import { getUser } from '../../../apis/user.api';
 import { LoadingButton } from '@mui/lab';
 
 
@@ -184,7 +184,7 @@ const ProjectManagement = () => {
           variant="outlined"
           color="primary"
           size="small"
-          sx={{ fontSize: "12px", border: `1px ${blue[500]} solid` }}
+          sx={{ fontSize: 12, border: `1px ${blue[500]} solid` }}
           onClick={() => {
             // parseName(params.row.col6)
           }}
@@ -279,10 +279,57 @@ const ProjectManagement = () => {
   }
 
 
+  // hàm render nút chuyển qua trang Task
+  const renderLinkProjectIdButton = (params) => {
+    return (
+      <strong>
+        <Button
+          variant="outlined"
+          color="primary"
+          size="small"
+          sx={{ fontSize: 12, border: 0 }}
+          onClick={() => {
+            navigate(`${PATH.PROJECT}/${params.id}`)
+          }}
+        >
+          {params.id}
+        </Button>
+      </strong >
+    )
+  }
+
+
+  // hàm render nút chuyển qua trang Task
+  const renderLinkProjectNameButton = (params) => {
+    return (
+      <strong>
+        <Button
+          variant="outlined"
+          color="primary"
+          size="small"
+          sx={{ fontSize: 12, border: 0 }}
+          onClick={() => {
+            navigate(`${PATH.PROJECT}/${params.id}`)
+          }}
+        >
+          {params.row.projectName}
+        </Button>
+      </strong >
+    )
+  }
+
+
+
   // Tạo column hiển thị danh sách Project cho DataGrid
   const columns = [
-    { field: 'id', headerName: 'ID', width: "60" },
-    { field: 'projectName', headerName: 'Dự án', width: "170" },
+    {
+      field: 'id', headerName: 'ID', width: "80",
+      renderCell: renderLinkProjectIdButton,
+    },
+    {
+      field: 'projectName', headerName: 'Dự án', width: "250",
+      renderCell: renderLinkProjectNameButton,
+    },
     { field: 'categoryName', headerName: 'Phân loại', width: "150" },
     {
       field: 'creator', headerName: 'Người tạo', width: "220",
@@ -293,7 +340,7 @@ const ProjectManagement = () => {
       // }
     },
     {
-      field: 'members', headerName: 'Thành viên', width: "230",
+      field: 'members', headerName: 'Thành viên', width: "250",
       // valueGetter giúp lấy dữ liệu ko phải là string mà là array hoặc object
       // valueGetter: (params) =>
       // {

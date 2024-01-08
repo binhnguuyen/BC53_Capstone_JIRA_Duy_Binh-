@@ -1,4 +1,3 @@
-import { Query } from "@tanstack/react-query";
 import fetcher from "./fetcher";
 
 // Link:

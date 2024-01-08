@@ -103,7 +103,8 @@ export default function Header(props) {
                     // disablePadding
                     sx={{ display: { lg: 'block', xl: 'none' } }}
                 >
-                    <ListItemButton sx={{ textAlign: 'center', display: { md: 'none' } }}>
+                    <ListItemButton sx={{ textAlign: 'center', display: { md: 'none' } }}
+                    onClick={() => navigate(PATH.TASK)}>
                         <ListItemText primary="Công việc" />
                         <KeyboardArrowDownIcon />
                     </ListItemButton>
