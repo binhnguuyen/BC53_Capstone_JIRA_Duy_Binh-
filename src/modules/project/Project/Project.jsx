@@ -1,5 +1,5 @@
 import React from 'react'
-import { Box, Card, CardActions, CardContent, CardHeader, CardMedia, Container, Divider, Stack, Typography } from '@mui/material'
+import { Box, Button, Card, CardActions, CardContent, CardHeader, CardMedia, Container, Divider, Stack, Typography } from '@mui/material'
 import Copyright from "../../../components/Copyright";
 import { blue } from '@mui/material/colors'
 import { green } from '@mui/material/colors'
@@ -8,12 +8,16 @@ import { useParams } from 'react-router-dom';
 import { getProjectDetail } from '../../../apis/project.api';
 import { useQuery } from '@tanstack/react-query';
 import Avatar from '@mui/material/Avatar';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import IconButton from '@mui/material/IconButton';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import EmojiPeopleIcon from '@mui/icons-material/EmojiPeople';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import CategoryIcon from '@mui/icons-material/Category';
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
+import AddBoxIcon from '@mui/icons-material/AddBox';
+import { LoadingButton } from '@mui/lab';
 
 // CSS
 const typographySettings = {
@@ -72,19 +76,58 @@ const Project = () => {
                       <CardHeader
                         sx={{ p: "2px", height: "10%" }}
                         avatar={
-                          <Avatar sx={{ bgcolor: blue[500], height: 40, width: 40, fontSize: "30px" }} aria-label="recipe">
+                          <Avatar sx={{ bgcolor: blue[500], height: 30, width: 30, fontSize: "24px" }} aria-label="recipe">
                             {task.statusId}
                           </Avatar>
                         }
                         action={
-                          <IconButton aria-label="settings">
-                            <MoreVertIcon />
-                          </IconButton>
+                          <Box>
+                            <IconButton
+                              variant="contained"
+                              color="error"
+                              size="small"
+                              title="Sửa công việc"
+                              onClick={() => {
+                                // handleProjectIdToEdit(params.row.id);
+                              }}
+                            >
+                              <EditIcon sx={{ fontSize: 18 }} />
+                            </IconButton>
+                            <IconButton
+                              variant="contained"
+                              color="primary"
+                              size="small"
+                              title="Xoá công việc"
+                              onClick={() => {
+                                MySwal.fire({
+                                  icon: "question",
+                                  title: "Bạn có chắc muốn xoá dự án này?",
+                                  text: "Xoá xong tạo lại thì cũng đơn giản lắm nha, xoá thoải mái!",
+                                  showCancelButton: true,
+                                  confirmButtonText: "Đồng ý"
+                                }).then((result) => {
+                                  if (result.isConfirmed) {
+                                    // handleDeleteProject(params.row.id);
+                                  }
+                                  else {
+                                    // do nothing
+                                  }
+                                })
+                              }}
+                            >
+                              <DeleteIcon sx={{ fontSize: 18 }} />
+                            </IconButton>
+                            <IconButton aria-label="settings">
+                              <MoreVertIcon />
+                            </IconButton>
+                          </Box>
                         }
                         title={task.statusName
                         }
                       >
+
                       </CardHeader>
+
                       <Divider width="100%" />
                       <CardContent
                         sx={{ p: "0px", height: "90%" }}
@@ -92,9 +135,9 @@ const Project = () => {
                         {
                           task.lstTaskDeTail ? (
                             task.lstTaskDeTail.map((taskDetail, index) => (
-                              <Card sx={{ height: "50%", fontSize: "12px", mb: "10px"}}>
+                              <Card sx={{ height: "50%", fontSize: "12px", mb: "10px" }}>
                                 <CardHeader
-                                  sx={{ height: "35%", p: "10px"  }}
+                                  sx={{ height: "35%", p: "10px" }}
                                   action={
                                     <IconButton aria-label="settings">
                                       <MoreVertIcon />
@@ -110,21 +153,21 @@ const Project = () => {
                                 >
                                 </CardHeader>
                                 <Divider width="100%" />
-                                <CardContent sx={{ height: "65%", p: "10px"  }}>
+                                <CardContent sx={{ height: "65%", p: "10px" }}>
                                   <Typography sx={{ fontSize: 14, mb: "2px" }} >
                                     <CategoryIcon sx={{ fontSize: 14 }} />
                                     Phân loại: {taskDetail.taskTypeDetail.taskType}
                                   </Typography>
-                                  <Typography sx={{ fontSize: 14, mb: "2px"  }} >
+                                  <Typography sx={{ fontSize: 14, mb: "2px" }} >
                                     <LibraryBooksIcon sx={{ fontSize: 14 }} />
                                     Nội dung: {taskDetail.description}
                                   </Typography>
-                                  <Typography sx={{ fontSize: 14, mb: "2px"  }} >
+                                  <Typography sx={{ fontSize: 14, mb: "2px" }} >
                                     <PriorityHighIcon sx={{ fontSize: 14 }} />
                                     Độ ưu tiên: {taskDetail.priorityTask.priority}
                                   </Typography>
                                   <Typography
-                                    sx={{ fontSize: 14, mb: "2px"  }}
+                                    sx={{ fontSize: 14, mb: "2px" }}
                                   >
                                     <EmojiPeopleIcon sx={{ fontSize: 14 }} />
                                     Thành viên:
@@ -133,22 +176,39 @@ const Project = () => {
                                     taskDetail.assigness.length > 0 ? (
                                       taskDetail.assigness.map((member, index) => {
                                         return (
-                                          <Button
-                                            size='small'
-                                            variant='outlined'
-                                            sx={{ fontSize: 14 }}
+                                          <IconButton
                                             key={index}
+                                            variant="contained"
+                                            color="primary"
+                                            size="small"
+                                            title={member.name}
+                                            onClick={() => {
+                                              // handleOpen();
+                                              // handleSetProjectId(params.row.id);
+                                            }}
                                           >
-                                            #{taskDetail.member}
-                                          </Button>
+                                            <img src={member.avatar} alt={member.name} style={{ width: "30px", height: "30px", border: `1px ${blue[500]} solid`, borderRadius: "30px" }} />
+                                            {/* #{item.name}&cedil; */}
+                                          </IconButton>
                                         )
                                       })
                                     ) : (
-                                      <Typography color={"red"} sx={{ fontSize: 14, mb: "2px"  }}>
+                                      <Typography color={"red"} sx={{ fontSize: 14, mb: "2px" }}>
                                         Chưa có
                                       </Typography>
                                     )
                                   }
+                                  <IconButton
+                                    size="small"
+                                    title="Thêm thành viên"
+                                    style={{ width: "30px", height: "30px", border: `1px ${blue[500]} solid`}}
+                                    onClick={() => {
+                                      // handleOpenModalAddUser();
+                                      // handleSetProjectId(params.row.id);
+                                    }}
+                                  >
+                                    <AddBoxIcon />
+                                  </IconButton>
                                 </CardContent>
                               </Card>
                             ))
