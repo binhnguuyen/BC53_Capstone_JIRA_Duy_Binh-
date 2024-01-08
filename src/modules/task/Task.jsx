@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Autocomplete, Box, Container, Slider, Stack, TextField, Typography } from '@mui/material'
+import { Autocomplete, Box, Button, Container, Slider, Stack, TextField, Typography } from '@mui/material'
 import { blue } from '@mui/material/colors'
 import { green } from '@mui/material/colors'
 import { orange } from '@mui/material/colors'
@@ -8,14 +8,16 @@ import Copyright from "../../components/Copyright";
 import { styled, alpha } from '@mui/material/styles';
 import { LoadingButton } from '@mui/lab';
 import { useSelector } from 'react-redux';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import Tooltip from '@mui/material/Tooltip';
 
 // API
 import { getAllProject } from '../../apis/project.api';
-import { getAllStatus, getTaskType } from '../../apis/task.api';
+import { getAllStatus } from '../../apis/status.api';
+import { getTaskType } from '../../apis/taskType.api';
 import { getAllPriority } from '../../apis/priority.api';
+import { createTask } from '../../apis/task.api';
 
 // Thư viện Yup giúp mình validate Hook Form
 import * as yup from "yup"
@@ -25,6 +27,8 @@ import { yupResolver } from "@hookform/resolvers/yup"
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import { getUser } from '../../apis/user.api';
+import { useNavigate } from 'react-router-dom'
+import { PATH } from '../../utils/paths'
 
 
 // thư viện SweetAlert
@@ -52,9 +56,8 @@ const style = {
 };
 
 
-
-
 const Task = () => {
+    const navigate = useNavigate();
     let { projectList } = useSelector((state) => state.project);
     const [searchprojectInput, setSearchProjectInput] = useState("");
     const [searchProjectResult, setSearchProjectResult] = useState("");
@@ -72,7 +75,6 @@ const Task = () => {
     // Xử lý formValue (raw data lấy từ form)
     const [formValue, setFormValue] = useState({
         listUserAsign: [],
-        taskId: "",
         taskName: "",
         description: "",
         statusId: "",
@@ -87,13 +89,9 @@ const Task = () => {
 
     // Thư viện Yup resolver
     const schemaCreateProject = yup.object({
-        listUserAsign: yup
-            .string()
-            .required("Vui lòng chọn"),
-        taskId: yup.string().required("Vui lòng chọn"),
         taskName: yup.string().required("Vui lòng nhập thông tin"),
         statusId: yup.string().required("Vui lòng chọn"),
-        projectName: yup.string().required("Vui lòng nhập thông tin"),
+        description: yup.string().required("Vui lòng nhập thông tin"),
     });
 
 
@@ -101,7 +99,6 @@ const Task = () => {
     const { register, handleSubmit, formState: { errors } } = useForm({
         defaultValues: {
             listUserAsign: [],
-            taskId: "",
             taskName: "",
             description: "",
             statusId: "",
@@ -111,7 +108,6 @@ const Task = () => {
             projectId: 0,
             typeId: 0,
             priorityId: 0,
-            projectName: "",
         },
         resolver: yupResolver(schemaCreateProject),
         // sự kiện này có onChange, onBlue, onSubmit
@@ -156,42 +152,145 @@ const Task = () => {
         queryKey: ["allStatus"],
         queryFn: getAllStatus,
     });
-    console.log('allStatus: ', allStatus);
 
     // hàm GET allPriority
     const { data: allPriority, isLoadingAllPriority, refetch: refetchAllPriority } = useQuery({
         queryKey: ["allPriority"],
         queryFn: getAllPriority,
     });
-    console.log('allPriority: ', allPriority);
 
     // hàm GET taskType
     const { data: taskType, isLoadingTaskType, refetch: refetchTaskType } = useQuery({
         queryKey: ["taskType"],
         queryFn: getTaskType,
     });
-    console.log('taskType: ', taskType);
 
     // Hàm getUser
     const { data: allUser, isLoading: isLoadingAllUser } = useQuery({
         queryKey: ["getUser"],
         queryFn: getUser,
     });
-    console.log('allUser: ', allUser);
 
 
-    // Hàm xử lý formValue
+    // 
+    const { mutate: handleCreateTask, isPending: isAdding } = useMutation({
+        mutationFn: (payload) => createTask(payload),
+        onSuccess: () => {
+            MySwal.fire({
+                icon: "success",
+                title: "Bạn đã tạo dự án thành công",
+                text: "Quay lại trang quản lý dự án",
+                confirmButtonText: "Đồng ý"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    queryClient.invalidateQueries({ queryKey: ["creatProjectAuthorize"] });
+                    // navigate(PATH.PROJECTMANAGEMENT);
+                }
+            })
+        },
+        onError: (error) => {
+            alert(error);
+        }
+    });
+
+
     const handleSetFormValue = (value) => event => {
         setFormValue({
-            // clone lại vì những cái setFormValue sau dòng này sẽ làm mất giá trị id
             ...formValue,
-            // có dấu ngoặc vuông là dynamic, thì nó sẽ hiểu đây là thuộc tính để truyền vào
             [value]: event.target.value,
         })
     }
-    console.log('projectList: ', projectList);
-    console.log('formValue: ', formValue);
 
+
+    const handleSubmitButton = () => {
+        // Hàm xử lý các giá trị của phần tử trong formValue
+        if (searchStatusResult.trim() && allStatus.length > 0) {
+            allStatus.filter((item) => {
+                if (item.statusName
+                    .toLowerCase().trim().includes(searchStatusResult.toLowerCase().trim())) {
+                    formValue.statusId = item.statusId;
+                }
+            })
+        }
+        if (searchPriorityResult.trim() && allPriority.length > 0) {
+            allPriority.filter((item) => {
+                if (item.priority
+                    .toLowerCase().trim().includes(searchPriorityResult.toLowerCase().trim())) {
+                    formValue.priorityId = item.priorityId;
+                }
+            })
+        }
+        if (searchTaskTypeResult.trim() && taskType.length > 0) {
+            taskType.filter((item) => {
+                if (item.taskType.toLowerCase().trim().includes(searchTaskTypeResult.toLowerCase().trim())) {
+                    formValue.typeId = item.id;
+                }
+            })
+        }
+        if (searchProjectResult.trim() && projectList.length > 0) {
+            projectList.filter((item) => {
+                if (item.projectName.toLowerCase().trim().includes(searchProjectResult.toLowerCase().trim())) {
+                    formValue.projectId = item.id;
+                }
+            })
+        }
+        if (projectList.length > 0) {
+            // formValue.listUserAsign = [];
+            for (let i in allUser) {
+                for (let j in searchMemberResult) {
+                    if (allUser[i].name.toLowerCase().trim().includes(searchMemberResult[j]
+                        .toLowerCase().trim())) {
+                        formValue.listUserAsign.push(allUser[i]);
+                    }
+                }
+            }
+        }
+        if( formValue.originalEstimate ) {
+            formValue.originalEstimate = parseInt(formValue.originalEstimate);
+        }
+        if( formValue.timeTrackingSpent ) {
+            formValue.timeTrackingSpent = parseInt(formValue.timeTrackingSpent);
+        }
+        if( formValue.timeTrackingRemaining ) {
+            formValue.timeTrackingRemaining = parseInt(formValue.timeTrackingRemaining);
+        }
+        
+        if (
+            // formValue.listUserAsign.length > 0 &&
+            formValue.description !== "" &&
+            formValue.statusId !== "" &&
+            formValue.originalEstimate !== 0 &&
+            formValue.projectId !== 0 &&
+            formValue.typeId !== 0 &&
+            formValue.priorityId !== 0
+        ) {
+            MySwal.fire({
+                icon: "question",
+                title: "Bạn có chắc muốn thêm công việc này không?",
+                text: "Thêm một phát sửa mệt lắm nha, ko giỡn!",
+                showCancelButton: true,
+                confirmButtonText: "Đồng ý"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    handleCreateTask(formValue);
+                }
+                else {
+                    // do nothing
+                }
+            })
+        }
+    }
+
+
+    // Hàm xử lý form
+    const onSubmit = () => {
+        console.log("Submit thành công");
+    };
+
+
+    const onError = (error) => {
+        alert("Bạn có chắc muốn tạo Task?");
+    };
 
 
     return (
@@ -213,7 +312,7 @@ const Task = () => {
                     <Box
                         component="form"
                         sx={{ mt: 1 }}
-                    // onSubmit={handleSubmit(onSubmit, onError)}
+                        onSubmit={handleSubmit(onSubmit, onError)}
                     >
                         <Box sx={{ width: "100%", margin: "0 0 15px" }}>
                             <Typography {...typographySettings} sx={{ margin: "0 0 5px" }}>
@@ -227,7 +326,6 @@ const Task = () => {
                                                 id="free-solo-2-demo"
                                                 disableClearable
                                                 options={projectList.map((project) => project.projectName)}
-                                                defaultValue={projectList[0]?.projectName}
                                                 onChange={(event, newValue) => {
                                                     setSearchProjectResult(newValue);
                                                 }}
@@ -267,7 +365,6 @@ const Task = () => {
                                     name="taskName"
                                     type="text"
                                     placeholder="Fix Bug"
-                                    autoFocus
                                     {...register("taskName")}
                                     error={Boolean(errors.taskName)}
                                     helperText={Boolean(errors.taskName) && errors.taskName.message}
@@ -288,13 +385,11 @@ const Task = () => {
                                                 id="free-solo-2-demo"
                                                 disableClearable
                                                 options={allStatus.map((status) => status.statusName)}
-                                                defaultValue={allStatus[0]?.statusName}
                                                 onChange={(event, newValue) => {
                                                     setSearchStatusResult(newValue);
                                                 }}
                                                 onInputChange={(event, newInputValue) => {
                                                     setSearchStatusInput(newInputValue);
-
                                                 }}
                                                 renderInput={(params) => (
                                                     <TextField
@@ -335,13 +430,12 @@ const Task = () => {
                                                     id="free-solo-2-demo"
                                                     disableClearable
                                                     options={allPriority.map((priority) => priority.priority)}
-                                                    defaultValue={allPriority[0]?.priority}
+                                                    value={allPriority.priorityId}
                                                     onChange={(event, newValue) => {
                                                         setSearchPriorityResult(newValue);
                                                     }}
                                                     onInputChange={(event, newInputValue) => {
                                                         setSearchPriorityInput(newInputValue);
-
                                                     }}
                                                     renderInput={(params) => (
                                                         <TextField
@@ -375,13 +469,12 @@ const Task = () => {
                                                     id="free-solo-2-demo"
                                                     disableClearable
                                                     options={taskType.map((taskType) => taskType.taskType)}
-                                                    defaultValue={taskType[0]?.taskType}
+                                                    value={taskType.id}
                                                     onChange={(event, newValue) => {
                                                         setSearchTaskTypeResult(newValue);
                                                     }}
                                                     onInputChange={(event, newInputValue) => {
                                                         setSearchTaskTypeInput(newInputValue);
-
                                                     }}
                                                     renderInput={(params) => (
                                                         <TextField
@@ -420,6 +513,7 @@ const Task = () => {
                                         allUser ? (
                                             <Stack spacing={2}>
                                                 <Autocomplete
+                                                    multiple
                                                     id="free-solo-2-demo"
                                                     disableClearable
                                                     options={allUser.map((user) => user.name)}
@@ -454,7 +548,7 @@ const Task = () => {
                                     sx={{
                                         textAlign: "left"
                                     }}
-                                >Thời gian cần</Typography>
+                                >Thời gian cần (ngày)</Typography>
                                 <Slider
                                     valueLabelDisplay="auto"
                                     slots={{
@@ -469,7 +563,6 @@ const Task = () => {
                                     }}
                                 ></Slider>
                             </Box>
-
                         </Stack>
                         <Stack
                             spacing={3}
@@ -480,7 +573,7 @@ const Task = () => {
                         >
                             <Box sx={{ width: "50%" }}>
                                 <Typography {...typographySettings} sx={{ margin: "0 0 5px" }}>
-                                    Thời gian dự định
+                                    Thời gian dự định (ngày)
                                 </Typography>
                                 <Typography>
                                     <TextField
@@ -489,8 +582,10 @@ const Task = () => {
                                         id="estimatedTime"
                                         label={"Thời gian dự định"}
                                         name="estimatedTime"
-                                        type="text"
+                                        type="number"
                                         placeholder="5"
+                                        value={formValue.originalEstimate}
+                                        onChange={handleSetFormValue("originalEstimate")}
                                     />
                                 </Typography>
                             </Box>
@@ -505,8 +600,10 @@ const Task = () => {
                                         id="passedTime"
                                         label={"Thời gian đã qua"}
                                         name="passedTime"
-                                        type="text"
+                                        type="number"
                                         placeholder="3"
+                                        value={formValue.timeTrackingSpent}
+                                        onChange={handleSetFormValue("timeTrackingSpent")}
                                     />
                                 </Typography>
                             </Box>
@@ -525,8 +622,10 @@ const Task = () => {
                                         id="remainedTime"
                                         label={"Thời gian còn lại"}
                                         name="remainedTime"
-                                        type="text"
+                                        type="number"
                                         placeholder="2"
+                                        value={formValue.timeTrackingRemaining}
+                                        onChange={handleSetFormValue("timeTrackingRemaining")}
                                     />
                                 </Typography>
                             </Box>
@@ -544,30 +643,35 @@ const Task = () => {
                                 multiline
                                 rows={6}
                                 defaultValue=""
+                                {...register("description")}
+                                error={Boolean(errors.description)}
+                                helperText={Boolean(errors.description) && errors.description.message}
+                                value={formValue.description}
+                                onChange={handleSetFormValue("description")}
                             />
                         </Box>
                         <Box sx={{ width: "100%", margin: "0 0 15px", textAlign: "right" }}>
-                            <LoadingButton
+                            <Button
                                 variant="outlined"
                                 size="large"
                                 color='error'
                                 sx={{ fontSize: "14px", border: `1px ${red[500]} solid` }}
-                                type="submit"
                             // loading={}
+                            // onClick={navigate(PATH.PROJECTMANAGEMENT)}
                             >
                                 Huỷ
-                            </LoadingButton>
+                            </Button>
                             <LoadingButton
                                 variant="contained"
                                 color="primary"
                                 size="large"
                                 sx={{ fontSize: "14px", border: `1px ${blue[500]} solid`, marginLeft: 3 }}
-                                type="submit"
-                            // loading={}
+                                // type="submit"
+                                onClick={handleSubmitButton}
+                                loading={isAdding}
                             >
                                 Tạo
                             </LoadingButton>
-
                         </Box>
                     </Box>
                 </div>
