@@ -170,6 +170,7 @@ const Task = () => {
         queryKey: ["getUser"],
         queryFn: getUser,
     });
+    console.log('allUser: ', allUser);
 
 
     // 
@@ -251,7 +252,7 @@ const Task = () => {
                 for (let j in searchMemberResult) {
                     if (allUser[i].name.toLowerCase().trim().includes(searchMemberResult[j]
                         .toLowerCase().trim())) {
-                        formValue.listUserAsign.push(allUser[i]);
+                        formValue.listUserAsign.push(allUser[i].userId);
                     }
                 }
             }
@@ -265,7 +266,6 @@ const Task = () => {
         if (formValue.timeTrackingRemaining) {
             formValue.timeTrackingRemaining = parseInt(formValue.timeTrackingRemaining);
         }
-
         if (
             formValue.description !== "" &&
             formValue.statusId !== "" &&

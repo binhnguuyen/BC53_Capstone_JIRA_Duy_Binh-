@@ -214,7 +214,7 @@ const Project = () => {
                             ))
                           ) : (
                             <Typography {...typographySettings} color={"error"}>
-                              Chưa có công việc
+                              Chưa có
                             </Typography>
                           )
                         }
@@ -224,7 +224,7 @@ const Project = () => {
                 ))
               ) : (
                 <Typography {...typographySettings} color={"error"}>
-                  Không tải được thành viên
+                  Đang load...
                 </Typography>
               )
             }
