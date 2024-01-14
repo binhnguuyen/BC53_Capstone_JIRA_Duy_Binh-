@@ -104,7 +104,7 @@ export default function Header(props) {
                     sx={{ display: { lg: 'block', xl: 'none' } }}
                 >
                     <ListItemButton sx={{ textAlign: 'center', display: { md: 'none' } }}
-                    onClick={() => navigate(PATH.TASK)}>
+                    onClick={() => navigate(PATH.CREATETASK)}>
                         <ListItemText primary="Công việc" />
                         <KeyboardArrowDownIcon />
                     </ListItemButton>
@@ -173,7 +173,7 @@ export default function Header(props) {
                             <IconButton
                                 component="div"
                                 sx={{ fontSize: 18, flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'block' } }}
-                                onClick={() => navigate(PATH.TASK)}
+                                onClick={() => navigate(PATH.CREATETASK)}
                             >
                                 Công việc
                                 <KeyboardArrowDownIcon />

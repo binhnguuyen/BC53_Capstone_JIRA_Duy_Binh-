@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Autocomplete, Box, Button, Container, Slider, Stack, TextField, Typography } from '@mui/material'
 import { blue } from '@mui/material/colors'
 import { green } from '@mui/material/colors'
@@ -8,7 +8,7 @@ import Copyright from "../../components/Copyright";
 import { styled, alpha } from '@mui/material/styles';
 import { LoadingButton } from '@mui/lab';
 import { useSelector } from 'react-redux';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import Tooltip from '@mui/material/Tooltip';
 
@@ -17,7 +17,7 @@ import { getAllProject } from '../../apis/project.api';
 import { getAllStatus } from '../../apis/status.api';
 import { getTaskType } from '../../apis/taskType.api';
 import { getAllPriority } from '../../apis/priority.api';
-import { createTask } from '../../apis/task.api';
+import { createTask, getTaskDetail, updateTask } from '../../apis/task.api';
 
 // Thư viện Yup giúp mình validate Hook Form
 import * as yup from "yup"
@@ -26,7 +26,7 @@ import { yupResolver } from "@hookform/resolvers/yup"
 // Thư viện Swal
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
-import { getUser } from '../../apis/user.api';
+import { getUser, getUserByProjectId } from '../../apis/user.api';
 import { useNavigate } from 'react-router-dom'
 import { PATH } from '../../utils/paths'
 
@@ -58,7 +58,8 @@ const style = {
 
 const Task = () => {
     const navigate = useNavigate();
-    let { projectList } = useSelector((state) => state.project);
+    const queryClient = useQueryClient();
+    let { taskIdToEdit, projectList, projectIdToEdit } = useSelector(state => state.project);
     const [searchprojectInput, setSearchProjectInput] = useState("");
     const [searchProjectResult, setSearchProjectResult] = useState("");
     const [searchStatusInput, setSearchStatusInput] = useState("");
@@ -86,6 +87,20 @@ const Task = () => {
         priorityId: 0,
     });
 
+    // Xử lý formValueToEdit (raw data lấy từ form)
+    const [formValueToEdit, setFormValueToEdit] = useState({
+        taskId: "",
+        listUserAsign: [],
+        taskName: "",
+        description: "",
+        statusId: "",
+        originalEstimate: 0,
+        timeTrackingSpent: 0,
+        timeTrackingRemaining: 0,
+        projectId: 0,
+        typeId: 0,
+        priorityId: 0,
+    });
 
     // Thư viện Yup resolver
     const schemaCreateProject = yup.object({
@@ -165,27 +180,71 @@ const Task = () => {
         queryFn: getTaskType,
     });
 
-    // Hàm getUser
-    const { data: allUser, isLoading: isLoadingAllUser } = useQuery({
-        queryKey: ["getUser"],
-        queryFn: getUser,
+
+    // hàm getProjectDetail bằng projectId
+    const { data: taskDetailToEdit, isLoadingTaskDetail, refetch: refetchTaskDetail } = useQuery({
+        queryKey: ["taskIdToShow", taskIdToEdit],
+        queryFn: () => getTaskDetail(taskIdToEdit),
     });
-    console.log('allUser: ', allUser);
+
+    // hàm getUserById để lấy dữ liệu user theo Project về
+    const { data: memberById, isLoading: searchingMember } = useQuery({
+        queryKey: ["userByProjectId", projectIdToEdit],
+        queryFn: () => getUserByProjectId(projectIdToEdit),
+        enabled: !!projectIdToEdit,
+    });
 
 
-    // 
+
+    // hàm handleCreateTask để tạo task mới
     const { mutate: handleCreateTask, isPending: isAdding } = useMutation({
         mutationFn: (payload) => createTask(payload),
         onSuccess: () => {
             MySwal.fire({
                 icon: "success",
                 title: "Bạn đã tạo dự án thành công",
-                // text: "Quay lại trang quản lý dự án",
+                text: "Quay lại trang quản lý dự án",
                 confirmButtonText: "Đồng ý"
             }).then((result) => {
                 if (result.isConfirmed) {
                     queryClient.invalidateQueries({ queryKey: ["createTask"] });
                     setFormValue({
+                        listUserAsign: [],
+                        taskName: "",
+                        description: "",
+                        statusId: "",
+                        originalEstimate: 0,
+                        timeTrackingSpent: 0,
+                        timeTrackingRemaining: 0,
+                        projectId: 0,
+                        typeId: 0,
+                        priorityId: 0,
+                    });
+                    navigate(PATH.PROJECTMANAGEMENT);
+                }
+            })
+        },
+        onError: (error) => {
+            alert(error);
+        }
+    });
+
+
+    // hàm handleCreateTask để tạo task mới
+    const { mutate: handleEditTask, isPending: isEditing } = useMutation({
+        mutationFn: (payload) => updateTask(payload),
+        onSuccess: () => {
+            MySwal.fire({
+                icon: "success",
+                title: "Bạn đã tạo sửa án thành công",
+                text: "Quay lại trang quản lý dự án",
+                confirmButtonText: "Đồng ý"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    queryClient.invalidateQueries({ queryKey: ["editTask"] });
+                    navigate(`${PATH.PROJECT}/${projectId}`);
+                    setFormValue({
+                        taskId: 0,
                         listUserAsign: [],
                         taskName: "",
                         description: "",
@@ -206,14 +265,23 @@ const Task = () => {
     });
 
 
+    // Hảm xửa lý nút form
     const handleSetFormValue = (value) => event => {
+        // set Form để createTask
         setFormValue({
             ...formValue,
             [value]: event.target.value,
         })
+        setFormValueToEdit({
+            ...formValueToEdit,
+            [value]: event.target.value,
+            taskId: taskDetailToEdit.taskId,
+            projectId: taskDetailToEdit.projectId,
+        })
     }
 
 
+    // Hảm xửa lý nút SubmitButton
     const handleSubmitButton = () => {
         // Hàm xử lý các giá trị của phần tử trong formValue
         if (searchStatusResult.trim() && allStatus.length > 0) {
@@ -221,6 +289,7 @@ const Task = () => {
                 if (item.statusName
                     .toLowerCase().trim().includes(searchStatusResult.toLowerCase().trim())) {
                     formValue.statusId = item.statusId;
+                    formValueToEdit.statusId = item.statusId;
                 }
             })
         }
@@ -229,6 +298,7 @@ const Task = () => {
                 if (item.priority
                     .toLowerCase().trim().includes(searchPriorityResult.toLowerCase().trim())) {
                     formValue.priorityId = item.priorityId;
+                    formValueToEdit.priorityId = item.priorityId;
                 }
             })
         }
@@ -236,6 +306,7 @@ const Task = () => {
             taskType.filter((item) => {
                 if (item.taskType.toLowerCase().trim().includes(searchTaskTypeResult.toLowerCase().trim())) {
                     formValue.typeId = item.id;
+                    formValueToEdit.typeId = item.id;
                 }
             })
         }
@@ -248,51 +319,91 @@ const Task = () => {
         }
         if (projectList.length > 0) {
             formValue.listUserAsign = [];
-            for (let i in allUser) {
+            for (let i in memberById) {
                 for (let j in searchMemberResult) {
-                    if (allUser[i].name.toLowerCase().trim().includes(searchMemberResult[j]
+                    if (memberById[i].name.toLowerCase().trim().includes(searchMemberResult[j]
                         .toLowerCase().trim())) {
-                        formValue.listUserAsign.push(allUser[i].userId);
+                        formValue.listUserAsign.push(memberById[i].userId);
+                        formValueToEdit.listUserAsign.push(memberById[i].userId);
                     }
                 }
             }
         }
         if (formValue.originalEstimate) {
             formValue.originalEstimate = parseInt(formValue.originalEstimate);
+            formValueToEdit.originalEstimate = parseInt(formValue.originalEstimate);
         }
         if (formValue.timeTrackingSpent) {
             formValue.timeTrackingSpent = parseInt(formValue.timeTrackingSpent);
+            formValueToEdit.timeTrackingSpent = parseInt(formValue.timeTrackingSpent);
         }
         if (formValue.timeTrackingRemaining) {
             formValue.timeTrackingRemaining = parseInt(formValue.timeTrackingRemaining);
+            formValueToEdit.timeTrackingRemaining = parseInt(formValue.timeTrackingRemaining);
         }
-        if (
-            formValue.description !== "" &&
-            formValue.statusId !== "" &&
-            formValue.originalEstimate !== 0 &&
-            formValue.projectId !== 0 &&
-            formValue.typeId !== 0 &&
-            formValue.priorityId !== 0
-        ) {
-            MySwal.fire({
-                icon: "question",
-                title: "Bạn có chắc muốn thêm công việc này không?",
-                text: "Thêm một phát sửa mệt lắm nha, ko giỡn!",
-                showCancelButton: true,
-                confirmButtonText: "Đồng ý"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    handleCreateTask(formValue);
-                }
-                else {
-                    // do nothing
-                }
-            })
+
+
+        if (taskDetailToEdit === undefined) {
+            // Xử lý thêm Task
+            if (
+                formValue.projectId !== 0 &&
+                formValue.statusId !== "" &&
+                formValue.priorityId !== 0 &&
+                formValue.typeId !== 0 &&
+                formValue.description !== ""
+            ) {
+                MySwal.fire({
+                    icon: "question",
+                    title: "Bạn có chắc muốn thêm công việc này không?",
+                    text: "Thêm một phát sửa mệt lắm nha, ko giỡn!",
+                    showCancelButton: true,
+                    confirmButtonText: "Đồng ý"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        handleCreateTask(formValue);
+                    }
+                    else {
+                        // do nothing
+                    }
+                })
+            }
+            else {
+                alert("Lỗi Form");
+            }
+        }
+        else {
+            // Xử lý sửa Task
+            if (
+                formValueToEdit.taskId !== 0 &&
+                formValueToEdit.projectId !== 0 &&
+                formValueToEdit.statusId !== "" &&
+                formValueToEdit.typeId !== 0 &&
+                formValueToEdit.priorityId !== 0 &&
+                formValueToEdit.taskName !== "" &&
+                formValueToEdit.description !== ""
+            ) {
+                MySwal.fire({
+                    icon: "question",
+                    title: "Bạn có chắc muốn sửa công việc này không?",
+                    text: "Sửa một phát sửa mệt lắm nha, ko giỡn!",
+                    showCancelButton: true,
+                    confirmButtonText: "Đồng ý"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        handleEditTask(formValueToEdit);
+                    }
+                    else {
+                        // do nothing
+                    }
+                })
+            }
+            else {
+                alert("Lỗi Form");
+            }
         }
     }
 
 
-    // Hàm xử lý form
     const onSubmit = () => {
         console.log("Submit thành công");
     };
@@ -301,6 +412,27 @@ const Task = () => {
     const onError = (error) => {
         alert("Lỗi Form");
     };
+
+
+    // khi ấn sửa thì taskDetailToEdit đc hình thành, hàm setFormValue chạy và formValue có giá trị. Giá trị này đc gán vào value={} trong TextField hoặc Select bên dưới
+    useEffect(() => {
+        if (taskDetailToEdit) {
+            setFormValueToEdit({
+                ...formValueToEdit,
+                taskId: taskDetailToEdit.taskId,
+                projectId: taskDetailToEdit.projectId,
+                listUserAsign: taskDetailToEdit.assigness,
+                taskName: taskDetailToEdit.taskName,
+                description: taskDetailToEdit.description,
+                statusId: taskDetailToEdit.statusId,
+                originalEstimate: taskDetailToEdit.originalEstimate,
+                timeTrackingSpent: taskDetailToEdit.timeTrackingSpent,
+                timeTrackingRemaining: taskDetailToEdit.timeTrackingRemaining,
+                typeId: taskDetailToEdit.typeId,
+                priorityId: taskDetailToEdit.priorityId,
+            });
+        }
+    }, [taskDetailToEdit])
 
 
     return (
@@ -324,64 +456,138 @@ const Task = () => {
                         sx={{ mt: 1 }}
                         onSubmit={handleSubmit(onSubmit, onError)}
                     >
+                        {
+                            taskDetailToEdit === undefined ? (
+                                <></>
+                            ) : (
+                                <Box sx={{ width: "100%", margin: "0 0 15px" }}>
+                                    <Typography {...typographySettings} sx={{ margin: "0 0 5px" }}>
+                                        <TextField
+                                            required
+                                            fullWidth
+                                            id="taskId"
+                                            label={"Task ID"}
+                                            name="taskId"
+                                            type="text"
+                                            placeholder="Fix Bug"
+                                            // {...register("taskId")}
+                                            // error={Boolean(errors.taskId)}
+                                            // helperText={Boolean(errors.taskId) && errors.taskId.message}
+                                            disabled
+                                            value={taskDetailToEdit.taskId}
+                                        >
+                                            {taskDetailToEdit.taskId}
+                                        </TextField>
+                                    </Typography>
+                                </Box>
+                            )
+                        }
                         <Box sx={{ width: "100%", margin: "0 0 15px" }}>
-                            <Typography {...typographySettings} sx={{ margin: "0 0 5px" }}>
-                                Chọn dự án
-                            </Typography>
-                            <Typography>
-                                {
-                                    projectList ? (
-                                        <Stack spacing={2}>
-                                            <Autocomplete
-                                                id="free-solo-2-demo"
-                                                disableClearable
-                                                options={projectList.map((project) => project.projectName)}
-                                                onChange={(event, newValue) => {
-                                                    setSearchProjectResult(newValue);
-                                                }}
-                                                onInputChange={(event, newInputValue) => {
-                                                    setSearchProjectInput(newInputValue);
-                                                }}
-                                                renderInput={(params) => (
-                                                    <TextField
-                                                        {...params}
-                                                        label="Tìm kiếm dự án"
-                                                        InputProps={{
-                                                            ...params.InputProps,
-                                                            type: 'search',
-                                                        }}
-                                                    />
-                                                )}
-                                            />
-                                        </Stack>
-                                    ) : (
-                                        <Typography {...typographySettings} color={"error"}>
-                                            Không tải được dự án
+                            {
+                                taskDetailToEdit === undefined ? (
+                                    <Box  {...typographySettings} sx={{ margin: "0 0 5px" }}>
+                                        <Typography {...typographySettings} sx={{ margin: "0 0 5px" }}>
+                                            Chọn dự án
                                         </Typography>
-                                    )
-                                }
-                            </Typography>
+                                        <Typography >
+                                            {
+                                                projectList ? (
+                                                    <Stack spacing={2}>
+                                                        <Autocomplete
+                                                            id="free-solo-2-demo"
+                                                            disableClearable
+                                                            options={projectList.map((project) => project.projectName)}
+                                                            onChange={(event, newValue) => {
+                                                                setSearchProjectResult(newValue);
+                                                            }}
+                                                            onInputChange={(event, newInputValue) => {
+                                                                setSearchProjectInput(newInputValue);
+                                                            }}
+                                                            renderInput={(params) => (
+                                                                <TextField
+                                                                    {...params}
+                                                                    label="Tìm kiếm dự án"
+                                                                    InputProps={{
+                                                                        ...params.InputProps,
+                                                                        type: 'search',
+                                                                    }}
+                                                                />
+                                                            )}
+                                                        />
+                                                    </Stack>
+                                                ) : (
+                                                    <Typography {...typographySettings} color={"error"}>
+                                                        Không tải được dự án
+                                                    </Typography>
+                                                )
+                                            }
+                                        </Typography>
+                                    </Box>
+                                ) : (
+                                    <Typography {...typographySettings} sx={{ margin: "0 0 5px" }}>
+                                        <TextField
+                                            required
+                                            fullWidth
+                                            id="projectId"
+                                            label={"Project ID"}
+                                            name="projectId"
+                                            type="text"
+                                            placeholder="Fix Bug"
+                                            // {...register("taskId")}
+                                            // error={Boolean(errors.taskId)}
+                                            // helperText={Boolean(errors.taskId) && errors.taskId.message}
+                                            disabled
+                                            value={taskDetailToEdit.projectId
+                                            }
+                                        >
+                                            {taskDetailToEdit.projectId}
+                                        </TextField>
+                                    </Typography>
+
+                                )
+                            }
                         </Box>
                         <Box sx={{ width: "100%", margin: "0 0 15px" }}>
-                            <Typography {...typographySettings} sx={{ margin: "0 0 5px" }}>
-                                Tên công việc
-                            </Typography>
-                            <Typography>
-                                <TextField
-                                    required
-                                    fullWidth
-                                    id="taskName"
-                                    label={"Tên công việc"}
-                                    name="taskName"
-                                    type="text"
-                                    placeholder="Fix Bug"
-                                    {...register("taskName")}
-                                    error={Boolean(errors.taskName)}
-                                    helperText={Boolean(errors.taskName) && errors.taskName.message}
-                                    value={formValue.taskName}
-                                    onChange={handleSetFormValue("taskName")}
-                                />
-                            </Typography>
+                            {
+                                taskDetailToEdit === undefined ? (
+                                    <Box {...typographySettings} sx={{ margin: "0 0 5px" }}>
+                                        <Typography {...typographySettings} sx={{ margin: "0 0 5px" }}>
+                                            Tên công việc
+                                        </Typography>
+                                        <Typography>
+                                            <TextField
+                                                required
+                                                fullWidth
+                                                id="taskName"
+                                                label={"Tên công việc"}
+                                                name="taskName"
+                                                type="text"
+                                                placeholder="Fix Bug"
+                                                {...register("taskName")}
+                                                error={Boolean(errors.taskName)}
+                                                helperText={Boolean(errors.taskName) && errors.taskName.message}
+                                                value={formValue.taskName}
+                                                onChange={handleSetFormValue("taskName")}
+                                            />
+                                        </Typography>
+                                    </Box>
+                                ) : (
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        id="taskName"
+                                        label={"Tên công việc"}
+                                        name="taskName"
+                                        type="text"
+                                        placeholder="Fix Bug"
+                                        {...register("taskName")}
+                                        error={Boolean(errors.taskName)}
+                                        helperText={Boolean(errors.taskName) && errors.taskName.message}
+                                        value={formValueToEdit?.taskName}
+                                        onChange={handleSetFormValue("taskName")}
+                                    />
+                                )
+                            }
                         </Box>
                         <Box sx={{ width: "100%", margin: "0 0 15px" }}>
                             <Typography {...typographySettings} sx={{ margin: "0 0 5px" }}>
@@ -520,13 +726,13 @@ const Task = () => {
                                 </Typography>
                                 <Typography>
                                     {
-                                        allUser ? (
+                                        memberById ? (
                                             <Stack spacing={2}>
                                                 <Autocomplete
                                                     multiple
                                                     id="free-solo-2-demo"
                                                     disableClearable
-                                                    options={allUser.map((user) => user.name)}
+                                                    options={memberById.map((user) => user.name)}
                                                     onChange={(event, newValue) => {
                                                         setSearchMemberResult(newValue);
                                                     }}
@@ -641,53 +847,93 @@ const Task = () => {
                             </Box>
                         </Stack>
                         <Box sx={{ width: "100%", margin: "0 0 15px" }}>
-                            <Typography {...typographySettings} sx={{ margin: "0 0 5px" }}>
-                                Nội dung công việc
-                            </Typography>
-                            <TextField
-                                required
-                                fullWidth
-                                label="Nội dung"
-                                variant="outlined"
-                                placeholder="Find bug and fix..."
-                                multiline
-                                rows={6}
-                                defaultValue=""
-                                {...register("description")}
-                                error={Boolean(errors.description)}
-                                helperText={Boolean(errors.description) && errors.description.message}
-                                value={formValue.description}
-                                onChange={handleSetFormValue("description")}
-                            />
+                            {
+                                taskDetailToEdit === undefined ? (
+                                    <Box {...typographySettings} sx={{ margin: "0 0 5px" }}>
+                                        <Typography {...typographySettings} sx={{ margin: "0 0 5px" }}>
+                                            Nội dung công việc
+                                        </Typography>
+                                        <TextField
+                                            required
+                                            fullWidth
+                                            label="Nội dung"
+                                            variant="outlined"
+                                            placeholder="Find bug and fix..."
+                                            multiline
+                                            rows={6}
+                                            defaultValue=""
+                                            {...register("description")}
+                                            error={Boolean(errors.description)}
+                                            helperText={Boolean(errors.description) && errors.description.message}
+                                            value={formValue.description}
+                                            onChange={handleSetFormValue("description")}
+                                        />
+                                    </Box>
+                                ) : (
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        label="Nội dung"
+                                        variant="outlined"
+                                        placeholder="Find bug and fix..."
+                                        multiline
+                                        rows={6}
+                                        defaultValue=""
+                                        {...register("description")}
+                                        error={Boolean(errors.description)}
+                                        helperText={Boolean(errors.description) && errors.description.message}
+                                        value={formValueToEdit?.description}
+                                        onChange={handleSetFormValue("description")}
+                                    />
+                                )
+                            }
                         </Box>
                         <Box sx={{ width: "100%", margin: "0 0 15px", textAlign: "right" }}>
-                            <Button
-                                variant="outlined"
-                                size="large"
-                                color='error'
-                                sx={{ fontSize: "14px", border: `1px ${red[500]} solid` }}
-                            // loading={}
-                            // onClick={navigate(PATH.PROJECTMANAGEMENT)}
-                            >
-                                Huỷ
-                            </Button>
-                            <LoadingButton
-                                variant="contained"
-                                color="primary"
-                                size="large"
-                                sx={{ fontSize: "14px", border: `1px ${blue[500]} solid`, marginLeft: 3 }}
-                                // type="submit"
-                                onClick={handleSubmitButton}
-                                loading={isAdding}
-                            >
-                                Tạo
-                            </LoadingButton>
+                            {
+                                taskDetailToEdit === undefined ? (
+                                    <Box>
+                                        <Button
+                                            variant="outlined"
+                                            size="large"
+                                            color='error'
+                                            sx={{ fontSize: "14px", border: `1px ${red[500]} solid` }}
+                                        // loading={}
+                                        // onClick={navigate(PATH.PROJECTMANAGEMENT)}
+                                        >
+                                            Huỷ
+                                        </Button>
+                                        <LoadingButton
+                                            variant="contained"
+                                            color="primary"
+                                            size="large"
+                                            sx={{ fontSize: "14px", border: `1px ${blue[500]} solid`, marginLeft: 3 }}
+                                            // type="submit"
+                                            onClick={handleSubmitButton}
+                                            loading={isAdding}
+                                        >
+                                            Tạo
+                                        </LoadingButton>
+                                    </Box>
+                                ) : (
+                                    <LoadingButton
+                                        variant="contained"
+                                        color="success"
+                                        size="large"
+                                        sx={{ fontSize: "14px", border: `1px ${green[500]} solid`, marginLeft: 3 }}
+                                        // type="submit"
+                                        onClick={handleSubmitButton}
+                                        loading={isEditing}
+                                    >
+                                        Sửa
+                                    </LoadingButton>
+                                )
+                            }
                         </Box>
                     </Box>
                 </div>
                 <Copyright sx={{ mt: 5 }} />
-            </Container>
-        </div>
+            </Container >
+        </div >
     )
 }
 

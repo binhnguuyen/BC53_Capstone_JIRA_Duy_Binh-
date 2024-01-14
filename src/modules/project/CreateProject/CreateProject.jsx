@@ -210,7 +210,7 @@ const CreateProject = () => {
     }
 
 
-    // khi ấn sửa thì projectToEdit đc hình thành, hàm setFormValue hạy và formValue có giá trị. Giá trị này đc gán vào value={} trong TextField hoặc Select bên dưới
+    // khi ấn sửa thì projectToEdit đc hình thành, hàm setFormValue chạy và formValue có giá trị. Giá trị này đc gán vào value={} trong TextField hoặc Select bên dưới
     useEffect(() => {
         if (projectToEdit) {
             setFormValue({

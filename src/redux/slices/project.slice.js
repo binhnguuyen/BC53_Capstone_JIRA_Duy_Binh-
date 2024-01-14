@@ -7,6 +7,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
     projectList: [],
     projectIdToEdit: undefined,
+    taskIdToEdit: undefined,
 }
 
 const projectSlice = createSlice({
@@ -20,6 +21,9 @@ const projectSlice = createSlice({
         setProjectIdToEdit: (state, { payload }) => {
             // console.log("payload", payload);
             state.projectIdToEdit = payload;
+        },
+        setTaskIdToEdit: (state, { payload }) => {
+            state.taskIdToEdit = payload;
         },
     }
 });
