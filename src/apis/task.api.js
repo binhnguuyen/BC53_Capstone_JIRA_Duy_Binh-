@@ -33,7 +33,6 @@ export const getTaskDetail = async (taskId) => {
 // Link:
 // https://jiranew.cybersoft.edu.vn/api/Project/updateTask
 export const updateTask = async (payload) => {
-    // console.log('payload: ', payload);
     try {
         const response = await fetcher.post("/Project/updateTask", payload);
         return response.data.content;
@@ -48,9 +47,20 @@ export const updateTask = async (payload) => {
 export const assignUserTask = async (payload) => {
     try {
         const response = await fetcher.post("/Project/assignUserTask", payload);
-        // console.log('response', response)
         return response.data.content;
     } catch (error) {
         throw "Lỗi assign User Task";
+    }
+};
+
+
+// Link:
+// https://jiranew.cybersoft.edu.vn/api/Project/removeUserFromTask
+export const removeUserFromTask = async (payload) => {
+    try {
+        const response = await fetcher.post("/Project/removeUserFromTask", payload);
+        return response.data.content;
+    } catch (error) {
+        throw "Lỗi remove User Task";
     }
 };

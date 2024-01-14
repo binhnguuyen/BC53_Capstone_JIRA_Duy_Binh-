@@ -18,7 +18,7 @@ import CategoryIcon from '@mui/icons-material/Category';
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import { LoadingButton } from '@mui/lab';
-import { assignUserTask } from '../../../apis/task.api';
+import { assignUserTask, getTaskDetail, removeUserFromTask } from '../../../apis/task.api';
 import { styled } from '@mui/material/styles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -89,6 +89,9 @@ const Project = () => {
   // console.log('memberToAssign', memberToAssign)
 
   // Hàm để handle modal
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
   const [openModalAddUser, setOpenModalAddUser] = useState(false);
   const handleOpenModalAddUser = () => setOpenModalAddUser(true);
   const handleCloseModalAddUser = () => setOpenModalAddUser(false);
@@ -110,6 +113,16 @@ const Project = () => {
   //   queryKey: ["userByProjectId", projectId],
   //   queryFn: getUserByProjectId(projectId),
   // });
+
+
+  // Hàm getTaskDetail để lấy dữ liệu task về theo id
+  const { data: taskDetail, isLoadingTaskDetail, refetch: refetchTaskDetail } = useQuery({
+    queryKey: ["taskId", taskId],
+    queryFn: () => getTaskDetail(taskId),
+    enabled: !!taskId,
+  });
+  // console.log('taskDetail: ', taskDetail);
+
 
 
   // Hàm tìm kiếm searchMemberResult trong foundMember
@@ -173,13 +186,67 @@ const Project = () => {
   });
 
 
+  // Hàm removeUserFromTask để thêm vào project
+  const { mutate: handleRemoveUserFromTask, isPending: isRemovingUserTask } = useMutation({
+    mutationFn: (payload) => removeUserFromTask(payload),
+    onSuccess: () => {
+      handleClose();
+      MySwal.fire({
+        icon: "success",
+        title: "Bạn đã xoá thành viên ra khỏi công việc thành công",
+        text: "Bạn muốn xoá thêm thành viên khác?",
+        // showCancelButton: true,
+        confirmButtonText: "Đồng ý"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          handleClose();
+          refetchTaskDetail();
+          queryClient.invalidateQueries({ queryKey: ["projectIdToShow"] });
+        }
+        else {
+          handleClose();
+          refetchTaskDetail();
+        }
+      })
+    },
+    onError: (error) => {
+      alert(error);
+    }
+  });
+
+
   // Hàm để truyền dữ liệu Project muống edit lên store Redux và chuyển hướng qua trang CreateProject
   const handleTaskIdToEdit = (value) => {
     if (value) {
       dispatch(projectListAction.setProjectIdToEdit(projectId));
-      dispatch(projectListAction.setTaskIdToEdit(value));
+      dispatch(projectListAction.setThandleOpenaskIdToEdit(value));
     }
     navigate(PATH.CREATETASK);
+  }
+
+
+  // Hàm set User để xoá khỏi Task
+  const handleSetRemoveUserTask = (value) => {
+    if (value && taskId) {
+      handleClose();
+      MySwal.fire({
+        icon: "question",
+        title: "Bạn có chắc muốn gỡ thành viên ra khỏi công việc",
+        // text: "Bạn muốn thêm thành viên khác?",
+        showCancelButton: true,
+        confirmButtonText: "Đồng ý"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          handleRemoveUserFromTask({
+            userId: value,
+            taskId: taskId,
+          });
+        }
+        else {
+          // do nothing
+        }
+      })
+    }
   }
 
 
@@ -353,6 +420,7 @@ const Project = () => {
                                       {
                                         taskDetail.assigness.length > 0 ? (
                                           taskDetail.assigness.map((member, index) => {
+                                            // console.log('member: ', member);
                                             return (
                                               <IconButton
                                                 key={index}
@@ -361,8 +429,9 @@ const Project = () => {
                                                 size="small"
                                                 title={member.name}
                                                 onClick={() => {
-                                                  // handleOpen();
-                                                  // handleSetProjectId(params.row.id);
+                                                  handleOpen();
+                                                  setTaskId(taskDetail.taskId);
+                                                  // handleSetRemoveUserTask(taskDetail.taskId);
                                                 }}
                                               >
                                                 <img src={member.avatar} alt={member.name} style={{ width: "30px", height: "30px", border: `1px ${blue[500]} solid`, borderRadius: "30px" }} />
@@ -410,6 +479,111 @@ const Project = () => {
               )
             }
           </Stack>
+          <Modal
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="modal-list-member"
+            aria-describedby="modal-list-member-description"
+          >
+            <Box sx={style}>
+              <Typography id="modal-list-member" variant="h5" color={`${blue[500]}`} gutterBottom>
+                Danh sách thành viên
+              </Typography>
+              <Typography id="modal-list-member-description" gutterBottom>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell
+                        align="left"
+                        {...typographySettings}
+                      >
+                        Id
+                      </TableCell>
+                      <TableCell
+                        align="left"
+                        {...typographySettings}
+                      >
+                        Avatar
+                      </TableCell>
+                      <TableCell
+                        align="left"
+                        {...typographySettings}
+                      >
+                        Tên
+                      </TableCell>
+                      <TableCell
+                        align="left"
+                        {...typographySettings}
+                      >
+                        Xoá
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {
+                      taskDetail !== undefined ? (
+                        taskDetail.assigness.map((item, index) => (
+                          <TableRow key={index}>
+                            <TableCell
+                              align="left"
+                            >
+                              <Typography
+                                {...typographySettings}
+                              >
+                                {item.id}
+                              </Typography>
+                            </TableCell>
+                            <TableCell
+                              align="left"
+                            >
+                              <IconButton
+                                size="small"
+                                sx={{ fontSize: "16px" }}
+                              >
+                                <img src={item.avatar} alt={item.name} style={{ width: "30px", height: "30px", border: `1px ${blue[500]} solid` }} />
+                              </IconButton>
+                            </TableCell>
+                            <TableCell
+                              align="left"
+                            >
+                              <Typography
+                                {...typographySettings}
+                              >
+                                {item.name}
+                              </Typography>
+                            </TableCell>
+                            <TableCell
+                              align="left"
+                            >
+                              <IconButton
+                                variant="contained"
+                                color="primary"
+                                size="small"
+                                title="Loại thành viên"
+                                sx={{
+                                  border: `1px ${red[500]} solid`,
+                                  marginLeft: "10px",
+                                }}
+                                onClick={() => {
+                                  handleSetRemoveUserTask(item.id);
+                                }}
+                              >
+                                <DeleteIcon />
+                              </IconButton>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      ) : (
+                        <Typography {...typographySettings} color={"error"}>
+                          Chưa có thành viên
+                        </Typography>
+                      )
+                    }
+                  </TableBody>
+                </Table>
+              </Typography>
+            </Box>
+          </Modal>
           <Modal
             open={openModalAddUser}
             onClose={handleCloseModalAddUser}
