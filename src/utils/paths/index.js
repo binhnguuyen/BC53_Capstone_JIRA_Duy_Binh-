@@ -6,5 +6,5 @@ export const PATH = {
     PROJECT: "/project",
     PROJECTMANAGEMENT: "/projectmanagement",
     CREATEPROJECT:"/createproject",
-    TASK: "/task",
+    CREATETASK: "/createtask",
 }

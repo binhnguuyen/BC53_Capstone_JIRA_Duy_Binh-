@@ -49,9 +49,15 @@ const Register = () => {
             navigate(`${PATH.LOGIN}`);
         },
         onError: (error) => {
-            console.log("error", error.message);
-            alert(error.message);
-        },
+            MySwal.fire({
+                icon: "error",
+                title: error.content,
+                text: "Bạn đã gặp lỗi",
+                // showCancelButton: true,
+                confirmButtonText: "Đồng ý",
+                // denyButtonText: "Không chấp nhận"
+            })
+        }
     });
 
     const onSubmit = async (values) => {

@@ -111,14 +111,20 @@ const CreateProject = () => {
             }).then((result) => {
                 if (result.isConfirmed) {
                     queryClient.invalidateQueries({ queryKey: ["creatProjectAuthorize"] });
-
                     getAllProject();
                     navigate(PATH.PROJECTMANAGEMENT);
                 }
             })
         },
         onError: (error) => {
-            alert(error);
+            MySwal.fire({
+                icon: "error",
+                title: error.content,
+                text: "Bạn đã gặp lỗi",
+                // showCancelButton: true,
+                confirmButtonText: "Đồng ý",
+                // denyButtonText: "Không chấp nhận"
+            })
         }
     });
 
@@ -137,6 +143,7 @@ const CreateProject = () => {
                     queryClient.invalidateQueries({ queryKey: ["editProject"] });
                     // clear form sau khi addProduct
                     setFormValue({
+                        ...formValue,
                         id: "",
                         projectName: "",
                         // creator: "",
@@ -151,7 +158,14 @@ const CreateProject = () => {
             })
         },
         onError: (error) => {
-            alert(error);
+            MySwal.fire({
+                icon: "error",
+                title: error.content,
+                text: "Bạn đã gặp lỗi",
+                // showCancelButton: true,
+                confirmButtonText: "Đồng ý",
+                // denyButtonText: "Không chấp nhận"
+            })
         }
     });
 
@@ -210,7 +224,7 @@ const CreateProject = () => {
     }
 
 
-    // khi ấn sửa thì projectToEdit đc hình thành, hàm setFormValue hạy và formValue có giá trị. Giá trị này đc gán vào value={} trong TextField hoặc Select bên dưới
+    // khi ấn sửa thì projectToEdit đc hình thành, hàm setFormValue chạy và formValue có giá trị. Giá trị này đc gán vào value={} trong TextField hoặc Select bên dưới
     useEffect(() => {
         if (projectToEdit) {
             setFormValue({

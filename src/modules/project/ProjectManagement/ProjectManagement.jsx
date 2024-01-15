@@ -322,7 +322,6 @@ const ProjectManagement = () => {
   }
 
 
-
   // Tạo column hiển thị danh sách Project cho DataGrid
   const columns = [
     {
@@ -441,7 +440,14 @@ const ProjectManagement = () => {
       })
     },
     onError: (error) => {
-      alert(error);
+      MySwal.fire({
+        icon: "error",
+        title: error.content,
+        text: "Bạn đã gặp lỗi",
+        // showCancelButton: true,
+        confirmButtonText: "Đồng ý",
+        // denyButtonText: "Không chấp nhận"
+      })
     }
   });
 
@@ -496,7 +502,14 @@ const ProjectManagement = () => {
       })
     },
     onError: (error) => {
-      alert(error);
+      MySwal.fire({
+        icon: "error",
+        title: error.content,
+        text: "Bạn đã gặp lỗi",
+        // showCancelButton: true,
+        confirmButtonText: "Đồng ý",
+        // denyButtonText: "Không chấp nhận"
+      })
     }
   });
 
@@ -518,7 +531,14 @@ const ProjectManagement = () => {
       })
     },
     onError: (error) => {
-      alert(error);
+      MySwal.fire({
+        icon: "error",
+        title: error.content,
+        text: "Bạn đã gặp lỗi",
+        // showCancelButton: true,
+        confirmButtonText: "Đồng ý",
+        // denyButtonText: "Không chấp nhận"
+      })
     }
   });
 
