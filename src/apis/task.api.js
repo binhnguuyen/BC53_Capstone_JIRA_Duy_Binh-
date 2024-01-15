@@ -43,6 +43,25 @@ export const updateTask = async (payload) => {
 
 
 // Link:
+// https://jiranew.cybersoft.edu.vn/api/Project/removeTask
+export const removeTask = async (taskId) => {
+    try {
+        const response = await fetcher.delete("/Project/removeTask",
+            {
+                params: {
+                    taskId: taskId,
+                },
+            }
+        );
+        return response.data.content;
+    } catch (error) {
+        throw "Lỗi remove task API";
+    }
+};
+
+
+
+// Link:
 // https://jiranew.cybersoft.edu.vn/api/Project/assignUserTask
 export const assignUserTask = async (payload) => {
     try {

@@ -202,13 +202,15 @@ const Task = () => {
         onSuccess: () => {
             MySwal.fire({
                 icon: "success",
-                title: "Bạn đã tạo dự án thành công",
-                text: "Quay lại trang quản lý dự án",
+                title: "Bạn đã tạo công việc thành công",
+                text: "Bạn có muốn tiếp tục?",
+                showCancelButton: true,
                 confirmButtonText: "Đồng ý"
             }).then((result) => {
                 if (result.isConfirmed) {
                     queryClient.invalidateQueries({ queryKey: ["createTask"] });
                     setFormValue({
+                        ...formValue,
                         listUserAsign: [],
                         taskName: "",
                         description: "",
@@ -216,16 +218,25 @@ const Task = () => {
                         originalEstimate: 0,
                         timeTrackingSpent: 0,
                         timeTrackingRemaining: 0,
-                        projectId: 0,
+                        // projectId: 0,
                         typeId: 0,
                         priorityId: 0,
                     });
-                    navigate(PATH.PROJECTMANAGEMENT);
+                }
+                else {
+                    navigate(`${PATH.PROJECT}/${projectId}`);
                 }
             })
         },
         onError: (error) => {
-            alert(error);
+            MySwal.fire({
+                icon: "error",
+                title: error.content,
+                text: "Bạn đã gặp lỗi",
+                // showCancelButton: true,
+                confirmButtonText: "Đồng ý",
+                // denyButtonText: "Không chấp nhận"
+            })
         }
     });
 
@@ -260,7 +271,14 @@ const Task = () => {
             })
         },
         onError: (error) => {
-            alert(error);
+            MySwal.fire({
+                icon: "error",
+                title: error.content,
+                text: "Bạn đã gặp lỗi",
+                // showCancelButton: true,
+                confirmButtonText: "Đồng ý",
+                // denyButtonText: "Không chấp nhận"
+            })
         }
     });
 
@@ -410,7 +428,7 @@ const Task = () => {
 
 
     const onError = (error) => {
-        alert("Lỗi Form");
+        alert(error);
     };
 
 
@@ -897,8 +915,10 @@ const Task = () => {
                                             size="large"
                                             color='error'
                                             sx={{ fontSize: "14px", border: `1px ${red[500]} solid` }}
-                                        // loading={}
-                                        // onClick={navigate(PATH.PROJECTMANAGEMENT)}
+                                            // loading={}
+                                            onClick={() => {
+                                                navigate(`${PATH.PROJECT}/${projectId}`)
+                                            }}
                                         >
                                             Huỷ
                                         </Button>

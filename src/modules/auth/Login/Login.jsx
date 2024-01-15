@@ -44,16 +44,22 @@ const Login = () => {
             alert("Đăng nhập thành công!");
             // save user's information to local storage (using values)
             // save sau khi login POST thành công lên API để có Access Token
-            setLocalStorage(CURRENT_USER , values);
+            setLocalStorage(CURRENT_USER, values);
             // navigate to page home
             navigate(`${PATH.HOME}`);
         },
         onError: (error) => {
-            console.log("error", error.message);
-            alert(error.message);
-        },
+            MySwal.fire({
+                icon: "error",
+                title: error.content,
+                text: "Bạn đã gặp lỗi",
+                // showCancelButton: true,
+                confirmButtonText: "Đồng ý",
+                // denyButtonText: "Không chấp nhận"
+            })
+        }
     });
-    
+
     const onSubmit = async (values) => {
 
         // call api

@@ -18,7 +18,7 @@ import CategoryIcon from '@mui/icons-material/Category';
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import { LoadingButton } from '@mui/lab';
-import { assignUserTask, getTaskDetail, removeUserFromTask } from '../../../apis/task.api';
+import { assignUserTask, getTaskDetail, removeTask, removeUserFromTask } from '../../../apis/task.api';
 import { styled } from '@mui/material/styles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -181,12 +181,19 @@ const Project = () => {
       })
     },
     onError: (error) => {
-      alert(error);
+      MySwal.fire({
+        icon: "error",
+        title: error.content,
+        text: "Bạn đã gặp lỗi",
+        // showCancelButton: true,
+        confirmButtonText: "Đồng ý",
+        // denyButtonText: "Không chấp nhận"
+      })
     }
   });
 
 
-  // Hàm removeUserFromTask để thêm vào project
+  // Hàm removeUserFromTask để xoá user ra khỏi task
   const { mutate: handleRemoveUserFromTask, isPending: isRemovingUserTask } = useMutation({
     mutationFn: (payload) => removeUserFromTask(payload),
     onSuccess: () => {
@@ -210,7 +217,47 @@ const Project = () => {
       })
     },
     onError: (error) => {
-      alert(error);
+      MySwal.fire({
+        icon: "error",
+        title: error.content,
+        text: "Bạn đã gặp lỗi",
+        // showCancelButton: true,
+        confirmButtonText: "Đồng ý",
+        // denyButtonText: "Không chấp nhận"
+      })
+    }
+  });
+
+
+  // Hàm removeTask xoá task ra khỏi project
+  const { mutate: handleRemoveTask, isPending: isRemovingTask } = useMutation({
+    mutationFn: (payload) => removeTask(payload),
+    onSuccess: () => {
+      MySwal.fire({
+        icon: "success",
+        title: "Bạn đã xoá thành viên ra khỏi công việc thành công",
+        text: "Bạn muốn xoá thêm thành viên khác?",
+        // showCancelButton: true,
+        confirmButtonText: "Đồng ý"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          refetchTaskDetail();
+          queryClient.invalidateQueries({ queryKey: ["projectIdToShow"] });
+        }
+        else {
+          refetchTaskDetail();
+        }
+      })
+    },
+    onError: (error) => {
+      MySwal.fire({
+        icon: "error",
+        title: error.content,
+        text: "Bạn đã gặp lỗi",
+        // showCancelButton: true,
+        confirmButtonText: "Đồng ý",
+        // denyButtonText: "Không chấp nhận"
+      })
     }
   });
 
@@ -219,7 +266,7 @@ const Project = () => {
   const handleTaskIdToEdit = (value) => {
     if (value) {
       dispatch(projectListAction.setProjectIdToEdit(projectId));
-      dispatch(projectListAction.setThandleOpenaskIdToEdit(value));
+      dispatch(projectListAction.setTaskIdToEdit(value));
     }
     navigate(PATH.CREATETASK);
   }
@@ -249,6 +296,24 @@ const Project = () => {
     }
   }
 
+  // Hàm set taskID để remove ra khỏi project
+  const handleTaskIdToRemove = (value) => {
+    MySwal.fire({
+      icon: "question",
+      title: "Bạn có chắc muốn xoá công việc này?",
+      text: "Xoá xong tạo lại thì cũng đơn giản lắm nha, xoá thoải mái!",
+      showCancelButton: true,
+      confirmButtonText: "Đồng ý"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        handleRemoveTask(value);
+      }
+      else {
+        // do nothing
+      }
+    })
+  }
+
 
   return (
     <div style={{ display: "flex", justifyContent: "center", alignContent: "center" }}>
@@ -264,6 +329,19 @@ const Project = () => {
           <Typography variant="h5" style={{ color: `${blue[500]}` }}>
             Chi tiết dự án
           </Typography>
+          <Button
+            variant="contained"
+            size="small"
+            sx={{
+              height: 40,
+            }}
+            onClick={() => {
+              dispatch(projectListAction.setProjectIdToEdit(projectId));
+              navigate(PATH.CREATETASK);
+            }}
+          >
+            Thêm công việc
+          </Button>
         </Box>
         <div style={{ height: "90vh", width: '100%' }}>
           <Stack
@@ -338,20 +416,7 @@ const Project = () => {
                                         size="small"
                                         title="Xoá công việc"
                                         onClick={() => {
-                                          MySwal.fire({
-                                            icon: "question",
-                                            title: "Bạn có chắc muốn xoá dự án này?",
-                                            text: "Xoá xong tạo lại thì cũng đơn giản lắm nha, xoá thoải mái!",
-                                            showCancelButton: true,
-                                            confirmButtonText: "Đồng ý"
-                                          }).then((result) => {
-                                            if (result.isConfirmed) {
-                                              // handleDeleteProject(params.row.id);
-                                            }
-                                            else {
-                                              // do nothing
-                                            }
-                                          })
+                                          handleTaskIdToRemove(taskDetail.taskId);
                                         }}
                                       >
                                         <DeleteIcon sx={{ fontSize: 18 }} />
