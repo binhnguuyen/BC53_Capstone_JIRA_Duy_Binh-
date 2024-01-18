@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Accordion, AccordionDetails, AccordionSummary, Autocomplete, Box, Button, Card, CardActions, CardContent, CardHeader, CardMedia, Collapse, Container, Divider, Modal, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from '@mui/material'
+import { Accordion, AccordionDetails, AccordionSummary, Autocomplete, Box, Button, Card, CardActions, CardContent, CardHeader, CardMedia, Collapse, Container, Divider, FormControl, MenuItem, Modal, Select, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, InputLabel } from '@mui/material'
 import Copyright from "../../../components/Copyright";
 import { blue } from '@mui/material/colors'
 import { green } from '@mui/material/colors'
@@ -8,6 +8,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { getProjectDetail } from '../../../apis/project.api';
 import { getUser, getUserByProjectId } from '../../../apis/user.api';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { getAllStatus } from '../../../apis/status.api';
 import Avatar from '@mui/material/Avatar';
 import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
@@ -18,18 +19,21 @@ import CategoryIcon from '@mui/icons-material/Category';
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import { LoadingButton } from '@mui/lab';
-import { assignUserTask, getTaskDetail, removeTask, removeUserFromTask } from '../../../apis/task.api';
+import { assignUserTask, getTaskDetail, removeTask, removeUserFromTask, updatePriority, updateStatus } from '../../../apis/task.api';
 import { styled } from '@mui/material/styles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { projectListAction } from "../../../redux/slices/project.slice"
 import { PATH } from '../../../utils/paths';
+import { useDispatch, useSelector } from 'react-redux';
+import { getTaskType } from '../../../apis/taskType.api';
 
 
 // Thư viện Swal
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
-import { useDispatch } from 'react-redux';
+import { getAllPriority } from '../../../apis/priority.api';
+import { printValue } from 'yup';
 
 
 
@@ -45,8 +49,9 @@ const style = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 500,
+  width: "80vw",
   height: "auto",
+  maxHeight: "80vh",
   bgcolor: 'background.paper',
   border: `1px ${blue[500]} solid`,
   boxShadow: 24,
@@ -80,13 +85,17 @@ const Project = () => {
     taskId: "",
     userId: "",
   });
+  const { currentUser } = useSelector(state => state.user);
 
   const [expanded, setExpanded] = React.useState(false);
   const handleChange = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false);
   };
 
-  // console.log('memberToAssign', memberToAssign)
+  const [formUpdatePriority, setFormUpdatePriority] = useState("");
+  const [formUpdateStatus, setFormUpdateStatus] = useState("");
+
+
 
   // Hàm để handle modal
   const [open, setOpen] = useState(false);
@@ -95,6 +104,9 @@ const Project = () => {
   const [openModalAddUser, setOpenModalAddUser] = useState(false);
   const handleOpenModalAddUser = () => setOpenModalAddUser(true);
   const handleCloseModalAddUser = () => setOpenModalAddUser(false);
+  const [openModalUpdateTask, setOpenModalUpdateTask] = useState(false);
+  const handleOpenModalUpdateTask = () => setOpenModalUpdateTask(true);
+  const handleCloseModalUpdateTask = () => setOpenModalUpdateTask(false);
 
 
   // thư viện SweetAlert
@@ -121,8 +133,27 @@ const Project = () => {
     queryFn: () => getTaskDetail(taskId),
     enabled: !!taskId,
   });
-  // console.log('taskDetail: ', taskDetail);
+  console.log('taskDetail: ', taskDetail);
 
+
+  // Hàm GET taskType
+  const { data: taskType, isLoadingTaskType, refetch: refetchTaskType } = useQuery({
+    queryKey: ["taskType"],
+    queryFn: getTaskType,
+  });
+
+  // hàm GET allStatus
+  const { data: allStatus, isLoadingAllStatus, refetch: refetchAllStatus } = useQuery({
+    queryKey: ["allStatus"],
+    queryFn: getAllStatus,
+  });
+  console.log('allStatus: ', allStatus);
+
+  // hàm GET allPriority
+  const { data: allPriority, isLoadingAllPriority, refetch: refetchAllPriority } = useQuery({
+    queryKey: ["allPriority"],
+    queryFn: getAllPriority,
+  });
 
 
   // Hàm tìm kiếm searchMemberResult trong foundMember
@@ -141,7 +172,6 @@ const Project = () => {
         break;
       }
     }
-    // setSearchMemberInput("");
     setSearchMemberResult("");
     setMemberToAssign({
       ...memberToAssign,
@@ -262,6 +292,52 @@ const Project = () => {
   });
 
 
+
+  // Hàm handleUpdatePriority để update priority
+  const { mutate: handleUpdatePriority, isPending: isUpdatingPriority } = useMutation({
+    mutationFn: (payload) => updatePriority(payload),
+    onSuccess: () => {
+      MySwal.fire({
+        icon: "success",
+        title: "Bạn đã lưu công việc thành công",
+        confirmButtonText: "Đồng ý"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          queryClient.invalidateQueries({ queryKey: ["updatePriority"] });
+        }
+        else {
+          // do nothing
+        }
+      })
+    },
+    onError: (error) => {
+      MySwal.fire({
+        icon: "error",
+        title: error.content,
+        text: "Bạn đã gặp lỗi khi lưu Priority",
+        confirmButtonText: "Đồng ý",
+      })
+    }
+  });
+
+
+  // Hàm handleUpdatePriority để update priority
+  const { mutate: handleUpdateStatus, isPending: isUpdatingStatus } = useMutation({
+    mutationFn: (payload) => updateStatus(payload),
+    onSuccess: () => {
+      refetchProjectDetail();
+    },
+    onError: (error) => {
+      MySwal.fire({
+        icon: "error",
+        title: error.content,
+        text: "Bạn đã gặp lỗi khi lưu Status",
+        confirmButtonText: "Đồng ý",
+      })
+    }
+  });
+
+
   // Hàm để truyền dữ liệu Project muống edit lên store Redux và chuyển hướng qua trang CreateProject
   const handleTaskIdToEdit = (value) => {
     if (value) {
@@ -279,7 +355,6 @@ const Project = () => {
       MySwal.fire({
         icon: "question",
         title: "Bạn có chắc muốn gỡ thành viên ra khỏi công việc",
-        // text: "Bạn muốn thêm thành viên khác?",
         showCancelButton: true,
         confirmButtonText: "Đồng ý"
       }).then((result) => {
@@ -315,6 +390,50 @@ const Project = () => {
   }
 
 
+  // Hàm set handleSetPriorityId để set formUpdatePriority
+  const handleSetPriorityId = (value) => {
+    setFormUpdatePriority({
+      ...formUpdatePriority,
+      taskId: taskId,
+      priorityId: value,
+    })
+  }
+
+
+  // Hàm set handleSetPriorityId để set formUpdatePriority
+  const handleSetStatusId = (value) => {
+    setFormUpdateStatus({
+      ...formUpdateStatus,
+      taskId: taskId,
+      statusId: value,
+    })
+  }
+
+
+  // Hàm set handleUpdateTask để set Update tất cả những thứ đã thay đổi
+  const handleUpdateTask = () => {
+    handleCloseModalUpdateTask();
+    MySwal.fire({
+      icon: "question",
+      title: "Bạn có chắc muốn sửa công việc này?",
+      showCancelButton: true,
+      confirmButtonText: "Đồng ý"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        if ( formUpdatePriority !== "" ) {
+          handleUpdatePriority(formUpdatePriority);
+        }
+        if ( formUpdateStatus !== "" ) {
+          handleUpdateStatus(formUpdateStatus);
+        }
+      }
+      else {
+        // do nothing
+      }
+    })
+  }
+
+
   return (
     <div style={{ display: "flex", justifyContent: "center", alignContent: "center" }}>
       <Container style={{ maxWidth: "80vw" }} sx={{ margin: "60px 60px", padding: "24px", boxShadow: "0px 1px 10px 0px rgba(0,0,0,0.12)" }}>
@@ -332,6 +451,7 @@ const Project = () => {
           <Button
             variant="contained"
             size="small"
+            title="Thêm công việc"
             sx={{
               height: 40,
             }}
@@ -364,7 +484,7 @@ const Project = () => {
                           </Avatar>
                         }
                         action={
-                          <IconButton aria-label="settings">
+                          <IconButton aria-label="settings" title="More Options">
                             <MoreVertIcon />
                           </IconButton>
                         }
@@ -382,7 +502,7 @@ const Project = () => {
                                   <Stack direction={"row"}
                                     sx={{
                                       display: 'flex',
-                                      justifyContent: "space-around",
+                                      justifyContent: "space-between",
                                       alignItems: 'center',
                                       border: '1px solid',
                                       borderBottom: "none",
@@ -393,17 +513,24 @@ const Project = () => {
                                       '& svg': {
                                         m: 1,
                                       },
+                                      padding: "5px",
                                     }}>
-                                    <Typography sx={{ width: '33%', flexShrink: 0, fontSize: 18, width: "50%" }}>
-                                      ID: {taskDetail.taskId}
+                                    <Typography sx={{ width: '65%', flexShrink: 0, fontSize: 12, width: "50%", cursor: "pointer" }}
+                                      onClick={() => {
+                                        setTaskId(taskDetail.taskId);
+                                        handleOpenModalUpdateTask();
+                                      }}
+                                    >
+                                      {taskDetail.taskName}
                                     </Typography>
-                                    <Box>
+                                    <Box sx={{ width: '35%' }}>
                                       <IconButton
                                         variant="contained"
                                         color="error"
                                         size="small"
                                         title="Sửa công việc"
                                         margin={4}
+                                        style={{ width: "30px", height: "30px", border: `1px ${green[500]} solid`, borderRadius: "30px", marginRight: "5px" }}
                                         onClick={() => {
                                           handleTaskIdToEdit(taskDetail.taskId);
                                         }}
@@ -415,6 +542,7 @@ const Project = () => {
                                         color="primary"
                                         size="small"
                                         title="Xoá công việc"
+                                        style={{ width: "30px", height: "30px", border: `1px ${red[500]} solid`, borderRadius: "30px" }}
                                         onClick={() => {
                                           handleTaskIdToRemove(taskDetail.taskId);
                                         }}
@@ -485,7 +613,6 @@ const Project = () => {
                                       {
                                         taskDetail.assigness.length > 0 ? (
                                           taskDetail.assigness.map((member, index) => {
-                                            // console.log('member: ', member);
                                             return (
                                               <IconButton
                                                 key={index}
@@ -500,7 +627,6 @@ const Project = () => {
                                                 }}
                                               >
                                                 <img src={member.avatar} alt={member.name} style={{ width: "30px", height: "30px", border: `1px ${blue[500]} solid`, borderRadius: "30px" }} />
-                                                {/* #{item.name}&cedil; */}
                                               </IconButton>
                                             )
                                           })
@@ -521,7 +647,6 @@ const Project = () => {
                                       >
                                         <AddBoxIcon />
                                       </IconButton>
-                                      {/* </CardContent> */}
                                     </AccordionDetails>
                                   </Accordion>
                                 </Stack>
@@ -713,6 +838,249 @@ const Project = () => {
                   )
                 }
               </Typography>
+            </Box>
+          </Modal>
+          <Modal
+            open={openModalUpdateTask}
+            onClose={handleCloseModalUpdateTask}
+            aria-labelledby="modal-add-member"
+            aria-describedby="modal-add-member-description"
+          >
+            <Box sx={style}>
+              <Stack
+                direction={"row"}
+                sx={{
+                  display: 'flex',
+                  justifyContent: "space-around",
+                  alignItems: 'center',
+                  border: '1px solid',
+                  borderBottom: "none",
+                  borderColor: 'divider',
+                  borderRadius: 0,
+                  bgcolor: 'background.paper',
+                  color: 'text.secondary',
+                  '& svg': {
+                    m: 1,
+                  },
+                  padding: "5px",
+                }}
+              >
+                <Box sx={{ width: "60%", padding: "10px" }}>
+                  <Typography
+                    variant='h5'
+                    sx={{
+                      mb: "20px",
+                    }}
+                  >
+                    {taskDetail?.taskName}
+                  </Typography>
+                  <Typography
+                    {...typographySettings}
+                    sx={{
+                      mb: "5px",
+                    }}
+                  >
+                    Nội dung:
+                  </Typography>
+                  <Typography
+                    {...typographySettings}
+                    sx={{
+                      mb: "20px",
+                    }}
+                  >
+                    {taskDetail?.description}
+                  </Typography>
+                  {
+                    currentUser ? (
+                      <IconButton
+                        variant="contained"
+                        color="primary"
+                        size="small"
+                        title={currentUser.name}
+                        onClick={() => {
+                          handleOpen();
+                        }}
+                        sx={{
+                          mb: "5px",
+                        }}
+                      >
+                        <img src={currentUser.avatar} alt={currentUser.name} style={{ width: "30px", height: "30px", border: `1px ${blue[500]} solid`, borderRadius: "30px" }} />
+                      </IconButton>
+                    ) : (
+                      <Typography {...typographySettings} color={"error"}>
+                        Bạn chưa login!
+                      </Typography>
+                    )
+                  }
+                  <TextField
+                    required
+                    fullWidth
+                    label="Comment"
+                    variant="outlined"
+                    placeholder="Find bug and fix..."
+                    style={{ marginBottom: 10 }}
+                    multiline
+                    rows={2}
+                    defaultValue=""
+                  />
+                </Box>
+                <Box sx={{ width: "60%", padding: "10px" }}>
+                  <Box>
+                    <Typography
+                      sx={{ fontSize: 14, mb: "2px" }}
+                    >
+                      Dự án
+                    </Typography>
+                  </Box>
+                  <FormControl fullWidth
+                    sx={{ mb: 2 }}
+                  >
+                    {/* <InputLabel id="demo-simple-select-label" >Chọn dự án</InputLabel> */}
+                    {
+                      taskDetail?.statusId ? (
+                        <FormControl fullWidth
+                          sx={{ mb: 2 }}
+                        >
+                          <Select
+                            required
+                            id="statusId"
+                            // label={"Chọn dự án"}
+                            defaultValue={taskDetail.statusId}
+                          >
+                            {
+                              allStatus?.length > 0 ?
+                                (
+                                  allStatus.map((status, index) => {
+                                    return (
+                                      <MenuItem key={index} value={status.statusId}
+                                        onClick={() => { handleSetStatusId(status.statusId) }}
+                                      >
+                                        {status.statusName}
+                                      </MenuItem>
+                                    )
+                                  })
+                                ) : (
+                                  <MenuItem >
+                                    ...
+                                  </MenuItem>
+                                )
+                            }
+                          </Select>
+                        </FormControl>
+                      ) : (
+                        <Typography color={"red"} sx={{ fontSize: 14, mb: "2px" }}>
+                          Đang tải...
+                        </Typography>
+                      )
+                    }
+                  </FormControl>
+                  <Box sx={{ mb: 2 }}>
+                    <Typography
+                      sx={{ fontSize: 14, mb: "0px" }}
+                    >
+                      Thành viên:
+                    </Typography>
+                    <Box>
+                      {
+                        taskDetail?.assigness.length > 0 ? (
+                          taskDetail.assigness.map((member, index) => {
+                            return (
+                              <IconButton
+                                key={index}
+                                variant="contained"
+                                color="primary"
+                                size="small"
+                                title={member.name}
+                                onClick={() => {
+                                  handleOpen();
+                                  setTaskId(taskDetail.taskId);
+                                }}
+                              >
+                                <img src={member.avatar} alt={member.name} style={{ width: "30px", height: "30px", border: `1px ${blue[500]} solid`, borderRadius: "30px" }} />
+                              </IconButton>
+                            )
+                          })
+                        ) : (
+                          <Typography color={"red"} sx={{ fontSize: 14, mb: "2px" }}>
+                            Đang tải...
+                          </Typography>
+                        )
+                      }
+                    </Box>
+                    <Box sx={{ mb: 2 }}>
+                      <Typography
+                        sx={{ fontSize: 14, mb: "2px" }}
+                      >
+                        Ưu tiên
+                      </Typography>
+                      {
+                        taskDetail?.priorityTask ? (
+                          <FormControl fullWidth
+                            sx={{ mb: 2 }}
+                          >
+                            <Select
+                              required
+                              id="priorityId"
+                              // label={"Chọn ưu tiên"}
+                              defaultValue={taskDetail.priorityTask.priorityId}
+                            >
+                              {
+                                allPriority?.length > 0 ?
+                                  (
+                                    allPriority.map((priority, index) => {
+                                      return (
+                                        <MenuItem key={index} value={priority.priorityId}
+                                          onClick={() => { handleSetPriorityId(priority.priorityId) }}
+                                        >
+                                          {priority.priority}
+                                        </MenuItem>
+                                      )
+                                    })
+                                  ) : (
+                                    <MenuItem >
+                                      ...
+                                    </MenuItem>
+                                  )
+                              }
+                            </Select>
+                          </FormControl>
+                        ) : (
+                          <Typography color={"red"} sx={{ fontSize: 14, mb: "2px" }}>
+                            Đang tải...
+                          </Typography>
+                        )
+                      }
+                    </Box>
+                    <Box sx={{ width: "100%", margin: "0 0 15px", textAlign: "right" }}>
+                      <Button
+                        variant="outlined"
+                        size="large"
+                        color='error'
+                        sx={{ fontSize: "14px", border: `1px ${red[500]} solid` }}
+                        // loading={}
+                        onClick={() => {
+                          handleCloseModalUpdateTask()
+                        }}
+                      >
+                        Huỷ
+                      </Button>
+                      <LoadingButton
+                        variant="contained"
+                        color="primary"
+                        size="large"
+                        sx={{ fontSize: "14px", border: `1px ${blue[500]} solid`, marginLeft: 3 }}
+                        loading={isUpdatingPriority}
+                        onClick={() => {
+                          handleUpdateTask()
+                        }}
+                      >
+                        Lưu
+                      </LoadingButton>
+                    </Box>
+                  </Box>
+
+                </Box>
+              </Stack>
             </Box>
           </Modal>
         </div>

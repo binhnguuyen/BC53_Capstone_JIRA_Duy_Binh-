@@ -83,3 +83,63 @@ export const removeUserFromTask = async (payload) => {
         throw "Lỗi remove User Task";
     }
 };
+
+
+// Link:
+// https://jiranew.cybersoft.edu.vn/api/Project/updateStatus
+export const updateStatus = async (payload) => {
+    try {
+        const response = await fetcher.put("/Project/updateStatus", payload);
+        return response.data.content;
+    } catch (error) {
+        throw "Lỗi update Status";
+    }
+};
+
+
+// Link:
+// https://jiranew.cybersoft.edu.vn/api/Project/updatePriority
+export const updatePriority = async (payload) => {
+    try {
+        const response = await fetcher.put("/Project/updatePriority", payload);
+        return response.data.content;
+    } catch (error) {
+        throw "Lỗi update Priority";
+    }
+};
+
+
+// Link:
+// https://jiranew.cybersoft.edu.vn/api/Project/updateDescription
+export const updateDescription = async (payload) => {
+    try {
+        const response = await fetcher.put("/Project/updateDescription", payload);
+        return response.data.content;
+    } catch (error) {
+        throw "Lỗi update description";
+    }
+};
+
+
+// Link:
+// https://jiranew.cybersoft.edu.vn/api/Project/updateTimeTracking
+export const updateTimeTracking = async (payload) => {
+    try {
+        const response = await fetcher.put("/Project/updateTimeTracking", payload);
+        return response.data.content;
+    } catch (error) {
+        throw "Lỗi update timeTracking";
+    }
+};
+
+
+// Link:
+// https://jiranew.cybersoft.edu.vn/api/Project/updateEstimate
+export const updateEstimate = async (payload) => {
+    try {
+        const response = await fetcher.put("/Project/updateEstimate", payload);
+        return response.data.content;
+    } catch (error) {
+        throw "Lỗi update Estimate";
+    }
+};
