@@ -4,7 +4,6 @@ import { blue } from '@mui/material/colors'
 import { green } from '@mui/material/colors'
 import { orange } from '@mui/material/colors'
 import { red } from '@mui/material/colors'
-import Copyright from "../../components/Copyright";
 import { styled, alpha } from '@mui/material/styles';
 import { LoadingButton } from '@mui/lab';
 import { useSelector } from 'react-redux';
@@ -951,7 +950,6 @@ const Task = () => {
                         </Box>
                     </Box>
                 </div>
-                <Copyright sx={{ mt: 5 }} />
             </Container >
         </div >
     )

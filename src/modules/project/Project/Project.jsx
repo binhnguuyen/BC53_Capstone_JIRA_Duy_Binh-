@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { Accordion, AccordionDetails, AccordionSummary, Autocomplete, Box, Button, Card, CardActions, CardContent, CardHeader, CardMedia, Collapse, Container, Divider, FormControl, MenuItem, Modal, Select, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, InputLabel, Slider, Tooltip } from '@mui/material'
-import Copyright from "../../../components/Copyright";
 import { blue } from '@mui/material/colors'
 import { green } from '@mui/material/colors'
 import { red } from '@mui/material/colors'
@@ -555,6 +554,7 @@ const Project = () => {
   }
 
 
+  console.log('projectDetail: ', projectDetail);
   return (
     <div style={{ display: "flex", justifyContent: "center", alignContent: "center" }}>
       <Container style={{ maxWidth: "80vw" }} sx={{ margin: "60px 60px", padding: "24px", boxShadow: "0px 1px 10px 0px rgba(0,0,0,0.12)" }}>
@@ -567,7 +567,7 @@ const Project = () => {
           }}
         >
           <Typography variant="h5" style={{ color: `${blue[500]}` }}>
-            Chi tiết dự án
+            {projectDetail?.projectName}
           </Typography>
           <Button
             variant="contained"
@@ -584,7 +584,7 @@ const Project = () => {
             Thêm công việc
           </Button>
         </Box>
-        <div style={{ height: "90vh", width: '100%' }}>
+        <div style={{ height: "90%", width: '100%' }}>
           <Stack
             spacing={1}
             justifyContent={"center"}
@@ -595,8 +595,8 @@ const Project = () => {
             {
               projectDetail ? (
                 projectDetail.lstTask?.map((task, index) => (
-                  <Box sx={{ width: "25%" }} key={index}>
-                    <Card sx={{ minHeight: "50vw", border: `1px ${blue[200]} solid`, margin: "5px 5px", p: "5px" }}>
+                  <Box sx={{ width: "25%", height: "85vh" }} key={index}>
+                    <Card sx={{ height: "85vh", border: `1px ${blue[200]} solid`, margin: "5px 5px", p: "5px" }}>
                       <CardHeader
                         sx={{ p: "2px", height: "10%" }}
                         avatar={
@@ -605,10 +605,13 @@ const Project = () => {
                           </Avatar>
                         }
                         action={
-                          <IconButton aria-label="settings" title="More Options">
-                            <MoreVertIcon />
-                          </IconButton>
+                          <>
+                            <IconButton aria-label="settings" title="More Options">
+                              <MoreVertIcon />
+                            </IconButton>
+                          </>
                         }
+                        subheader={task.statusName}
                       >
                       </CardHeader>
 
@@ -618,7 +621,7 @@ const Project = () => {
                         {
                           task.lstTaskDeTail ? (
                             task.lstTaskDeTail.map((taskDetail, index) => (
-                              <Card sx={{ minHeight: "50%", fontSize: "12px", mb: "10px" }}>
+                              <Card sx={{ height: "auto", fontSize: "12px", mb: "10px" }}>
                                 <Stack direction={"column"}>
                                   <Stack direction={"row"}
                                     sx={{
@@ -1044,8 +1047,8 @@ const Project = () => {
                     style={{ marginBottom: 10 }}
                     multiline
                     rows={1}
-                    // defaultValue={}
-                    // onChange={}
+                  // defaultValue={}
+                  // onChange={}
                   />
                 </Box>
                 <Box sx={{ width: "55%", padding: "10px" }}>
@@ -1291,7 +1294,6 @@ const Project = () => {
             </Box>
           </Modal>
         </div>
-        <Copyright sx={{ mt: 5 }} />
       </Container >
     </div >
   )

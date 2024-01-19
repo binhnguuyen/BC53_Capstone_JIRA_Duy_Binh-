@@ -3,7 +3,6 @@ import { blue } from '@mui/material/colors'
 import { green } from '@mui/material/colors'
 import { LoadingButton } from "@mui/lab";
 import { Link, useNavigate } from "react-router-dom";
-import Copyright from "../../../components/Copyright";
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
 
@@ -384,7 +383,6 @@ const CreateProject = () => {
                         }
                     </Box>
                 </div>
-                <Copyright sx={{ mt: 5 }} />
             </Container>
         </div>
     )

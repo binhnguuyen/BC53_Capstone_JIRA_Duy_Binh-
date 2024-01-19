@@ -1,8 +1,11 @@
 import React from 'react'
+import Copyright from "../../components/Copyright";
 
 const Footer = () => {
   return (
-    <div>Footer</div>
+    <div>
+      <Copyright sx={{ mt: 5, mb: 5, }} />
+    </div>
   )
 }
 
