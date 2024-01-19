@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Accordion, AccordionDetails, AccordionSummary, Autocomplete, Box, Button, Card, CardActions, CardContent, CardHeader, CardMedia, Collapse, Container, Divider, FormControl, MenuItem, Modal, Select, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, InputLabel } from '@mui/material'
+import { Accordion, AccordionDetails, AccordionSummary, Autocomplete, Box, Button, Card, CardActions, CardContent, CardHeader, CardMedia, Collapse, Container, Divider, FormControl, MenuItem, Modal, Select, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, InputLabel, Slider, Tooltip } from '@mui/material'
 import Copyright from "../../../components/Copyright";
 import { blue } from '@mui/material/colors'
 import { green } from '@mui/material/colors'
@@ -19,7 +19,7 @@ import CategoryIcon from '@mui/icons-material/Category';
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import { LoadingButton } from '@mui/lab';
-import { assignUserTask, getTaskDetail, removeTask, removeUserFromTask, updatePriority, updateStatus } from '../../../apis/task.api';
+import { assignUserTask, getTaskDetail, removeTask, removeUserFromTask, updateDescription, updateEstimate, updatePriority, updateStatus, updateTimeTracking } from '../../../apis/task.api';
 import { styled } from '@mui/material/styles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -27,13 +27,13 @@ import { projectListAction } from "../../../redux/slices/project.slice"
 import { PATH } from '../../../utils/paths';
 import { useDispatch, useSelector } from 'react-redux';
 import { getTaskType } from '../../../apis/taskType.api';
+import { getAllPriority } from '../../../apis/priority.api';
+import { printValue } from 'yup';
 
 
 // Thư viện Swal
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
-import { getAllPriority } from '../../../apis/priority.api';
-import { printValue } from 'yup';
 
 
 
@@ -71,6 +71,9 @@ const ExpandMore = styled((props) => {
 }));
 
 
+
+
+
 const Project = () => {
   // dùng useParams lấy id sau dầu : trong URL của details về
   const { projectId } = useParams();
@@ -94,7 +97,42 @@ const Project = () => {
 
   const [formUpdatePriority, setFormUpdatePriority] = useState("");
   const [formUpdateStatus, setFormUpdateStatus] = useState("");
+  const [formUpdateDescription, setFormUpdateDescription] = useState("");
+  const [formUpdateTimeTracking, setFormUpdateTimeTracking] = useState("");
+  const [formUpdateEstimate, setFormUpdateEstimate] = useState("");
+  const [timeEstimate, setTimeEstimate] = useState("");
+  const [timeSpent, setTimeSpent] = useState("");
+  const [timeRemaining, setTimeRemaining] = useState("");
 
+
+  // thư viện Slider từ MUI
+  function handleSetTimeEstimate(props) {
+    const { children, value } = props;
+    setTimeEstimate(value);
+    return (
+      <Tooltip enterTouchDelay={0} placement="top" title={value}>
+        {children}
+      </Tooltip>
+    );
+  }
+  function handleSetTimeSpent(props) {
+    const { children, value } = props;
+    setTimeSpent(value);
+    return (
+      <Tooltip enterTouchDelay={0} placement="top" title={value}>
+        {children}
+      </Tooltip>
+    );
+  }
+  function handleSetTimeRemaining(props) {
+    const { children, value } = props;
+    setTimeRemaining(value);
+    return (
+      <Tooltip enterTouchDelay={0} placement="top" title={value}>
+        {children}
+      </Tooltip>
+    );
+  }
 
 
   // Hàm để handle modal
@@ -133,7 +171,7 @@ const Project = () => {
     queryFn: () => getTaskDetail(taskId),
     enabled: !!taskId,
   });
-  console.log('taskDetail: ', taskDetail);
+  // console.log('taskDetail: ', taskDetail);
 
 
   // Hàm GET taskType
@@ -147,7 +185,6 @@ const Project = () => {
     queryKey: ["allStatus"],
     queryFn: getAllStatus,
   });
-  console.log('allStatus: ', allStatus);
 
   // hàm GET allPriority
   const { data: allPriority, isLoadingAllPriority, refetch: refetchAllPriority } = useQuery({
@@ -294,21 +331,10 @@ const Project = () => {
 
 
   // Hàm handleUpdatePriority để update priority
-  const { mutate: handleUpdatePriority, isPending: isUpdatingPriority } = useMutation({
+  const { mutate: handleUpdatePriority, isPending: isUpdatingPriority, error: errorUpdatingPriority } = useMutation({
     mutationFn: (payload) => updatePriority(payload),
     onSuccess: () => {
-      MySwal.fire({
-        icon: "success",
-        title: "Bạn đã lưu công việc thành công",
-        confirmButtonText: "Đồng ý"
-      }).then((result) => {
-        if (result.isConfirmed) {
-          queryClient.invalidateQueries({ queryKey: ["updatePriority"] });
-        }
-        else {
-          // do nothing
-        }
-      })
+      // refetchProjectDetail();
     },
     onError: (error) => {
       MySwal.fire({
@@ -321,17 +347,68 @@ const Project = () => {
   });
 
 
-  // Hàm handleUpdatePriority để update priority
-  const { mutate: handleUpdateStatus, isPending: isUpdatingStatus } = useMutation({
+  // Hàm handleUpdatePriority để update status
+  const { mutate: handleUpdateStatus, isPending: isUpdatingStatus, error: errorUpdatingStatus } = useMutation({
     mutationFn: (payload) => updateStatus(payload),
     onSuccess: () => {
-      refetchProjectDetail();
+      // refetchProjectDetail();
     },
     onError: (error) => {
       MySwal.fire({
         icon: "error",
         title: error.content,
         text: "Bạn đã gặp lỗi khi lưu Status",
+        confirmButtonText: "Đồng ý",
+      })
+    }
+  });
+
+
+  // Hàm updateDescription để update description
+  const { mutate: handleUpdateDescription, isPending: isUpdatingDescription, error: errorUpdatingDescription } = useMutation({
+    mutationFn: (payload) => updateDescription(payload),
+    onSuccess: () => {
+      // refetchProjectDetail();
+    },
+    onError: (error) => {
+      MySwal.fire({
+        icon: "error",
+        title: error.content,
+        text: "Bạn đã gặp lỗi khi lưu Description",
+        confirmButtonText: "Đồng ý",
+      })
+    }
+  });
+
+
+  // Hàm updateTimeTracking để update TimeTracking
+  const { mutate: handleUpdateTimeTracking, isPending: isUpdatingTimeTracking, error: errorUpdatingTimeTracking } = useMutation({
+    mutationFn: (payload) => updateTimeTracking(payload),
+    onSuccess: () => {
+      // refetchProjectDetail();
+    },
+    onError: (error) => {
+      MySwal.fire({
+        icon: "error",
+        title: error.content,
+        text: "Bạn đã gặp lỗi khi lưu TimeTracking",
+        confirmButtonText: "Đồng ý",
+      })
+    }
+  });
+
+
+  // Hàm updateTimeTracking để update Estimate
+  const { mutate: handleUpdateEstimate, isPending: isUpdatingEstimate, error: errorUpdatingEstimate } = useMutation({
+    mutationFn: (payload) => updateEstimate(payload),
+    onSuccess: () => {
+      // refetchProjectDetail();
+    },
+    onError: (error) => {
+      MySwal.fire({
+        icon: "error",
+        title: error.content,
+        text: "Bạn đã gặp lỗi khi lưu Estimate",
         confirmButtonText: "Đồng ý",
       })
     }
@@ -410,6 +487,17 @@ const Project = () => {
   }
 
 
+  // Hàm set handleSetDescription để set formUpdateDescription
+  const handleSetDescription = (value) => event => {
+    setFormUpdateDescription({
+      ...formUpdateDescription,
+      taskId: taskId,
+      description: event.target.value,
+    })
+  }
+
+
+
   // Hàm set handleUpdateTask để set Update tất cả những thứ đã thay đổi
   const handleUpdateTask = () => {
     handleCloseModalUpdateTask();
@@ -420,11 +508,44 @@ const Project = () => {
       confirmButtonText: "Đồng ý"
     }).then((result) => {
       if (result.isConfirmed) {
-        if ( formUpdatePriority !== "" ) {
+        if (formUpdatePriority !== "") {
           handleUpdatePriority(formUpdatePriority);
         }
-        if ( formUpdateStatus !== "" ) {
+        if (formUpdateStatus !== "") {
           handleUpdateStatus(formUpdateStatus);
+        }
+        if (formUpdateDescription !== "" && (formUpdateDescription !== taskDetail.description)) {
+          handleUpdateDescription(formUpdateDescription);
+        }
+        if (timeEstimate && (timeEstimate !== taskDetail.originalEstimate)) {
+          handleUpdateEstimate({
+            ...formUpdateEstimate,
+            taskId: taskId,
+            originalEstimate: timeEstimate,
+          });
+        }
+        if ((timeRemaining && (timeRemaining !== taskDetail.timeTrackingRemaining)) || (timeSpent && (timeSpent !== taskDetail.timeTrackingSpent))) {
+          handleUpdateTimeTracking({
+            ...formUpdateTimeTracking,
+            taskId: taskId,
+            timeTrackingSpent: timeSpent,
+            timeTrackingRemaining: timeRemaining,
+          });
+        }
+
+        if (!errorUpdatingPriority && !errorUpdatingStatus && !errorUpdatingTimeTracking && !errorUpdatingDescription && !errorUpdatingEstimate) {
+          MySwal.fire({
+            icon: "success",
+            title: "Bạn đã lưu công việc thành công",
+            confirmButtonText: "Đồng ý"
+          }).then((result) => {
+            if (result.isConfirmed) {
+              refetchProjectDetail();
+            }
+          })
+        }
+        else {
+          console.log("Lỗi rồi");
         }
       }
       else {
@@ -865,7 +986,7 @@ const Project = () => {
                   padding: "5px",
                 }}
               >
-                <Box sx={{ width: "60%", padding: "10px" }}>
+                <Box sx={{ width: "45%", padding: "10px" }}>
                   <Typography
                     variant='h5'
                     sx={{
@@ -877,19 +998,22 @@ const Project = () => {
                   <Typography
                     {...typographySettings}
                     sx={{
-                      mb: "5px",
+                      mb: "10px",
                     }}
                   >
                     Nội dung:
                   </Typography>
-                  <Typography
-                    {...typographySettings}
-                    sx={{
-                      mb: "20px",
-                    }}
-                  >
-                    {taskDetail?.description}
-                  </Typography>
+                  <TextField
+                    fullWidth
+                    label={"Miêu tả"}
+                    variant="outlined"
+                    placeholder="Find bug and fix..."
+                    style={{ marginBottom: 10 }}
+                    multiline
+                    rows={2}
+                    defaultValue={taskDetail?.description}
+                    onChange={handleSetDescription("description")}
+                  />
                   {
                     currentUser ? (
                       <IconButton
@@ -913,144 +1037,228 @@ const Project = () => {
                     )
                   }
                   <TextField
-                    required
                     fullWidth
-                    label="Comment"
+                    label={"Comment..."}
                     variant="outlined"
                     placeholder="Find bug and fix..."
                     style={{ marginBottom: 10 }}
                     multiline
-                    rows={2}
-                    defaultValue=""
+                    rows={1}
+                    // defaultValue={}
+                    // onChange={}
                   />
                 </Box>
-                <Box sx={{ width: "60%", padding: "10px" }}>
-                  <Box>
-                    <Typography
-                      sx={{ fontSize: 14, mb: "2px" }}
-                    >
-                      Dự án
-                    </Typography>
-                  </Box>
-                  <FormControl fullWidth
-                    sx={{ mb: 2 }}
-                  >
-                    {/* <InputLabel id="demo-simple-select-label" >Chọn dự án</InputLabel> */}
-                    {
-                      taskDetail?.statusId ? (
-                        <FormControl fullWidth
-                          sx={{ mb: 2 }}
-                        >
-                          <Select
-                            required
-                            id="statusId"
-                            // label={"Chọn dự án"}
-                            defaultValue={taskDetail.statusId}
-                          >
-                            {
-                              allStatus?.length > 0 ?
-                                (
-                                  allStatus.map((status, index) => {
-                                    return (
-                                      <MenuItem key={index} value={status.statusId}
-                                        onClick={() => { handleSetStatusId(status.statusId) }}
-                                      >
-                                        {status.statusName}
-                                      </MenuItem>
-                                    )
-                                  })
-                                ) : (
-                                  <MenuItem >
-                                    ...
-                                  </MenuItem>
-                                )
-                            }
-                          </Select>
-                        </FormControl>
-                      ) : (
-                        <Typography color={"red"} sx={{ fontSize: 14, mb: "2px" }}>
-                          Đang tải...
-                        </Typography>
-                      )
-                    }
-                  </FormControl>
+                <Box sx={{ width: "55%", padding: "10px" }}>
                   <Box sx={{ mb: 2 }}>
-                    <Typography
-                      sx={{ fontSize: 14, mb: "0px" }}
+                    <Stack
+                      spacing={1}
+                      justifyContent={"center"}
+                      alignItems={"center"}
+                      direction={"row"}
+                      sx={{ margin: "0 0 15px" }}
                     >
-                      Thành viên:
-                    </Typography>
-                    <Box>
-                      {
-                        taskDetail?.assigness.length > 0 ? (
-                          taskDetail.assigness.map((member, index) => {
-                            return (
-                              <IconButton
-                                key={index}
-                                variant="contained"
-                                color="primary"
-                                size="small"
-                                title={member.name}
-                                onClick={() => {
-                                  handleOpen();
-                                  setTaskId(taskDetail.taskId);
-                                }}
+                      <Box sx={{ mb: 2, width: "50%" }}>
+                        <Typography
+                          sx={{ fontSize: 14 }}
+                        >
+                          Dự án
+                        </Typography>
+                        <FormControl fullWidth >
+                          {/* <InputLabel id="demo-simple-select-label" >Chọn dự án</InputLabel> */}
+                          {
+                            taskDetail?.statusId ? (
+                              <FormControl fullWidth
+                                sx={{ mb: 2 }}
                               >
-                                <img src={member.avatar} alt={member.name} style={{ width: "30px", height: "30px", border: `1px ${blue[500]} solid`, borderRadius: "30px" }} />
-                              </IconButton>
-                            )
-                          })
-                        ) : (
-                          <Typography color={"red"} sx={{ fontSize: 14, mb: "2px" }}>
-                            Đang tải...
-                          </Typography>
-                        )
-                      }
-                    </Box>
-                    <Box sx={{ mb: 2 }}>
-                      <Typography
-                        sx={{ fontSize: 14, mb: "2px" }}
-                      >
-                        Ưu tiên
-                      </Typography>
-                      {
-                        taskDetail?.priorityTask ? (
-                          <FormControl fullWidth
-                            sx={{ mb: 2 }}
-                          >
-                            <Select
-                              required
-                              id="priorityId"
-                              // label={"Chọn ưu tiên"}
-                              defaultValue={taskDetail.priorityTask.priorityId}
-                            >
-                              {
-                                allPriority?.length > 0 ?
-                                  (
-                                    allPriority.map((priority, index) => {
-                                      return (
-                                        <MenuItem key={index} value={priority.priorityId}
-                                          onClick={() => { handleSetPriorityId(priority.priorityId) }}
-                                        >
-                                          {priority.priority}
+                                <Select
+                                  required
+                                  id="statusId"
+                                  // label={"Chọn dự án"}
+                                  defaultValue={taskDetail.statusId}
+                                >
+                                  {
+                                    allStatus?.length > 0 ?
+                                      (
+                                        allStatus.map((status, index) => {
+                                          return (
+                                            <MenuItem key={index} value={status.statusId}
+                                              onClick={() => { handleSetStatusId(status.statusId) }}
+                                            >
+                                              {status.statusName}
+                                            </MenuItem>
+                                          )
+                                        })
+                                      ) : (
+                                        <MenuItem >
+                                          ...
                                         </MenuItem>
                                       )
-                                    })
-                                  ) : (
-                                    <MenuItem >
-                                      ...
-                                    </MenuItem>
-                                  )
-                              }
-                            </Select>
-                          </FormControl>
-                        ) : (
-                          <Typography color={"red"} sx={{ fontSize: 14, mb: "2px" }}>
-                            Đang tải...
-                          </Typography>
-                        )
-                      }
-                    </Box>
+                                  }
+                                </Select>
+                              </FormControl>
+                            ) : (
+                              <Typography color={"red"} sx={{ fontSize: 14, mb: "2px" }}>
+                                Đang tải...
+                              </Typography>
+                            )
+                          }
+                        </FormControl>
+                      </Box>
+                      <Box sx={{ mb: 2, width: "50%" }}>
+                        <Typography
+                          sx={{ fontSize: 14, mb: "2px" }}
+                        >
+                          Ưu tiên
+                        </Typography>
+                        {
+                          taskDetail?.priorityTask ? (
+                            <FormControl fullWidth
+                              sx={{ mb: 2 }}
+                            >
+                              <Select
+                                required
+                                id="priorityId"
+                                // label={"Chọn ưu tiên"}
+                                defaultValue={taskDetail.priorityTask.priorityId}
+                              >
+                                {
+                                  allPriority?.length > 0 ?
+                                    (
+                                      allPriority.map((priority, index) => {
+                                        return (
+                                          <MenuItem key={index} value={priority.priorityId}
+                                            onClick={() => { handleSetPriorityId(priority.priorityId) }}
+                                          >
+                                            {priority.priority}
+                                          </MenuItem>
+                                        )
+                                      })
+                                    ) : (
+                                      <MenuItem >
+                                        ...
+                                      </MenuItem>
+                                    )
+                                }
+                              </Select>
+                            </FormControl>
+                          ) : (
+                            <Typography color={"red"} sx={{ fontSize: 14, mb: "2px" }}>
+                              Đang tải...
+                            </Typography>
+                          )
+                        }
+                      </Box>
+                    </Stack>
+                    <Stack
+                      spacing={1}
+                      justifyContent={"center"}
+                      alignItems={"center"}
+                      direction={"row"}
+                      sx={{ margin: "0 0 15px" }}
+                    >
+                      <Box sx={{ mb: 2, width: "50%" }}>
+                        <Typography
+                          sx={{ fontSize: 14, mb: "0px" }}
+                        >
+                          Thành viên:
+                        </Typography>
+                        {
+                          taskDetail?.assigness.length > 0 ? (
+                            taskDetail.assigness.map((member, index) => {
+                              return (
+                                <IconButton
+                                  key={index}
+                                  variant="contained"
+                                  color="primary"
+                                  size="small"
+                                  title={member.name}
+                                  onClick={() => {
+                                    handleOpen();
+                                    setTaskId(taskDetail.taskId);
+                                  }}
+                                >
+                                  <img src={member.avatar} alt={member.name} style={{ width: "30px", height: "30px", border: `1px ${blue[500]} solid`, borderRadius: "30px" }} />
+                                </IconButton>
+                              )
+                            })
+                          ) : (
+                            <Typography color={"red"} sx={{ fontSize: 14, mb: "2px" }}>
+                              Đang tải...
+                            </Typography>
+                          )
+                        }
+                      </Box>
+                      <Box sx={{ mb: 2, width: "50%" }}>
+                        <Typography gutterBottom
+                          sx={{
+                            textAlign: "left"
+                          }}
+                        >Thời gian dự định (ngày)</Typography>
+                        <Slider
+                          valueLabelDisplay="auto"
+                          slots={{
+                            valueLabel: handleSetTimeEstimate,
+                          }}
+                          aria-label="custom thumb label"
+                          defaultValue={taskDetail?.originalEstimate}
+                          sx={{
+                            width: "90%",
+                            color: 'success.main',
+                            textAlign: "center"
+                          }}
+                        ></Slider>
+                      </Box>
+                    </Stack>
+                    <Stack
+                      spacing={1}
+                      justifyContent={"center"}
+                      alignItems={"center"}
+                      direction={"row"}
+                      sx={{ margin: "0 0 15px" }}
+                    >
+                      <Box sx={{ mb: 2, width: "50%" }}>
+                        <Typography gutterBottom
+                          sx={{
+                            textAlign: "left"
+                          }}
+                        >Thời gian còn lại (ngày)</Typography>
+                        <Slider
+                          valueLabelDisplay="auto"
+                          slots={{
+                            valueLabel: handleSetTimeRemaining,
+                          }}
+                          aria-label="custom thumb label"
+                          defaultValue={taskDetail?.timeTrackingRemaining
+                          }
+                          sx={{
+                            width: "90%",
+                            color: 'success.main',
+                            textAlign: "center"
+                          }}
+                        ></Slider>
+                      </Box>
+                      <Box sx={{ mb: 2, width: "50%" }}>
+                        <Typography gutterBottom
+                          sx={{
+                            textAlign: "left"
+                          }}
+                        >Thời gian đã qua (ngày)</Typography>
+                        <Slider
+                          valueLabelDisplay="auto"
+                          slots={{
+                            valueLabel: handleSetTimeSpent,
+                          }}
+                          aria-label="custom thumb label"
+                          defaultValue={taskDetail?.timeTrackingSpent
+                          }
+                          sx={{
+                            width: "90%",
+                            color: 'success.main',
+                            textAlign: "center"
+                          }}
+                        ></Slider>
+                      </Box>
+                    </Stack>
                     <Box sx={{ width: "100%", margin: "0 0 15px", textAlign: "right" }}>
                       <Button
                         variant="outlined"
@@ -1078,7 +1286,6 @@ const Project = () => {
                       </LoadingButton>
                     </Box>
                   </Box>
-
                 </Box>
               </Stack>
             </Box>
