@@ -18,6 +18,7 @@ import { Button, Container, Divider, Drawer, List, ListItem, ListItemButton, Lis
 import { blue } from '@mui/material/colors';
 import { useNavigate } from 'react-router';
 import { PATH } from "../../utils/paths/index"
+import { useSelector } from 'react-redux';
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -76,6 +77,8 @@ const drawerWidth = 350;
 
 export default function Header(props) {
     const navigate = useNavigate();
+    const { currentUser } = useSelector(state => state.user);
+
 
     const stackSettings = {
         width: "100%",
@@ -104,7 +107,7 @@ export default function Header(props) {
                     sx={{ display: { lg: 'block', xl: 'none' } }}
                 >
                     <ListItemButton sx={{ textAlign: 'center', display: { md: 'none' } }}
-                    onClick={() => navigate(PATH.CREATETASK)}>
+                        onClick={() => navigate(PATH.CREATETASK)}>
                         <ListItemText primary="Công việc" />
                         <KeyboardArrowDownIcon />
                     </ListItemButton>
@@ -151,7 +154,7 @@ export default function Header(props) {
                     }}
                 >
                     <Stack {...stackSettings}>
-                        <Item sx={{ textAlign: "center", alignItems: "center"}}>
+                        <Item sx={{ textAlign: "center", alignItems: "center" }}>
                             <IconButton
                                 sx={{ flexGrow: 1, display: { xl: 'none' } }}
                                 size="medium"
@@ -233,7 +236,7 @@ export default function Header(props) {
                                 Tạo dự án
                             </Button>
                         </Item>
-                        <Item sx={{ textAlign: "center", alignItems: "center"}}>
+                        <Item sx={{ textAlign: "center", alignItems: "center" }}>
                             <Search
                                 style={{
                                     border: "1px solid #6B778C",
@@ -274,14 +277,39 @@ export default function Header(props) {
                             >
                                 <SettingsIcon />
                             </IconButton>
-                            <IconButton
-                                variant="h6"
-                                nowrap="true"
-                                component="div"
-                                sx={{ fontSize: 10, flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
-                            >
-                                <AccountCircleIcon />
-                            </IconButton>
+                            {currentUser ? (
+                                <Stack direction={"row"} spacing={2} alignItems={"center"}>
+                                    <IconButton
+                                        variant="h6"
+                                        nowrap="true"
+                                        component="div"
+                                        title={currentUser.name}
+                                        sx={{ fontSize: 10, flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                                    >
+                                        <AccountCircleIcon />
+                                    </IconButton>
+                                    <Button
+                                        size="large"
+                                        variant="contained"
+                                        onClick={() => {
+                                            handleLogout();
+                                            // đăng xuất rồi thì đá qua trang HOME
+                                            navigate(PATH.HOME);
+                                        }}>
+                                        Đăng xuất
+                                    </Button>
+                                </Stack>
+                            ) : (
+                                <Stack spacing={2} direction={"row"}>
+                                    <Button variant="outlined" onClick={() => navigate(PATH.REGISTER)}>
+                                        ĐĂng ký
+                                    </Button>
+                                    <Button variant="contained" onClick={() => navigate(PATH.LOGIN)}>
+                                        Đăng nhập
+                                    </Button>
+                                </Stack>
+                            )}
+
                         </Item>
                     </Stack>
                 </Toolbar>
