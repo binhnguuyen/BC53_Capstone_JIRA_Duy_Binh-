@@ -71,7 +71,6 @@ const ProjectManagement = () => {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
   const [memberByProjectId, setMemberByProjectId] = useState("");
-  console.log('memberByProjectId: ', memberByProjectId);
   const [searchMemberInput, setSearchMemberInput] = useState("");
   const [searchMemberResult, setSearchMemberResult] = useState("");
   const [projectId, setProjectId] = useState("");
@@ -612,7 +611,7 @@ const ProjectManagement = () => {
           aria-labelledby="modal-list-member"
           aria-describedby="modal-list-member-description"
         >
-          <MemberList memberList={memberByProjectId} />
+          <MemberList memberList={memberByProjectId} projectId={projectId}/>
         </Modal>
         <Modal
           open={openModalAddUser}
