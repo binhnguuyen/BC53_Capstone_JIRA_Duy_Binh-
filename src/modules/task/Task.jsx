@@ -6,7 +6,7 @@ import { orange } from '@mui/material/colors'
 import { red } from '@mui/material/colors'
 import { styled, alpha } from '@mui/material/styles';
 import { LoadingButton } from '@mui/lab';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import Tooltip from '@mui/material/Tooltip';
@@ -28,6 +28,7 @@ import withReactContent from 'sweetalert2-react-content'
 import { getUser, getUserByProjectId } from '../../apis/user.api';
 import { useNavigate } from 'react-router-dom'
 import { PATH } from '../../utils/paths'
+import { projectListAction } from '../../redux/slices/project.slice'
 
 
 // thư viện SweetAlert
@@ -59,6 +60,7 @@ const Task = () => {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     let { taskIdToEdit, projectList, projectIdToEdit } = useSelector(state => state.project);
+    const dispatch = useDispatch();
     const [searchprojectInput, setSearchProjectInput] = useState("");
     const [searchProjectResult, setSearchProjectResult] = useState("");
     const [searchStatusInput, setSearchStatusInput] = useState("");
@@ -433,7 +435,7 @@ const Task = () => {
 
     // khi ấn sửa thì taskDetailToEdit đc hình thành, hàm setFormValue chạy và formValue có giá trị. Giá trị này đc gán vào value={} trong TextField hoặc Select bên dưới
     useEffect(() => {
-        if (taskDetailToEdit) {
+        if (taskDetailToEdit && projectIdToEdit) {
             setFormValueToEdit({
                 ...formValueToEdit,
                 taskId: taskDetailToEdit.taskId,
@@ -916,8 +918,7 @@ const Task = () => {
                                             sx={{ fontSize: "14px", border: `1px ${red[500]} solid` }}
                                             // loading={}
                                             onClick={() => {
-                                                setFormValueToEdit("");
-                                                navigate(`${PATH.PROJECT}/${taskDetailToEdit.projectId}`)
+                                                navigate(`${PATH.PROJECT}/${projectIdToEdit}`)
                                             }}
                                         >
                                             Huỷ

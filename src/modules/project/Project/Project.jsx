@@ -509,6 +509,7 @@ const Project = () => {
             }}
             onClick={() => {
               dispatch(projectListAction.setProjectIdToEdit(projectId));
+              dispatch(projectListAction.setTaskIdToEdit(undefined));
               navigate(PATH.CREATETASK);
             }}
           >
