@@ -1,26 +1,17 @@
 import { Box, Button, Container, IconButton, Typography, Modal, Stack, Autocomplete, TextField } from '@mui/material'
-import React, { useEffect, useState } from 'react'
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
+import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
-import { blue } from '@mui/material/colors';
-import { red } from '@mui/material/colors';
-import { green } from '@mui/material/colors';
+import { blue, red, green } from '@mui/material/colors';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { deleteProject, getAllProject, assignUserProject, removeUserFromProject } from '../../../apis/project.api';
 import { getUser } from '../../../apis/user.api';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddBoxIcon from '@mui/icons-material/AddBox';
-import AddIcon from '@mui/icons-material/Add';
 import { DataGrid } from '@mui/x-data-grid';
 import { PATH } from '../../../utils/paths';
 import { useNavigate } from 'react-router-dom';
 import { projectListAction } from "../../../redux/slices/project.slice"
-import SearchIcon from '@mui/icons-material/Search';
 import InputBase from '@mui/material/InputBase';
 import { styled, alpha } from '@mui/material/styles';
 
@@ -71,6 +62,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import { LoadingButton } from '@mui/lab';
+import MemberList from '../../../components/MemberList';
 
 
 const ProjectManagement = () => {
@@ -619,104 +611,7 @@ const ProjectManagement = () => {
           aria-labelledby="modal-list-member"
           aria-describedby="modal-list-member-description"
         >
-          <Box sx={style}>
-            <Typography id="modal-list-member" variant="h5" color={`${blue[500]}`} gutterBottom>
-              Danh sách thành viên
-            </Typography>
-            <Typography id="modal-list-member-description" gutterBottom>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell
-                      align="left"
-                      {...typographySettings}
-                    >
-                      Id
-                    </TableCell>
-                    <TableCell
-                      align="left"
-                      {...typographySettings}
-                    >
-                      Avatar
-                    </TableCell>
-                    <TableCell
-                      align="left"
-                      {...typographySettings}
-                    >
-                      Tên
-                    </TableCell>
-                    <TableCell
-                      align="left"
-                      {...typographySettings}
-                    >
-                      Xoá
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {
-                    memberByProjectId.length > 0 ? (
-                      memberByProjectId.map((item, index) => (
-                        <TableRow key={index}>
-                          <TableCell
-                            align="left"
-                          >
-                            <Typography
-                              {...typographySettings}
-                            >
-                              {item.userId}
-                            </Typography>
-                          </TableCell>
-                          <TableCell
-                            align="left"
-                          >
-                            <IconButton
-                              size="small"
-                              sx={{ fontSize: "16px" }}
-                            >
-                              <img src={item.avatar} alt={item.name} style={{ width: "30px", height: "30px", border: `1px ${blue[500]} solid` }} />
-                            </IconButton>
-                          </TableCell>
-                          <TableCell
-                            align="left"
-                          >
-                            <Typography
-                              {...typographySettings}
-                            >
-                              {item.name}
-                            </Typography>
-                          </TableCell>
-                          <TableCell
-                            align="left"
-                          >
-                            <IconButton
-                              variant="contained"
-                              color="primary"
-                              size="small"
-                              title="Loại thành viên"
-                              sx={{
-                                border: `1px ${red[500]} solid`,
-                                marginLeft: "10px",
-                              }}
-                              onClick={() => {
-                                handleSetMemberToRemove(item.userId);
-                              }}
-                            >
-                              <DeleteIcon />
-                            </IconButton>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    ) : (
-                      <Typography {...typographySettings} color={"error"}>
-                        Chưa có thành viên
-                      </Typography>
-                    )
-                  }
-                </TableBody>
-              </Table>
-            </Typography>
-          </Box>
+          <MemberList memberList={memberByProjectId} projectId={projectId}/>
         </Modal>
         <Modal
           open={openModalAddUser}

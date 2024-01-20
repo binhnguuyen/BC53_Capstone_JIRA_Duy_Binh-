@@ -1,11 +1,8 @@
 import React, { useState } from 'react'
-import { Accordion, AccordionDetails, AccordionSummary, Autocomplete, Box, Button, Card, CardActions, CardContent, CardHeader, CardMedia, Collapse, Container, Divider, FormControl, MenuItem, Modal, Select, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, InputLabel, Slider, Tooltip } from '@mui/material'
-import { blue } from '@mui/material/colors'
-import { green } from '@mui/material/colors'
-import { red } from '@mui/material/colors'
+import { Accordion, AccordionDetails, AccordionSummary, Autocomplete, Box, Button, Card, CardContent, CardHeader, CardMedia, Collapse, Container, Divider, FormControl, MenuItem, Modal, Select, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, InputLabel, Slider, Tooltip } from '@mui/material'
+import { blue, red, green } from '@mui/material/colors';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getProjectDetail } from '../../../apis/project.api';
-import { getUser, getUserByProjectId } from '../../../apis/user.api';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getAllStatus } from '../../../apis/status.api';
 import Avatar from '@mui/material/Avatar';
@@ -27,7 +24,7 @@ import { PATH } from '../../../utils/paths';
 import { useDispatch, useSelector } from 'react-redux';
 import { getTaskType } from '../../../apis/taskType.api';
 import { getAllPriority } from '../../../apis/priority.api';
-import { printValue } from 'yup';
+import MemberList from '../../../components/MemberList'
 
 
 // Thư viện Swal
@@ -68,9 +65,6 @@ const ExpandMore = styled((props) => {
     duration: theme.transitions.duration.shortest,
   }),
 }));
-
-
-
 
 
 const Project = () => {
@@ -157,20 +151,12 @@ const Project = () => {
   });
 
 
-  // Hàm getUser để lấy dữ liệu user về
-  // const { data: foundMember, isLoading: searchingMember } = useQuery({
-  //   queryKey: ["userByProjectId", projectId],
-  //   queryFn: getUserByProjectId(projectId),
-  // });
-
-
   // Hàm getTaskDetail để lấy dữ liệu task về theo id
   const { data: taskDetail, isLoadingTaskDetail, refetch: refetchTaskDetail } = useQuery({
     queryKey: ["taskId", taskId],
     queryFn: () => getTaskDetail(taskId),
     enabled: !!taskId,
   });
-  // console.log('taskDetail: ', taskDetail);
 
 
   // Hàm GET taskType
@@ -259,40 +245,7 @@ const Project = () => {
   });
 
 
-  // Hàm removeUserFromTask để xoá user ra khỏi task
-  const { mutate: handleRemoveUserFromTask, isPending: isRemovingUserTask } = useMutation({
-    mutationFn: (payload) => removeUserFromTask(payload),
-    onSuccess: () => {
-      handleClose();
-      MySwal.fire({
-        icon: "success",
-        title: "Bạn đã xoá thành viên ra khỏi công việc thành công",
-        text: "Bạn muốn xoá thêm thành viên khác?",
-        // showCancelButton: true,
-        confirmButtonText: "Đồng ý"
-      }).then((result) => {
-        if (result.isConfirmed) {
-          handleClose();
-          refetchTaskDetail();
-          queryClient.invalidateQueries({ queryKey: ["projectIdToShow"] });
-        }
-        else {
-          handleClose();
-          refetchTaskDetail();
-        }
-      })
-    },
-    onError: (error) => {
-      MySwal.fire({
-        icon: "error",
-        title: error.content,
-        text: "Bạn đã gặp lỗi",
-        // showCancelButton: true,
-        confirmButtonText: "Đồng ý",
-        // denyButtonText: "Không chấp nhận"
-      })
-    }
-  });
+
 
 
   // Hàm removeTask xoá task ra khỏi project
@@ -424,28 +377,7 @@ const Project = () => {
   }
 
 
-  // Hàm set User để xoá khỏi Task
-  const handleSetRemoveUserTask = (value) => {
-    if (value && taskId) {
-      handleClose();
-      MySwal.fire({
-        icon: "question",
-        title: "Bạn có chắc muốn gỡ thành viên ra khỏi công việc",
-        showCancelButton: true,
-        confirmButtonText: "Đồng ý"
-      }).then((result) => {
-        if (result.isConfirmed) {
-          handleRemoveUserFromTask({
-            userId: value,
-            taskId: taskId,
-          });
-        }
-        else {
-          // do nothing
-        }
-      })
-    }
-  }
+
 
   // Hàm set taskID để remove ra khỏi project
   const handleTaskIdToRemove = (value) => {
@@ -554,7 +486,6 @@ const Project = () => {
   }
 
 
-  console.log('projectDetail: ', projectDetail);
   return (
     <div style={{ display: "flex", justifyContent: "center", alignContent: "center" }}>
       <Container style={{ maxWidth: "80vw" }} sx={{ margin: "60px 60px", padding: "24px", boxShadow: "0px 1px 10px 0px rgba(0,0,0,0.12)" }}>
@@ -799,104 +730,7 @@ const Project = () => {
             aria-labelledby="modal-list-member"
             aria-describedby="modal-list-member-description"
           >
-            <Box sx={style}>
-              <Typography id="modal-list-member" variant="h5" color={`${blue[500]}`} gutterBottom>
-                Danh sách thành viên
-              </Typography>
-              <Typography id="modal-list-member-description" gutterBottom>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell
-                        align="left"
-                        {...typographySettings}
-                      >
-                        Id
-                      </TableCell>
-                      <TableCell
-                        align="left"
-                        {...typographySettings}
-                      >
-                        Avatar
-                      </TableCell>
-                      <TableCell
-                        align="left"
-                        {...typographySettings}
-                      >
-                        Tên
-                      </TableCell>
-                      <TableCell
-                        align="left"
-                        {...typographySettings}
-                      >
-                        Xoá
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {
-                      taskDetail !== undefined ? (
-                        taskDetail.assigness.map((item, index) => (
-                          <TableRow key={index}>
-                            <TableCell
-                              align="left"
-                            >
-                              <Typography
-                                {...typographySettings}
-                              >
-                                {item.id}
-                              </Typography>
-                            </TableCell>
-                            <TableCell
-                              align="left"
-                            >
-                              <IconButton
-                                size="small"
-                                sx={{ fontSize: "16px" }}
-                              >
-                                <img src={item.avatar} alt={item.name} style={{ width: "30px", height: "30px", border: `1px ${blue[500]} solid` }} />
-                              </IconButton>
-                            </TableCell>
-                            <TableCell
-                              align="left"
-                            >
-                              <Typography
-                                {...typographySettings}
-                              >
-                                {item.name}
-                              </Typography>
-                            </TableCell>
-                            <TableCell
-                              align="left"
-                            >
-                              <IconButton
-                                variant="contained"
-                                color="primary"
-                                size="small"
-                                title="Loại thành viên"
-                                sx={{
-                                  border: `1px ${red[500]} solid`,
-                                  marginLeft: "10px",
-                                }}
-                                onClick={() => {
-                                  handleSetRemoveUserTask(item.id);
-                                }}
-                              >
-                                <DeleteIcon />
-                              </IconButton>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      ) : (
-                        <Typography {...typographySettings} color={"error"}>
-                          Chưa có thành viên
-                        </Typography>
-                      )
-                    }
-                  </TableBody>
-                </Table>
-              </Typography>
-            </Box>
+            <MemberList memberList={taskDetail?.assigness} taskId={taskDetail?.taskId} />
           </Modal>
           <Modal
             open={openModalAddUser}
