@@ -73,6 +73,12 @@ const Task = () => {
     const [searchMemberResult, setSearchMemberResult] = useState("");
     const [timeTracking, setTimeTracking] = useState("");
 
+    const { currentUser } = useSelector(state => state.user);
+    // nếu có currentUser thì đá sang trang HOME
+    if (!currentUser) {
+        navigate(PATH.LOGIN);
+    }
+
 
     // Xử lý formValue (raw data lấy từ form)
     const [formValue, setFormValue] = useState({

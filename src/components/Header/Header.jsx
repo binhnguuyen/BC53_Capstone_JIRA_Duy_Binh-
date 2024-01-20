@@ -135,12 +135,13 @@ export default function Header(props) {
                     // disablePadding
                     sx={{ display: { lg: 'block', xl: 'none' } }}
                 >
-                    <ListItemButton sx={{ textAlign: 'center', display: { md: 'none' } }}
-                        onClick={() => navigate(PATH.CREATETASK)}>
+                    <ListItemButton sx={{ textAlign: 'center', display: { md: 'none' } }}>
                         <ListItemText primary="Công việc" />
                         <KeyboardArrowDownIcon />
                     </ListItemButton>
-                    <ListItemButton sx={{ textAlign: 'center', display: { md: 'none' } }} onClick={() => navigate(PATH.PROJECTMANAGEMENT)}>
+                    <ListItemButton sx={{ textAlign: 'center', display: { md: 'none' } }}
+                        onClick={() => navigate(PATH.PROJECTMANAGEMENT)}
+                    >
                         <ListItemText primary="Dự án" />
                         <KeyboardArrowDownIcon />
                     </ListItemButton>
@@ -208,7 +209,6 @@ export default function Header(props) {
                             <IconButton
                                 component="div"
                                 sx={{ fontSize: 18, flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'flex' }, textAlign: "center", alignItems: "center" }}
-                                onClick={() => navigate(PATH.CREATETASK)}
                             >
                                 Công việc
                                 <KeyboardArrowDownIcon />

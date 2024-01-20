@@ -84,9 +84,25 @@ const ProjectManagement = () => {
     userId: "",
   });
 
-
   // thư viện SweetAlert
   const MySwal = withReactContent(Swal);
+
+  // nếu người dùng chưa đăng nhập thì hướng về trang login
+  const { currentUser } = useSelector(state => state.user);
+  if (!currentUser) {
+    MySwal.fire({
+      icon: "success",
+      title: "Bạn chưa đăng nhập",
+      text: "Quay lại trang đăng nhập",
+      confirmButtonText: "Đồng ý"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        navigate(PATH.LOGIN);
+      }
+    })
+  }
+
+
 
 
   // CSS
@@ -611,7 +627,7 @@ const ProjectManagement = () => {
           aria-labelledby="modal-list-member"
           aria-describedby="modal-list-member-description"
         >
-          <MemberList memberList={memberByProjectId} projectId={projectId}/>
+          <MemberList memberList={memberByProjectId} projectId={projectId} />
         </Modal>
         <Modal
           open={openModalAddUser}

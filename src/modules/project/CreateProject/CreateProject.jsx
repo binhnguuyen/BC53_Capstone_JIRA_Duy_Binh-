@@ -2,7 +2,7 @@ import { Box, Button, Container, FormControl, FormControlLabel, FormHelperText, 
 import { blue } from '@mui/material/colors'
 import { green } from '@mui/material/colors'
 import { LoadingButton } from "@mui/lab";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
 
@@ -42,6 +42,21 @@ const CreateProject = () => {
 
     // thư viện SweetAlert
     const MySwal = withReactContent(Swal);
+
+    // nếu người dùng chưa đăng nhập thì hướng về trang login
+    const { currentUser } = useSelector(state => state.user);
+    if (!currentUser) {
+        MySwal.fire({
+            icon: "success",
+            title: "Bạn chưa đăng nhập",
+            text: "Quay lại trang đăng nhập",
+            confirmButtonText: "Đồng ý"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                navigate(PATH.LOGIN);
+            }
+        })
+    }
 
 
     // CSS
