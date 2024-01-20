@@ -78,7 +78,7 @@ const MemberList = ({ memberList, taskId, projectId }) => {
             projectList = projectListData;
         }
     }
-    if (allProject.length > 0) {
+    if (allProject?.length > 0) {
         handleChangeData();
     }
 
