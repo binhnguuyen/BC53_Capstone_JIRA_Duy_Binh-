@@ -62,7 +62,7 @@ const Login = () => {
             setLocalStorage(CURRENT_USER, values);
             dispatch(userAction.setCurrentUser(values));
             // navigate to page home
-            navigate(`${PATH.HOME}`);
+            navigate(PATH.PROJECTMANAGEMENT);
         },
         onError: (error) => {
             MySwal.fire({
