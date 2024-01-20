@@ -916,7 +916,8 @@ const Task = () => {
                                             sx={{ fontSize: "14px", border: `1px ${red[500]} solid` }}
                                             // loading={}
                                             onClick={() => {
-                                                navigate(`${PATH.PROJECT}/${projectId}`)
+                                                setFormValueToEdit("");
+                                                navigate(`${PATH.PROJECT}/${taskDetailToEdit.projectId}`)
                                             }}
                                         >
                                             Huỷ
@@ -934,17 +935,32 @@ const Task = () => {
                                         </LoadingButton>
                                     </Box>
                                 ) : (
-                                    <LoadingButton
-                                        variant="contained"
-                                        color="success"
-                                        size="large"
-                                        sx={{ fontSize: "14px", border: `1px ${green[500]} solid`, marginLeft: 3 }}
-                                        // type="submit"
-                                        onClick={handleSubmitButton}
-                                        loading={isEditing}
-                                    >
-                                        Sửa
-                                    </LoadingButton>
+                                    <Box>
+                                        <Button
+                                            variant="outlined"
+                                            size="large"
+                                            color='error'
+                                            sx={{ fontSize: "14px", border: `1px ${red[500]} solid` }}
+                                            // loading={}
+                                            onClick={() => {
+                                                setFormValueToEdit("");
+                                                navigate(`${PATH.PROJECT}/${taskDetailToEdit.projectId}`)
+                                            }}
+                                        >
+                                            Huỷ
+                                        </Button>
+                                        <LoadingButton
+                                            variant="contained"
+                                            color="success"
+                                            size="large"
+                                            sx={{ fontSize: "14px", border: `1px ${green[500]} solid`, marginLeft: 3 }}
+                                            // type="submit"
+                                            onClick={handleSubmitButton}
+                                            loading={isEditing}
+                                        >
+                                            Sửa
+                                        </LoadingButton>
+                                    </Box>
                                 )
                             }
                         </Box>

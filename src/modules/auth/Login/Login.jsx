@@ -22,8 +22,18 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useState } from "react";
 import { CURRENT_USER } from "../../../utils/constants";
 import { setLocalStorage } from "../../../utils/helpers";
+import { userAction } from "../../../redux/slices/user.slice";
+import { useDispatch } from "react-redux";
+
+// Thư viện Swal
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 
 const Login = () => {
+    // thư viện SweetAlert
+    const MySwal = withReactContent(Swal);
+
+
     const {
         register,
         handleSubmit,
@@ -37,14 +47,20 @@ const Login = () => {
     });
 
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const { mutate: handleSignin, isPending } = useMutation({
         mutationFn: (payload) => loginApi(payload),
         onSuccess: (values) => {
-            alert("Đăng nhập thành công!");
+            MySwal.fire({
+                icon: "sucess",
+                title: "Đăng nhập thành công",
+                confirmButtonText: "Đồng ý",
+            })
             // save user's information to local storage (using values)
             // save sau khi login POST thành công lên API để có Access Token
             setLocalStorage(CURRENT_USER, values);
+            dispatch(userAction.setCurrentUser(values));
             // navigate to page home
             navigate(`${PATH.HOME}`);
         },
@@ -52,16 +68,13 @@ const Login = () => {
             MySwal.fire({
                 icon: "error",
                 title: error.content,
-                text: "Bạn đã gặp lỗi",
-                // showCancelButton: true,
+                text: "Đăng nhập lỗi",
                 confirmButtonText: "Đồng ý",
-                // denyButtonText: "Không chấp nhận"
             })
         }
     });
 
     const onSubmit = async (values) => {
-
         // call api
         handleSignin(values);
     };
