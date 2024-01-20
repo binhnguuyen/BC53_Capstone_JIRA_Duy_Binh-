@@ -1,8 +1,6 @@
 import React, { useState } from 'react'
 import { Accordion, AccordionDetails, AccordionSummary, Autocomplete, Box, Button, Card, CardContent, CardHeader, CardMedia, Collapse, Container, Divider, FormControl, MenuItem, Modal, Select, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, InputLabel, Slider, Tooltip } from '@mui/material'
-import { blue } from '@mui/material/colors'
-import { green } from '@mui/material/colors'
-import { red } from '@mui/material/colors'
+import { blue, red, green } from '@mui/material/colors';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getProjectDetail } from '../../../apis/project.api';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -732,7 +730,7 @@ const Project = () => {
             aria-labelledby="modal-list-member"
             aria-describedby="modal-list-member-description"
           >
-            <MemberList data={taskDetail} />
+            <MemberList memberList={taskDetail?.assigness} taskId={taskDetail?.taskId} />
           </Modal>
           <Modal
             open={openModalAddUser}

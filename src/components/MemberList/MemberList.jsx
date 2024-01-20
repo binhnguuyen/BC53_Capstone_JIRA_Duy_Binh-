@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Box, IconButton, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
-import { blue, red } from '@mui/material/colors';
+import { blue, red, green } from '@mui/material/colors';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { getTaskDetail, removeUserFromTask } from '../../apis/task.api';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -27,11 +27,14 @@ const style = {
     maxHeight: "80vh",
     bgcolor: 'background.paper',
     border: `1px ${blue[500]} solid`,
+    
     boxShadow: 24,
     p: 4,
 };
 
-const MemberList = ({ data: taskDetail }) => {
+const MemberList = ({ memberList, taskId }) => {
+    console.log('taskId: ', taskId);
+    console.log('memberList: ', memberList);
 
 
     // thư viện SweetAlert
@@ -40,9 +43,9 @@ const MemberList = ({ data: taskDetail }) => {
 
     // Hàm getTaskDetail để lấy dữ liệu task về theo id
     const { data, isLoadingTaskDetail, refetch: refetchTaskDetail } = useQuery({
-        queryKey: ["taskId", taskDetail.taskId],
-        queryFn: () => getTaskDetail(taskDetail.taskId),
-        enabled: !!taskDetail,
+        queryKey: ["taskId", taskId],
+        queryFn: () => getTaskDetail(taskId),
+        enabled: !!taskId,
     });
 
 
@@ -81,7 +84,7 @@ const MemberList = ({ data: taskDetail }) => {
 
     // Hàm set User để xoá khỏi Task
     const handleSetRemoveUserTask = (value) => {
-        if (value && taskDetail.taskId) {
+        if (value && taskId) {
             MySwal.fire({
                 icon: "question",
                 title: "Bạn có chắc muốn gỡ thành viên ra khỏi công việc",
@@ -91,7 +94,7 @@ const MemberList = ({ data: taskDetail }) => {
                 if (result.isConfirmed) {
                     handleRemoveUserFromTask({
                         userId: value,
-                        taskId: taskDetail.taskId,
+                        taskId: taskId,
                     });
                 }
                 else {
@@ -141,8 +144,8 @@ const MemberList = ({ data: taskDetail }) => {
                         </TableHead>
                         <TableBody>
                             {
-                                taskDetail !== undefined ? (
-                                    taskDetail.assigness.map((item, index) => (
+                                memberList !== undefined ? (
+                                    memberList.map((item, index) => (
                                         <TableRow key={index}>
                                             <TableCell
                                                 align="left"
@@ -150,7 +153,7 @@ const MemberList = ({ data: taskDetail }) => {
                                                 <Typography
                                                     {...typographySettings}
                                                 >
-                                                    {item.id}
+                                                    {item.id}{item.userId}
                                                 </Typography>
                                             </TableCell>
                                             <TableCell
