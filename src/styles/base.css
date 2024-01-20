@@ -60,3 +60,7 @@ body {
 .MuiAccordionSummary-content {
   margin: 0px !important;
 }
+
+.swal2-container {
+  z-index: 1301; /* Đặt giá trị z-index cao hơn so với cụm từ chung */
+}
