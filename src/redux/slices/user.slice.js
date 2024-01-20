@@ -27,5 +27,10 @@ const userSlice = createSlice({
 });
 
 // set tên action là setCurrentUser
-export const { setCurrentUser } = userSlice.actions;
+// export const { setCurrentUser } = userSlice.actions;
+// export default userSlice;
+
 export default userSlice;
+
+// ↓ đây là cách hay làm
+export const { reducer: userReducer, actions: userAction } = userSlice

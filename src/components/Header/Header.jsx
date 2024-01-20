@@ -18,7 +18,14 @@ import { Button, Container, Divider, Drawer, List, ListItem, ListItemButton, Lis
 import { blue } from '@mui/material/colors';
 import { useNavigate } from 'react-router';
 import { PATH } from "../../utils/paths/index"
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { userAction } from '../../redux/slices/user.slice';
+import { setLocalStorage } from '../../utils/helpers';
+import { CURRENT_USER } from '../../utils/constants';
+
+// Thư viện Swal
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -76,7 +83,11 @@ const Item = styled(Paper)(({ theme }) => ({
 const drawerWidth = 350;
 
 export default function Header(props) {
+    // thư viện SweetAlert
+    const MySwal = withReactContent(Swal);
+
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const { currentUser } = useSelector(state => state.user);
 
 
@@ -94,6 +105,24 @@ export default function Header(props) {
     const handleDrawerToggle = () => {
         setMobileOpen((prevState) => !prevState);
     };
+
+    const handleLogout = () => {
+        MySwal.fire({
+            icon: "question",
+            title: "Bạn chắc muốn đăng xuất?",
+            showCancelButton: true,
+            confirmButtonText: "Đồng ý"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                dispatch(userAction.setCurrentUser(null));
+                localStorage.clear(CURRENT_USER);
+                navigate(PATH.HOME);
+            }
+            else {
+                // do nothing
+            }
+        })
+    }
 
     const drawer = (
         <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
@@ -154,7 +183,10 @@ export default function Header(props) {
                     }}
                 >
                     <Stack {...stackSettings}>
-                        <Item sx={{ textAlign: "center", alignItems: "center" }}>
+                        <Stack
+                            direction="row"
+                            sx={{ textAlign: "center", alignItems: "center" }}
+                        >
                             <IconButton
                                 sx={{ flexGrow: 1, display: { xl: 'none' } }}
                                 size="medium"
@@ -168,14 +200,14 @@ export default function Header(props) {
                             </IconButton>
                             <IconButton
                                 component="div"
-                                sx={{ flexGrow: 1, fontSize: 24, color: `${blue[600]}`, fontWeight: 700, display: { sm: 'block' } }}
+                                sx={{ flexGrow: 1, fontSize: 24, color: `${blue[600]}`, fontWeight: 700, display: { sm: 'flex' } }}
                                 onClick={() => navigate(PATH.HOME)}
                             >
                                 Jira Software
                             </IconButton>
                             <IconButton
                                 component="div"
-                                sx={{ fontSize: 18, flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'block' } }}
+                                sx={{ fontSize: 18, flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'flex' }, textAlign: "center", alignItems: "center" }}
                                 onClick={() => navigate(PATH.CREATETASK)}
                             >
                                 Công việc
@@ -183,7 +215,7 @@ export default function Header(props) {
                             </IconButton>
                             <IconButton
                                 component="div"
-                                sx={{ fontSize: 18, flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'block' } }}
+                                sx={{ fontSize: 18, flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'flex' }, textAlign: "center", alignItems: "center" }}
                                 onClick={() => navigate(PATH.PROJECTMANAGEMENT)}
                             >
                                 Dự án
@@ -191,34 +223,34 @@ export default function Header(props) {
                             </IconButton>
                             <IconButton
                                 component="div"
-                                sx={{ fontSize: 18, flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'none', lg: 'block' } }}
+                                sx={{ fontSize: 18, flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'none', lg: 'flex' }, textAlign: "center", alignItems: "center" }}
                             >
                                 Bộ lọc
                                 <KeyboardArrowDownIcon />
                             </IconButton>
                             <IconButton
-                                sx={{ fontSize: 18, flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'none', lg: 'block' } }}
+                                sx={{ fontSize: 18, flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'none', lg: 'flex' }, textAlign: "center", alignItems: "center" }}
                                 component="div"
                             >
                                 Tổng quan
                                 <KeyboardArrowDownIcon />
                             </IconButton>
                             <IconButton
-                                sx={{ fontSize: 18, flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'none', lg: 'none', xl: 'block' } }}
+                                sx={{ fontSize: 18, flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'none', lg: 'none', xl: 'flex' }, textAlign: "center", alignItems: "center" }}
                                 component="div"
                             >
                                 Nhóm
                                 <KeyboardArrowDownIcon />
                             </IconButton>
                             <IconButton
-                                sx={{ fontSize: 18, flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'none', lg: 'none', xl: 'block' } }}
+                                sx={{ fontSize: 18, flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'none', lg: 'none', xl: 'flex' }, textAlign: "center", alignItems: "center" }}
                                 component="div"
                             >
                                 Kế hoạch
                                 <KeyboardArrowDownIcon />
                             </IconButton>
                             <IconButton
-                                sx={{ fontSize: 18, flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'none', lg: 'none', xl: 'block' } }}
+                                sx={{ fontSize: 18, flexGrow: 1, display: { xs: 'none', sm: 'none', md: 'none', lg: 'none', xl: 'flex' }, textAlign: "center", alignItems: "center" }}
                                 component="div"
                             >
                                 Ứng dụng
@@ -229,20 +261,21 @@ export default function Header(props) {
                                 size="small"
                                 sx={{
                                     height: 40,
-                                    marginLeft: 10,
+                                    // minWidth: 40,
+                                    ml: 1,
                                 }}
                                 onClick={() => navigate(PATH.CREATEPROJECT)}
                             >
                                 Tạo dự án
                             </Button>
-                        </Item>
-                        <Item sx={{ textAlign: "center", alignItems: "center" }}>
+                        </Stack>
+                        <Stack direction="row" sx={{ textAlign: "center", alignItems: "center" }}>
                             <Search
                                 style={{
                                     border: "1px solid #6B778C",
-                                    width: "12vw",
+                                    width: "8vw",
                                     height: 40,
-                                    marginRight: 10,
+                                    marginRight: 2,
                                 }}
                             >
                                 <SearchIconWrapper>
@@ -289,8 +322,12 @@ export default function Header(props) {
                                         <AccountCircleIcon />
                                     </IconButton>
                                     <Button
-                                        size="large"
                                         variant="contained"
+                                        size="small"
+                                        sx={{
+                                            height: 40,
+                                            marginLeft: 1,
+                                        }}
                                         onClick={() => {
                                             handleLogout();
                                             // đăng xuất rồi thì đá qua trang HOME
@@ -301,16 +338,28 @@ export default function Header(props) {
                                 </Stack>
                             ) : (
                                 <Stack spacing={2} direction={"row"}>
-                                    <Button variant="outlined" onClick={() => navigate(PATH.REGISTER)}>
+                                    <Button
+                                        sx={{
+                                            height: 40,
+                                            marginLeft: 1,
+                                        }}
+                                        variant="outlined"
+                                        onClick={() => navigate(PATH.REGISTER)}>
                                         ĐĂng ký
                                     </Button>
-                                    <Button variant="contained" onClick={() => navigate(PATH.LOGIN)}>
+                                    <Button
+                                        sx={{
+                                            height: 40,
+                                            // marginLeft: 1,
+                                        }}
+                                        variant="contained"
+                                        onClick={() => navigate(PATH.LOGIN)}>
                                         Đăng nhập
                                     </Button>
                                 </Stack>
                             )}
 
-                        </Item>
+                        </Stack>
                     </Stack>
                 </Toolbar>
             </AppBar>
